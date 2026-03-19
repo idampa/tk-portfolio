@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>삼성SDI 투자 공부 노트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e3a5f;
+    --accent: #0ea5e9;
+    --accent2: #38bdf8;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 14px;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 50%, #0a0e1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.5px;
+  }
+
+  .header .date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    background: var(--surface);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  /* Nav */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    position: sticky;
+    top: 68px;
+    z-index: 90;
+    overflow: hidden;
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text2);
+    padding: 12px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover, .nav-btn:active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+  /* Main */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    overflow-x: hidden;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 60px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .main { padding: 16px; }
+    .nav { padding: 0 8px; }
+    .header { padding: 16px; }
+    .header h1 { font-size: 16px; }
+    .code-block { font-size: 11px; }
+    .section-title { font-size: 18px; }
+  }
+
+  /* Table */
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  
+  table.wide {
+    min-width: 600px;
+  }
+
+  th {
+    background: var(--surface2);
+    color: var(--text2);
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  
+  @media (max-width: 480px) {
+    th { font-size: 11px; padding: 8px 10px; }
+    td { font-size: 12px; padding: 8px 10px; }
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(30, 58, 95, 0.5);
+    color: var(--text);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  
+  td.nowrap { white-space: nowrap; }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(14, 165, 233, 0.03); }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.3); }
+  .badge-blue { background: rgba(14, 165, 233, 0.15); color: var(--accent2); border: 1px solid rgba(14, 165, 233, 0.3); }
+  .badge-purple { background: rgba(167, 139, 250, 0.15); color: var(--purple); border: 1px solid rgba(167, 139, 250, 0.3); }
+
+  /* Definition boxes */
+  .def-box {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+
+  .def-term {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .def-desc {
+    color: var(--text2);
+    font-size: 13px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+
+  .timeline-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .timeline-text {
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* Comparison */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .compare-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .compare-label {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .compare-value {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Key insight box */
+  .insight {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(56, 189, 248, 0.04) 100%);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .insight-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .insight-text {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Warning box */
+  .warning {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+
+  .warning-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: #fcd34d;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Code-like */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #7dd3fc;
+    line-height: 1.8;
+    margin: 12px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: pre;
+    max-width: 100%;
+  }
+
+  .code-block .comment { color: var(--text3); }
+  .code-block .highlight { color: var(--green); }
+  .code-block .danger { color: var(--red); }
+  .code-block .warn { color: var(--gold); }
+
+  /* Progress bars */
+  .progress-bar {
+    background: var(--surface2);
+    border-radius: 4px;
+    height: 8px;
+    margin: 4px 0;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  /* Tag */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--text2);
+    margin: 2px;
+  }
+
+  p { color: var(--text2); font-size: 13px; line-height: 1.7; margin-bottom: 8px; word-break: keep-all; overflow-wrap: break-word; }
+  ul { padding-left: 20px; }
+  li { color: var(--text2); font-size: 13px; margin-bottom: 6px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+  strong { color: var(--text); font-weight: 600; }
+
+  .highlight-text { color: var(--accent2); font-weight: 600; }
+  .green-text { color: var(--green); }
+  .red-text { color: var(--red); }
+  .gold-text { color: var(--gold); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>📚 삼성SDI 투자 공부 노트</h1>
+    <span class="date">2026.03.19 작성</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn" onclick="document.getElementById('financials').scrollIntoView({behavior:'smooth'})">① 실적·재무</button>
+    <button class="nav-btn" onclick="document.getElementById('ess').scrollIntoView({behavior:'smooth'})">② ESS 시장</button>
+    <button class="nav-btn" onclick="document.getElementById('competitors').scrollIntoView({behavior:'smooth'})">③ 경쟁사 비교</button>
+    <button class="nav-btn" onclick="document.getElementById('solidstate').scrollIntoView({behavior:'smooth'})">④ 전고체·미래</button>
+    <button class="nav-btn" onclick="document.getElementById('investment').scrollIntoView({behavior:'smooth'})">⑤ 투자 프레임</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- ① 실적·재무 -->
+  <section class="section" id="financials">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">삼성SDI 실적 & 재무</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-title">사업 구조 — 매출의 95%가 배터리</div>
+      <div class="code-block">
+<span class="comment">// 사업 부문별 매출 비중</span>
+① EV 배터리 (전기차용)    <span class="warn">~60%</span>  ← 지금 적자 주범
+② ESS 배터리              <span class="highlight">~25%</span>  ← 성장 중
+③ 소형 배터리 (IT기기용)  <span class="comment">~15%</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">2025년 실적 — 역대 최악</div>
+        <div class="table-wrap"><table>
+          <tr><th>항목</th><th>수치</th></tr>
+          <tr><td>매출</td><td>13조 2,667억원</td></tr>
+          <tr><td>영업손실</td><td class="red-text">-1조 7,224억원</td></tr>
+          <tr><td>손실 원인</td><td class="wrap">EV 캐즘 + 중국 공세 + 공장 고정비</td></tr>
+          <tr><td>4분기 추세</td><td class="green-text">ESS로 손실 절반으로 축소</td></tr>
+        </table></div>
+        <div class="warning" style="margin-top: 12px;">
+          <div class="warning-label">⚠ 왜 적자났나</div>
+          <div class="warning-text">① 전기차 캐즘 → BMW·스텔란티스 발주 급감<br>② CATL 저가 공세 → 유럽 점유율 하락<br>③ 미국 합작공장 가동률 50% 이하 → 고정비 적자 전환</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2026년 컨센서스</div>
+        <div class="table-wrap"><table>
+          <tr><th>항목</th><th>전망</th></tr>
+          <tr><td>매출</td><td>15조 6,159억원 (+18%)</td></tr>
+          <tr><td>영업이익</td><td class="green-text">+2,360억원 (흑자전환)</td></tr>
+          <tr><td>하반기 목표</td><td>분기 흑자전환</td></tr>
+          <tr><td>핵심 드라이버</td><td>ESS 매출 +50% 성장</td></tr>
+        </table></div>
+        <div class="insight" style="margin-top: 12px;">
+          <div class="insight-label">🎯 핵심 트리거</div>
+          <div class="insight-text">4/23 1분기 실적발표 → ESS 흑자전환 확인 시 주가 재평가</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">글로벌 생산기지 현황</div>
+      <div class="table-wrap"><table class="wide">
+        <tr><th>지역</th><th>공장</th><th>주요 제품</th><th>중요도</th></tr>
+        <tr><td>🇰🇷 울산</td><td>국내 중대형 배터리</td><td>EV·ESS NCA</td><td><span class="badge badge-green">ESS 핵심</span></td></tr>
+        <tr><td>🇺🇸 인디애나 (스텔란티스 1공장)</td><td>33GWh</td><td>EV→ESS LFP 전환 중</td><td><span class="badge badge-blue">최우선</span></td></tr>
+        <tr><td>🇺🇸 인디애나 (스텔란티스 2공장)</td><td>34GWh</td><td class="wrap">설비 미확정·건물 공사</td><td><span class="badge badge-yellow">리스크</span></td></tr>
+        <tr><td>🇺🇸 인디애나 (GM 합작)</td><td>27→36GWh</td><td>ESS 전환 검토</td><td><span class="badge badge-yellow">2027년</span></td></tr>
+        <tr><td>🇭🇺 헝가리</td><td>30→60GWh 증설</td><td class="wrap">각형 EV (BMW·현대차)</td><td><span class="badge badge-blue">유럽 거점</span></td></tr>
+        <tr><td>🇲🇾 말레이시아</td><td>소형 원통형</td><td>IT기기·전동공구</td><td><span class="badge badge-purple">2공장 증설</span></td></tr>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AMPC 세액공제 — 미국 현지 생산의 핵심 혜택</div>
+      <p>미국 IRA 법안에 따라 미국 내 배터리 생산분에 kWh당 세액공제 지급. 삼성SDI 인디애나 공장이 ESS LFP 라인으로 전환 완료되면 본격 수령.</p>
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="compare-item">
+          <div class="compare-label">2025년</div>
+          <div class="compare-value"><span class="highlight-text">2,369억원</span></div>
+        </div>
+        <div class="compare-item">
+          <div class="compare-label">2026년</div>
+          <div class="compare-value"><span class="highlight-text">5,499억원</span></div>
+        </div>
+        <div class="compare-item">
+          <div class="compare-label">2027년</div>
+          <div class="compare-value"><span class="highlight-text">1조 1,144억원</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② ESS 시장 -->
+  <section class="section" id="ess">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">ESS 시장 — 단어 정의부터 구조까지</h2>
+    </div>
+
+    <!-- 핵심 단어 정의 -->
+    <div class="card">
+      <div class="card-title">핵심 단어 정의</div>
+
+      <div class="def-box">
+        <div class="def-term">ESS (Energy Storage System)</div>
+        <div class="def-desc">에너지 저장 장치. 전기를 저장했다가 필요할 때 꺼내 쓰는 시스템. 큰 배터리 덩어리라고 보면 됨. 용도별로 전력망용·데이터센터용·상업용·가정용으로 나뉨.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">Grid-scale ESS (전력망용 ESS)</div>
+        <div class="def-desc">태양광·풍력 발전소 옆에 컨테이너 크기로 설치. 낮에 만든 전기를 저장했다가 저녁 피크타임에 전력망으로 내보냄. 삼성SDI SBB, 테슬라 Megapack이 이 시장.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">UPS / BBU (데이터센터용)</div>
+        <div class="def-desc">무정전 전원장치(UPS)·배터리 백업 유닛(BBU). 정전 시 0.01초 안에 서버를 배터리로 전환. 소용량·초고속 반응이 핵심. 슈나이더·버티브 등이 장악한 별도 시장.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">SBB (Samsung Battery Box)</div>
+        <div class="def-desc">삼성SDI의 일체형 ESS 완제품 솔루션. 20피트 컨테이너에 배터리·열관리·화재안전·AI 모니터링(SBI)까지 다 넣은 턴키 솔루션. 설치하면 바로 작동. LFP 탑재 버전이 SBB 2.0.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">LFP (리튬인산철)</div>
+        <div class="def-desc">리튬·인·철을 쓰는 양극재. NCA 대비 에너지밀도 30~40% 낮지만 가격 20~30% 저렴, 화재 위험 낮음, 수명 3,000~8,000사이클. ESS에 최적. CATL이 원조. 삼성SDI는 2026년 울산 마더라인 양산 시작.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">NCA (니켈·코발트·알루미늄)</div>
+        <div class="def-desc">삼성SDI 원래 주력 양극재. 에너지밀도 높아 EV에 최적. 단 비싸고 화재 위험 있음. ESS에 쓸 때 별도 화재억제기술(EDI) 필요. 울산에서 현재 ESS용 NCA 생산 중.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">AMPC</div>
+        <div class="def-desc">첨단제조생산세액공제. 미국 IRA에 따라 미국 내 배터리 생산분에 kWh당 세금 감면 혜택 지급. 중국산 배제 효과 + 삼성SDI 수익성 개선의 핵심 레버.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">마더라인 (Mother Line)</div>
+        <div class="def-desc">파일럿 라인보다 크고 본격 양산 라인보다 작은 중간 단계 생산라인. 양산 가능성 검증하고 향후 대규모 증설의 기반이 됨. 삼성SDI 울산 LFP 마더라인이 2026년 가동 시작.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">ESS 중앙계약시장</div>
+        <div class="def-desc">한국 전력거래소가 운영하는 정부 주도 ESS 입찰 시장. 발전사업자 컨소시엄이 입찰하고 배터리 회사가 뒤에서 영업. 15년 장기계약. 2038년까지 23GW, 총 20조원 규모.</div>
+      </div>
+    </div>
+
+    <!-- ESS 시장 구조 -->
+    <div class="card">
+      <div class="card-title">태균님이 물어봤던 핵심 질문들</div>
+
+      <div class="insight">
+        <div class="insight-label">Q. EV 배터리 셀이랑 ESS 배터리 셀이 같아?</div>
+        <div class="insight-text">기본 원리는 같지만 요구 스펙이 완전히 다름. EV는 에너지밀도·소형화 우선 → NCA. ESS는 안전성·수명·가격 우선 → LFP. 같은 공장에서 소재 변경 + 설비 일부 교체로 전환 가능.</div>
+      </div>
+
+      <div class="insight">
+        <div class="insight-label">Q. 데이터센터 ESS도 Grid-scale ESS랑 같은 거야?</div>
+        <div class="insight-text">데이터센터에는 두 종류가 필요. ① 건물 외부 Grid-scale ESS (재생에너지 저장, SBB가 공략하는 시장) + ② 내부 UPS/BBU (정전 대비, 슈나이더·버티브가 장악). 삼성SDI는 ①번에 강점, ②번은 U8A1으로 진입 초기.</div>
+      </div>
+
+      <div class="insight">
+        <div class="insight-label">Q. SBB는 국내에서 만드는데 왜 2차 입찰에서 국산화 점수 밀렸어?</div>
+        <div class="insight-text">SBB 셀 자체(NCA)는 울산 국내 생산이라 1차에서 점수 받음. 2차에서 게임 룰이 LFP 유리하게 바뀌었는데, 삼성SDI의 LFP 소재 국산화가 아직 미흡. SK온은 국내산 LFP 양극재(엘앤에프) 조달해서 역전.</div>
+      </div>
+
+      <div class="insight">
+        <div class="insight-label">Q. 국내 민간 데이터센터엔 SDI가 유리하지 않아?</div>
+        <div class="insight-text">SBB 완제품 솔루션이 있어서 구조적으로 유리. 단 LFP 파이프라인 없으면 앙꼬없는 찐빵. 2026년 하반기 울산 LFP 마더라인 완성되면 완전한 경쟁력 갖춰짐. 지금은 과도기.</div>
+      </div>
+    </div>
+
+    <!-- ESS 시장 규모 -->
+    <div class="card">
+      <div class="card-title">북미 ESS 시장 구조 & 삼성SDI 가용 파이</div>
+      <div class="code-block">
+<span class="comment">// 2024년 북미 ESS 수요 78GWh 분해</span>
+테슬라 Megapack        <span class="warn">31GWh (39%)</span>  ← LGE 납품, SDI 진입 불가
+중국산 (CATL·BYD)     <span class="danger">37GWh (47%)</span>  ← 규제로 빠지는 파이
+K-배터리 + 기타        <span class="highlight">10GWh (13%)</span>  ← 현재 우리 파이
+
+<span class="comment">// 중국산 규제 이후 (2026년~)</span>
+테슬라 Megapack        <span class="warn">유지</span>
+K-배터리 공략 가능     <span class="highlight">최대 37GWh+</span>  ← 삼성SDI + LGE 분할
+
+<span class="comment">// 2030년 북미 전망</span>
+글로벌 ESS             748GWh
+북미 비중              ~21%
+K-배터리 점유율        20~35% 목표
+      </div>
+    </div>
+
+    <!-- 국내 ESS 경쟁 구도 -->
+    <div class="card">
+      <div class="card-title">국내 ESS 중앙계약시장 입찰 경쟁</div>
+      <div class="table-wrap"><table class="wide">
+        <tr><th>구분</th><th>1차 (2025.7)</th><th>2차 (2026.2)</th><th>누적</th><th>강점</th></tr>
+        <tr>
+          <td><strong>삼성SDI</strong></td>
+          <td><span class="badge badge-green">76%</span></td>
+          <td><span class="badge badge-yellow">35.7%</span></td>
+          <td><span class="badge badge-green">56%</span></td>
+          <td class="wrap">SBB 완제품·안전성 레퍼런스</td>
+        </tr>
+        <tr>
+          <td><strong>SK온</strong></td>
+          <td><span class="badge badge-red">0%</span></td>
+          <td><span class="badge badge-green">50.3%</span></td>
+          <td><span class="badge badge-yellow">25%</span></td>
+          <td class="wrap">LFP 국내생산·소재 국산화</td>
+        </tr>
+        <tr>
+          <td><strong>LG에너지솔루션</strong></td>
+          <td><span class="badge badge-yellow">24%</span></td>
+          <td><span class="badge badge-red">14%</span></td>
+          <td><span class="badge badge-yellow">19%</span></td>
+          <td class="wrap">북미 집중, 국내 취약</td>
+        </tr>
+      </table></div>
+      <div class="warning" style="margin-top: 12px;">
+        <div class="warning-label">2차 역전 원인</div>
+        <div class="warning-text">평가 룰이 가격:비가격 = 60:40 → 50:50으로 변경. 국내생산·소재국산화 배점 상승 → SK온의 LFP 국산화 전략이 맞아떨어짐.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 경쟁사 비교 -->
+  <section class="section" id="competitors">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">경쟁사 비교</h2>
+    </div>
+
+    <!-- CATL -->
+    <div class="card">
+      <div class="card-title">CATL — 왜 무서운가</div>
+      <div class="grid-2">
+        <div>
+          <p><strong>글로벌 EV 배터리 점유율</strong></p>
+          <div style="margin: 12px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-size:12px; color: var(--text2);">CATL</span><span style="font-size:12px; color: var(--red);">39.2%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 39.2%; background: linear-gradient(90deg, #ef4444, #f87171);"></div></div>
+          </div>
+          <div style="margin: 12px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-size:12px; color: var(--text2);">LG에너지솔루션</span><span style="font-size:12px; color: var(--gold);">9.2%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 9.2%; background: linear-gradient(90deg, #f59e0b, #fcd34d);"></div></div>
+          </div>
+          <div style="margin: 12px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-size:12px; color: var(--text2);">삼성SDI</span><span style="font-size:12px; color: var(--accent);">2.4%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 2.4%;"></div></div>
+          </div>
+        </div>
+        <div>
+          <p style="margin-bottom: 8px;"><strong>CATL이 싼 3가지 이유</strong></p>
+          <ul>
+            <li><strong>원자재 수직계열화</strong> — 리튬·코발트 광산 직접 투자. 시세보다 싸게 조달</li>
+            <li><strong>규모의 경제</strong> — 삼성SDI 대비 16배 생산량. 단위 원가 완전히 다른 수준</li>
+            <li><strong>중국 정부 보조금</strong> — 부지·전기·금융 이자 지원. 삼성SDI는 해당 없음</li>
+          </ul>
+          <div class="insight" style="margin-top: 12px;">
+            <div class="insight-label">역설적 구조</div>
+            <div class="insight-text">중국 규제가 강해질수록 삼성SDI 각형 LFP 포지션 가치 상승. CATL이 무서울수록 삼성SDI 투자 thesis가 강해짐.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3사 비교 -->
+    <div class="card">
+      <div class="card-title">K-배터리 3사 ESS 전략 비교</div>
+      <div class="table-wrap"><table class="wide">
+        <tr><th>항목</th><th>삼성SDI</th><th>LG에너지솔루션</th><th>SK온</th></tr>
+        <tr>
+          <td>셀 형태</td>
+          <td><span class="badge badge-blue">각형 (비중국 유일)</span></td>
+          <td>파우치·원통형</td>
+          <td>파우치형</td>
+        </tr>
+        <tr>
+          <td>ESS 전략</td>
+          <td><span class="badge badge-green">SBB 완제품</span></td>
+          <td>셀 공급 + 버텍(SI)</td>
+          <td>셀 공급</td>
+        </tr>
+        <tr>
+          <td>테슬라 관계</td>
+          <td>납품 없음</td>
+          <td><span class="badge badge-green">Megapack 6조 계약</span></td>
+          <td>납품 없음</td>
+        </tr>
+        <tr>
+          <td>북미 캐파 목표</td>
+          <td>30GWh (2026년 말)</td>
+          <td><span class="badge badge-green">50GWh (2026년 말)</span></td>
+          <td>소규모</td>
+        </tr>
+        <tr>
+          <td>국내 ESS 강점</td>
+          <td><span class="badge badge-green">압도적 1위(56%)</span></td>
+          <td>19%</td>
+          <td>25% (2차 역전)</td>
+        </tr>
+        <tr>
+          <td>전고체 로드맵</td>
+          <td><span class="badge badge-blue">2027년 하반기</span></td>
+          <td>2029~2030년</td>
+          <td>2028~2029년</td>
+        </tr>
+      </table></div>
+    </div>
+
+    <!-- 지역별 우위 -->
+    <div class="card">
+      <div class="card-title">지역별 Grid-scale ESS 우위</div>
+      <div class="grid-2">
+        <div class="compare-item">
+          <div class="compare-label">🇺🇸 북미 — LG에너지솔루션 우위</div>
+          <div class="compare-value">
+            먼저 LFP 양산 시작. 테슬라 파트너. 북미 5개 거점. 누적 수주 140GWh. 다만 파이가 빠르게 커서 삼성SDI도 충분한 파이 존재.
+          </div>
+        </div>
+        <div class="compare-item">
+          <div class="compare-label">🇰🇷 국내 — 삼성SDI 우위</div>
+          <div class="compare-value">
+            SBB 완제품 강점. 중앙계약 누적 56% 1위. 민간 데이터센터도 완제품 솔루션 선호. 단 SK온이 2차에서 역전하며 추격 중.
+          </div>
+        </div>
+      </div>
+      <div class="insight" style="margin-top: 16px;">
+        <div class="insight-label">태균님이 발견한 핵심</div>
+        <div class="insight-text">LGE는 셀 공급 → 테슬라가 Megapack 완제품 제조. SDI는 SBB 완제품 직접 판매. 국내 데이터센터는 완제품을 사고 싶어하기 때문에 SDI 구조적 유리. LGE는 국내에 버텍 같은 SI 파트너 없음.</div>
+      </div>
+    </div>
+
+    <!-- 한화솔루션 -->
+    <div class="card">
+      <div class="card-title">한화솔루션 — ESS 직접 수혜주 아님</div>
+      <p>핵심 사업은 태양광 모듈(한화큐셀). ESS 직접 생산 안 함. 태양광이 늘면 ESS 수요도 늘어나는 <strong>간접 수혜주</strong>. 미국 EPC 프로젝트에서 SI 역할로 LGE 셀을 사다 설치하는 방식.</p>
+      <div class="warning" style="margin-top: 12px;">
+        <div class="warning-label">현재 상황</div>
+        <div class="warning-text">2025년 영업손실 3,533억원. 태양광 모듈 중국 경쟁·케미칼 공급과잉 동시 적자. ESS 테마 타기 전에 본업 적자 문제가 먼저. 이전에 보유했다가 손절한 이유 있음.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 전고체·미래 -->
+  <section class="section" id="solidstate">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">전고체 배터리 & 휴머노이드 미래</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-title">전고체 배터리란?</div>
+
+      <div class="def-box">
+        <div class="def-term">전고체 배터리 (All-Solid-State Battery)</div>
+        <div class="def-desc">현재 리튬이온 배터리의 액체 전해질을 고체로 바꾼 배터리. 불에 타지 않아 화재 위험 근본 제거. 에너지밀도 40~50% 향상 (주행거리 700~1000km). 수명 3~5배. 40년 된 기술인데 아직 상용화 안 된 이유는 고체-고체 계면 저항·덴드라이트 문제·원가 문제.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">무음극(Anode-free) 기술 — 삼성SDI 독자 기술</div>
+        <div class="def-desc">일반 전고체는 음극에 흑연·리튬 금속을 씀. 삼성SDI는 음극 재료를 아예 없애버림. 충전 시 음극 집전체 표면에 리튬이 자연 형성. 덴드라이트 문제 감소 + 음극 재료비 절감 + 에너지밀도 추가 향상.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">황화물계 고체 전해질</div>
+        <div class="def-desc">전고체 3대 유형(황화물·산화물·폴리머) 중 이온 전도도 가장 높아 성능 우수. 단 수분에 닿으면 독성 황화수소 발생 → 드라이룸 환경 필수 → 제조 원가 수 배. 삼성SDI·도요타가 채택한 방식. 솔리드파워가 핵심 소재 공급.</div>
+      </div>
+
+      <div class="def-box">
+        <div class="def-term">솔리드스택 (SolidStack)</div>
+        <div class="def-desc">삼성SDI 전고체 배터리 제품명. 2026년 인터배터리에서 처음 공개. 파우치형으로 휴머노이드 로봇 적용 먼저 추진.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">전고체 소재 공급망 — 진짜 병목</div>
+      <div class="code-block">
+<span class="comment">// 전고체 배터리 = 3가지 소재 필요</span>
+① 양극재    <span class="highlight">✅ 에코프로·엘앤에프 공급 가능</span>
+② 음극재    <span class="highlight">✅ 삼성SDI 무음극 기술 (자체)</span>
+③ 고체 전해질  <span class="danger">⚠️ 진짜 병목</span>
+
+<span class="comment">// 고체 전해질 현재 공급 현황</span>
+솔리드파워 (미국)   → 30톤 → 75톤 (2025년 말) → 한국 500톤 (2028년)
+이수스페셜티케미컬   → 황화리튬 40톤 → 150톤 (2026년)
+에코프로비엠         → 고체전해질 파일럿 40톤
+롯데에너지머티리얼즈  → 파일럿 70톤
+
+<span class="warn">⚠ 문제: SDI 2027년 양산 목표 but 솔리드파워 한국 공장 2028년 완성</span>
+<span class="warn">⚠ 지금 원가: 액체 전해질 대비 50~60배 비쌈 → 양산 후 10~20배로 낮출 수 있음</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">삼성SDI 전고체 로드맵</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">2023년</div>
+          <div class="timeline-text">수원 파일럿 라인(S-Line) 준공 — 세계 최대 규모</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024~2026년</div>
+          <div class="timeline-text">A·B·C 샘플 완성차 업체에 제공. BMW·솔리드파워와 3자 협약 체결</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2026년</div>
+          <div class="timeline-text">울산 마더라인 구축 완료. 인터배터리에서 솔리드스택 샘플 최초 공개</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2027년 하반기 ⭐</div>
+          <div class="timeline-text"><strong>본격 양산 시작</strong> — 1차 타겟: 휴머노이드 로봇 (파우치형) + BMW 시범 차량 탑재</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2030년 이후</div>
+          <div class="timeline-text">EV 대중화 적용. 소재 공급망 확충으로 원가 10~20배 수준으로 하락.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 휴머노이드 -->
+    <div class="card">
+      <div class="card-title">휴머노이드 로봇 — 태균님이 발견한 핵심 논리</div>
+
+      <div class="compare-grid">
+        <div class="compare-item">
+          <div class="compare-label">전기차</div>
+          <div class="compare-value">
+            지금 리튬이온으로도 운영 가능 (500km 주행)<br>
+            전고체 = <strong>"더 좋으면 좋겠다"</strong> (업그레이드)
+          </div>
+        </div>
+        <div class="compare-item">
+          <div class="compare-label">휴머노이드 로봇</div>
+          <div class="compare-value">
+            지금 배터리로는 2~4시간 한계<br>
+            공장 투입 불가능 (하루 8시간 필요)<br>
+            전고체 = <strong>"없으면 상용화 자체 안 됨"</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight" style="margin-top: 16px;">
+        <div class="insight-label">🔑 핵심 인사이트</div>
+        <div class="insight-text">전고체 배터리의 첫 번째 킬러앱은 전기차가 아니라 휴머노이드 로봇. 로봇은 비싸도 팔림 (로봇 한 대 수천만 원). 전고체 원가 비싸도 비중 낮음. 로봇에서 양산 경험·수율 올린 후 → 전기차로 확장하는 전략.</div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <p style="margin-bottom: 12px; color: var(--text2);">현재 휴머노이드 배터리 현황</p>
+        <div class="table-wrap"><table>
+          <tr><th>구분</th><th>현재 (리튬이온)</th><th>미래 (전고체)</th></tr>
+          <tr><td>배터리 종류</td><td>원통형 NCA/NCM</td><td>파우치형 전고체</td></tr>
+          <tr><td>구동 시간</td><td class="red-text">2~4시간</td><td class="green-text">8시간</td></tr>
+          <tr><td>SDI 상황</td><td>다수 글로벌 로봇 업체 납품 중</td><td>2027년 솔리드스택 공급 목표</td></tr>
+          <tr><td>시장 전망</td><td colspan="2">2030년 휴머노이드 100만 대, 전고체 배터리 수요 2035년 74GWh (2026년 대비 1,000배)</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- 전고체 경쟁 구도 -->
+    <div class="card">
+      <div class="card-title">전고체 글로벌 경쟁 구도</div>
+      <div class="table-wrap"><table class="wide">
+        <tr><th>회사</th><th>기술 방식</th><th>양산 목표</th><th>현황</th></tr>
+        <tr><td><strong>삼성SDI</strong></td><td>황화물계 + 무음극</td><td><span class="badge badge-blue">2027년 하반기</span></td><td>특허 1,000건, 솔리드파워·BMW 3자 협약</td></tr>
+        <tr><td>도요타</td><td>황화물계</td><td>2027~2028년</td><td>이데미츠고산과 소재 협력</td></tr>
+        <tr><td>CATL</td><td>황화물계</td><td>2027년 소량</td><td>R&D 인력 1,000명 이상 추가</td></tr>
+        <tr><td>LG에너지솔루션</td><td>고분자(2026) + 황화물(2030)</td><td>2029~2030년</td><td>삼성SDI 대비 2년 후발</td></tr>
+        <tr><td>SK온</td><td>황화물계</td><td>2028~2029년</td><td>솔리드파워 파일럿 라인 협력</td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ⑤ 투자 프레임 -->
+  <section class="section" id="investment">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">삼성SDI 투자 종합 프레임</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-title">단기·중기·장기 투자 thesis</div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">단기 (2026년) — ESS 흑자전환</div>
+          <div class="timeline-text">
+            4/23 실적발표 트리거. ESS 매출 전년 대비 +50%. AMPC 수령 증가. SBB 국내 데이터센터 수주. 하반기 분기 흑자전환 목표.
+            <br><strong>진입 타겟: 350,000~380,000원</strong>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">중기 (2027~2029년) — 전고체 솔리드스택 양산</div>
+          <div class="timeline-text">
+            1차 타겟: 휴머노이드 로봇. 경쟁사 대비 2년 앞선 로드맵. 국내 LFP 마더라인 완성으로 ESS 경쟁력 강화. BMW 시범 차량 탑재.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">장기 (2030년 이후) — 차세대 플랫폼 독점</div>
+          <div class="timeline-text">
+            전고체 EV 대중화. 휴머노이드 100만 대 시대. 비중국 유일 각형 LFP + 전고체 이중 포트폴리오. 증권사 목표주가 530,000~600,000원.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">핵심 리스크</div>
+        <ul>
+          <li><strong>고체 전해질 소재 공급망 병목</strong> — 솔리드파워 한국 공장 2028년 완성, 2027년 양산 일정과 타임라인 불일치</li>
+          <li><strong>LFP 전환 과도기 경쟁</strong> — SK온이 국산화로 역전. 3차 입찰 룰 변화가 변수</li>
+          <li><strong>2공장 고정비 리스크</strong> — 스텔란티스 합작 2공장 설비 미확정 상태에서 2027년 가동 목표</li>
+          <li><strong>EV 캐즘 지속</strong> — BMW·스텔란티스 발주 회복 지연 시 고정비 부담 심화</li>
+          <li><strong>AMPC 불확실성</strong> — 트럼프 행정부 IRA 세액공제 축소 가능성</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">4/23 실적발표 체크리스트</div>
+        <ul>
+          <li>ESS 매출·영업이익 흑자전환 여부</li>
+          <li>북미 LFP 라인 전환 진행률 및 수주 파이프라인</li>
+          <li>울산 LFP 마더라인 양산 시작 여부</li>
+          <li>AMPC 수령액 규모 (5,499억원 달성 여부)</li>
+          <li>전고체 솔리드스택 고객사 협의 현황</li>
+          <li>삼성디스플레이 지분 매각 진행 상황</li>
+          <li>국내 ESS 3차 중앙계약시장 전략 발표</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">오늘 공부에서 태균님이 직접 발견한 인사이트들</div>
+      <div class="insight">
+        <div class="insight-label">🔑 인사이트 1</div>
+        <div class="insight-text">SBB 플랫폼이 있어도 LFP 파이프라인이 없으면 앙꼬없는 찐빵. 완제품 경쟁력과 소재 공급망은 별개의 문제.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-label">🔑 인사이트 2</div>
+        <div class="insight-text">국내 데이터센터 ESS는 LGE가 셀만 파는 구조라 완제품 SBB를 가진 SDI가 구조적 유리. 단 SK온이 생각보다 강한 경쟁자.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-label">🔑 인사이트 3</div>
+        <div class="insight-text">전고체의 첫 킬러앱은 EV가 아닌 휴머노이드. EV는 지금 배터리로도 되지만 공장 투입 휴머노이드는 전고체 없으면 상용화 자체가 안 됨.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-label">🔑 인사이트 4</div>
+        <div class="insight-text">전고체는 기술 개발과 양산 스케일이 별개 문제. 연구소에서 만드는 것과 수만 톤 양산하는 것 사이의 격차가 존재. 소재 공급망이 진짜 병목.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-label">🔑 인사이트 5</div>
+        <div class="insight-text">CATL 공세 → EV에서 치명적, ESS 미국 시장에서는 오히려 SDI에 유리. 중국 규제가 강해질수록 비중국 유일 각형 LFP 포지션 가치 상승.</div>
+      </div>
+    </div>
+
+    <!-- 관련 용어 정리 -->
+    <div class="card">
+      <div class="card-title">기타 용어 정리</div>
+      <div class="grid-2">
+        <div>
+          <div class="def-box">
+            <div class="def-term">EV 캐즘 (Chasm)</div>
+            <div class="def-desc">전기차 시장 일시적 수요 정체. 얼리어답터 이후 대중 확산 전 성장 둔화 구간. 미국 EV 보조금 폐지·유럽 규제 완화와 맞물려 심화.</div>
+          </div>
+          <div class="def-box">
+            <div class="def-term">드라이룸 (Dry Room)</div>
+            <div class="def-desc">황화물계 전고체 전해질 제조에 필요한 초저습도 환경. 수분에 독성 가스 발생하기 때문. 기존 리튬이온 공장보다 설비 비용 수 배 이상.</div>
+          </div>
+          <div class="def-box">
+            <div class="def-term">덴드라이트 (Dendrite)</div>
+            <div class="def-desc">충방전 반복 시 음극에서 리튬 결정이 나뭇가지처럼 자라는 현상. 고체 전해질을 뚫고 단락 일으킴. 전고체 배터리의 대표적 기술 난제.</div>
+          </div>
+        </div>
+        <div>
+          <div class="def-box">
+            <div class="def-term">SI (시스템 통합, System Integration)</div>
+            <div class="def-desc">배터리 셀을 사서 ESS 완제품으로 조립·설치·납품하는 역할. LGE 북미 자회사 버텍이 이 역할. 국내에서 SDI는 SBB로 직접 SI 역할 담당.</div>
+          </div>
+          <div class="def-box">
+            <div class="def-term">탭리스 (Tabless) 구조</div>
+            <div class="def-desc">배터리 내부 전극 탭을 없애고 전체 면적으로 전류가 흐르게 하는 구조. 저항 감소 → 고출력. 로봇 순간 전력 부하에 적합. SDI 원통형 배터리에 적용.</div>
+          </div>
+          <div class="def-box">
+            <div class="def-term">FEOC (Foreign Entity of Concern)</div>
+            <div class="def-desc">미국이 지정한 우려 외국 기업. CATL·BYD 등 중국 배터리 업체 포함. FEOC 제품 사용 시 IRA 세액공제 수령 불가. SDI 북미 생산의 핵심 경쟁 우위.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
