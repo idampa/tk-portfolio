@@ -209,9 +209,6 @@ canvas{display:block;}
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <div class="s-label" style="margin:0">현금 비중</div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span class="pending-badge"><span class="pending-dot"></span>테크윙 58,300 지정가 대기중</span>
-      </div>
     </div>
     <div class="cash-bar"><div class="cash-bar-fill" id="cash-bar-fill"></div></div>
     <div class="cash-bar-labels">
@@ -656,18 +653,18 @@ canvas{display:block;}
     </div>
     <div class="watch-item" style="border:none;">
       <div class="watch-left">
-        <div class="watch-name">테크윙 (70주 + 지정가 40주 대기)</div>
-        <div class="watch-sub">58,300원 지정가 40주 체결 대기 중</div>
-        <div class="watch-cond">체결시 평단 62,900원 · 목표 90,000원</div>
+        <div class="watch-name">테크윙 (110주 · 추매 체결완료)</div>
+        <div class="watch-sub">58,300원 × 40주 오늘 체결 / 평단 62,791원</div>
+        <div class="watch-cond">목표 90,000원 (+43%) · PO 공시 시 트리거</div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="s-label">지정가 대기 현황</div>
-    <div class="sum-row"><span class="sum-key">테크윙 추매</span><span class="sum-val" style="color:var(--gold)">58,300원 × 40주</span></div>
-    <div class="sum-row"><span class="sum-key">예상 소요금액</span><span class="sum-val">2,332,000원</span></div>
-    <div class="sum-row"><span class="sum-key">체결 후 평단</span><span class="sum-val">약 62,900원</span></div>
+    <div class="s-label">오늘 체결 완료</div>
+    <div class="sum-row"><span class="sum-key">테크윙 추매</span><span class="sum-val up">58,300원 × 40주 ✅</span></div>
+    <div class="sum-row"><span class="sum-key">체결 금액</span><span class="sum-val">2,332,000원</span></div>
+    <div class="sum-row"><span class="sum-key">체결 후 평단</span><span class="sum-val">62,791원 (110주)</span></div>
     <div class="sum-row"><span class="sum-key">목표가 (컨센)</span><span class="sum-val up">90,000원 (+43%)</span></div>
   </div>
 </div>
@@ -705,11 +702,11 @@ canvas{display:block;}
 // ── 포트폴리오 데이터 ──
 const HOLDINGS = {
   kiwoom: [
-    {id:'SKH', name:'SK하이닉스',        qty:26, avg:668367},
-    {id:'HWA', name:'한화에어로스페이스', qty:5,  avg:1220000},
-    {id:'TWI', name:'테크윙',             qty:70, avg:65471},
-    {id:'ISC', name:'ISC',               qty:9,  avg:176300},
-    {id:'APR', name:'에이피알',           qty:39, avg:289654},
+    {id:'SKH', name:'SK하이닉스',        qty:26,  avg:668367},
+    {id:'HWA', name:'한화에어로스페이스', qty:5,   avg:1220000},
+    {id:'TWI', name:'테크윙',             qty:110, avg:62791},
+    {id:'ISC', name:'ISC',               qty:9,   avg:176300},
+    {id:'APR', name:'에이피알',           qty:39,  avg:289654},
   ],
   toss: [
     {id:'DSE', name:'두산에너빌리티',    qty:42, avg:100442},
@@ -717,12 +714,12 @@ const HOLDINGS = {
   ]
 };
 
-// 현재가 (오늘 09:42 기준)
+// 현재가 (2026.03.19 장마감 기준)
 let PRICES = {
-  SKH:1007000, HWA:1366000, TWI:58900, ISC:227000, APR:363000,
-  DSE:105900,  MIA:67500
+  SKH:1012000, HWA:1367000, TWI:58500, ISC:240500, APR:369500,
+  DSE:106200,  MIA:66800
 };
-let CASH = { kiwoom:19096504, toss:3930000 };
+let CASH = { kiwoom:16764504, toss:3930000 };
 
 // 히스토리 데이터
 const HISTORY = [
@@ -730,7 +727,7 @@ const HISTORY = [
   {date:'03/11', total:7800, cashPct:27, pnl:{SKH:44,HWA:12,TWI:-3,ISC:10,APR:18}},
   {date:'03/13', total:8100, cashPct:26, pnl:{SKH:37,HWA:20,TWI:-4,ISC:3,APR:16}},
   {date:'03/18', total:8721, cashPct:26, pnl:{SKH:58,HWA:14,TWI:-6,ISC:30,APR:25}},
-  {date:'03/19', total:0,    cashPct:0,  pnl:{SKH:0, HWA:0, TWI:0, ISC:0, APR:0}}, // live
+  {date:'03/19', total:8600, cashPct:24, pnl:{SKH:51,HWA:12,TWI:-7,ISC:36,APR:27}},
 ];
 
 // ── 유틸 ──
