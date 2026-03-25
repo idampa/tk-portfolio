@@ -432,7 +432,7 @@ canvas{display:block;}
           <div class="watch-name">두산에너빌리티 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">42주</span></div>
           <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.25);">장기홀딩</span>
         </div>
-        <div class="watch-sub">-1.4% 보유 중 · 8~9월까지 장기 보유 기조</div>
+        <div class="watch-sub">+2.7% 보유 중 · 8~9월까지 장기 보유 기조</div>
       </div>
     </div>
     <div style="display:flex;align-items:flex-start;padding:10px 0;">
@@ -442,8 +442,8 @@ canvas{display:block;}
           <div class="watch-name">테크윙 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">110주</span></div>
           <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,185,56,0.1);color:var(--gold);border:1px solid rgba(255,185,56,0.25);">모니터링</span>
         </div>
-        <div class="watch-sub">평단 62,791원 · 손절가 50,000원 ← 3/23 재조정</div>
-        <div class="watch-cond">목표 90,000원 (+43%) · 3/23 실적발표</div>
+        <div class="watch-sub">평단 62,791원 · 손절가 50,000원</div>
+        <div class="watch-cond">목표 90,000원 (+43%)</div>
       </div>
     </div>
   </div>
@@ -538,11 +538,9 @@ canvas{display:block;}
 
 <script>
 // ════════════════════════════════════════
-// ★ 3/23 장마감 기준 업데이트
-// - SKH: 30주 / 평단 703,918원 (940,000원 2주 추가체결)
-// - 전 종목 현재가 3/23 장마감 기준
-// - HISTORY: 3/23 데이터 추가
-// - 테크윙 손절가 50,000원으로 재조정
+// ★ 3/25 장마감 기준 업데이트
+// - 전 종목 현재가 3/25 장마감 기준
+// - HISTORY: 03/24, 03/25 데이터 추가
 // ════════════════════════════════════════
 const HOLDINGS={
   kiwoom:[
@@ -558,11 +556,11 @@ const HOLDINGS={
   ]
 };
 
-// 3/23 장마감 현재가
-let PRICES={SKH:933000,HWA:1242000,TWI:53900,ISC:230500,APR:321500,DSE:99000,MIA:60300};
-// 전일(3/20) 종가
-let PRICES_PREV={SKH:1011000,HWA:1312000,TWI:58000,ISC:247000,APR:362000,DSE:110000,MIA:67700};
-let CASH={kiwoom:16764504,toss:3930000};
+// 3/25 장마감 현재가
+let PRICES={SKH:1004000,HWA:1394000,TWI:54500,ISC:251500,APR:329500,DSE:103200,MIA:67000};
+// 전일(3/24) 종가
+let PRICES_PREV={SKH:987000,HWA:1323000,TWI:53300,ISC:239500,APR:333500,DSE:100900,MIA:61900};
+let CASH={kiwoom:13000000,toss:4000000};
 
 const HISTORY=[
   {date:'03/05',total:7200,cashPct:28,pnl:{SKH:30,HWA:8,TWI:-2,ISC:5,APR:12}},
@@ -574,6 +572,8 @@ const HISTORY=[
   {date:'03/19',total:8600,cashPct:24,pnl:{SKH:51,HWA:12,TWI:-7,ISC:36,APR:27}},
   {date:'03/20',total:8630,cashPct:24,pnl:{SKH:52,HWA:7,TWI:-7,ISC:37,APR:26}},
   {date:'03/23',total:8320,cashPct:26,pnl:{SKH:32,HWA:2,TWI:-14,ISC:30,APR:11}},
+  {date:'03/24',total:8560,cashPct:20,pnl:{SKH:40,HWA:8,TWI:-15,ISC:36,APR:15}},
+  {date:'03/25',total:8688,cashPct:20,pnl:{SKH:43,HWA:14,TWI:-13,ISC:43,APR:14}},
 ];
 
 const fmt=n=>Math.round(n).toLocaleString('ko-KR');
@@ -658,15 +658,15 @@ function renderCharts(){
   chartInstances['cashChart']=new Chart(cc,{type:'line',data:{labels,datasets:[{label:'현금비중',data:hist.map(h=>h.cashPct),borderColor:'#00f5b4',backgroundColor:cGrad,fill:true,tension:0.4,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#00f5b4',pointBorderColor:'#0b1020',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:700},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(7,10,23,0.95)',borderColor:'rgba(0,245,180,0.3)',borderWidth:1,titleColor:'#9aafd4',bodyColor:'#dde6ff',bodyFont:{family:'JetBrains Mono',size:11}}},scales:{x:{ticks:{color:'#6a80aa',font:{size:9}},grid:{color:'rgba(79,143,255,0.06)'},border:{color:'rgba(79,143,255,0.15)'}},y:{min:10,max:40,ticks:{color:'#6a80aa',font:{size:9},callback:v=>v+'%',stepSize:10},grid:{color:'rgba(79,143,255,0.08)'},border:{color:'rgba(79,143,255,0.15)'}}}}});
 }
 
-// ★ 시뮬 기본값 - 3/23 기준
+// ★ 시뮬 기본값 - 3/25 기준
 const SIM_DEFAULTS={
-  SKH:{qty:30,avg:703918,cur:933000,budget:5000000,target:1100000,reinvest:880000,stop:850000,final:1500000},
-  HWA:{qty:5,avg:1220000,cur:1242000,budget:5000000,target:1500000,reinvest:1200000,stop:1100000,final:1800000},
-  TWI:{qty:110,avg:62791,cur:53900,budget:2000000,target:75000,reinvest:50000,stop:50000,final:90000},
-  ISC:{qty:9,avg:176300,cur:230500,budget:3000000,target:260000,reinvest:210000,stop:165000,final:300000},
-  APR:{qty:39,avg:289654,cur:321500,budget:5000000,target:380000,reinvest:290000,stop:265000,final:420000},
-  DSE:{qty:42,avg:100442,cur:99000,budget:3000000,target:120000,reinvest:95000,stop:85000,final:140000},
-  MIA:{qty:65,avg:71927,cur:60300,budget:3000000,target:75000,reinvest:58000,stop:55000,final:85000},
+  SKH:{qty:30,avg:703918,cur:1004000,budget:5000000,target:1100000,reinvest:950000,stop:850000,final:1500000},
+  HWA:{qty:5,avg:1220000,cur:1394000,budget:5000000,target:1500000,reinvest:1300000,stop:1100000,final:1800000},
+  TWI:{qty:110,avg:62791,cur:54500,budget:2000000,target:75000,reinvest:50000,stop:50000,final:90000},
+  ISC:{qty:9,avg:176300,cur:251500,budget:3000000,target:275000,reinvest:230000,stop:165000,final:320000},
+  APR:{qty:39,avg:289654,cur:329500,budget:5000000,target:380000,reinvest:295000,stop:265000,final:420000},
+  DSE:{qty:42,avg:100442,cur:103200,budget:3000000,target:120000,reinvest:98000,stop:85000,final:140000},
+  MIA:{qty:65,avg:71927,cur:67000,budget:3000000,target:75000,reinvest:63000,stop:55000,final:85000},
 };
 let activeTab='A';
 function switchTab(t){activeTab=t;['A','B','C'].forEach(x=>{document.getElementById('sc-'+x).style.display=x===t?'block':'none';document.getElementById('tab-'+x).classList.toggle('active',x===t);});}
