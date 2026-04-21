@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>크래프톤 스터디 노트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --border: #252a38;
+    --accent: #4f8ef7;
+    --accent2: #7c5cbf;
+    --green: #3ecf8e;
+    --red: #f76f6f;
+    --yellow: #f7c94f;
+    --text: #e2e8f0;
+    --text2: #8892a4;
+    --text3: #5a6478;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0d1520 0%, #0d0f14 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .title-area h1 {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .title-area h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .updated-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 10px;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+  }
+
+  /* Summary cards */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .s-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+  }
+
+  .s-card-label {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .s-card-value {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 1px;
+    color: #fff;
+  }
+
+  .s-card-value.green { color: var(--green); }
+  .s-card-value.yellow { color: var(--yellow); }
+  .s-card-value.red { color: var(--red); }
+  .s-card-value.blue { color: var(--accent); }
+
+  /* Main layout */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Section */
+  .section {
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Card */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* Badge */
+  .badge {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .badge-green { background: rgba(62,207,142,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(247,201,79,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(247,111,111,0.15); color: var(--red); }
+  .badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .badge-purple { background: rgba(124,92,191,0.15); color: var(--accent2); }
+  .badge-gray { background: rgba(90,100,120,0.2); color: var(--text3); }
+
+  /* Table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .data-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(37,42,56,0.5);
+    vertical-align: top;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Info rows */
+  .info-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(37,42,56,0.5);
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    font-size: 11px;
+    color: var(--text3);
+    min-width: 100px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .info-value {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    padding: 0 0 14px 16px;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg);
+  }
+
+  .tl-item.done::before { background: var(--green); }
+  .tl-item.active::before { background: var(--accent); }
+  .tl-item.pending::before { background: var(--text3); }
+  .tl-item.risk::before { background: var(--red); }
+
+  .tl-date {
+    font-size: 10px;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tl-content {
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 2px;
+  }
+
+  .tl-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* Risk meter */
+  .risk-bar {
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .risk-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .callout-green { border-color: var(--green); background: rgba(62,207,142,0.05); color: var(--text2); }
+  .callout-yellow { border-color: var(--yellow); background: rgba(247,201,79,0.05); color: var(--text2); }
+  .callout-red { border-color: var(--red); background: rgba(247,111,111,0.05); color: var(--text2); }
+  .callout-blue { border-color: var(--accent); background: rgba(79,142,247,0.05); color: var(--text2); }
+
+  .callout strong { color: var(--text); }
+
+  /* Tag cloud */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  /* Grid 2col */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Mono text */
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
+  }
+
+  /* Update note */
+  .update-note {
+    background: rgba(79,142,247,0.06);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  .update-note strong { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .summary-row { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    .tabs { flex-wrap: wrap; }
+    .tab { flex: none; width: calc(50% - 2px); }
+    .header { padding: 20px 16px 16px; }
+    .main { padding: 16px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="title-area">
+        <h1>크래프톤 <span>(259960)</span> 스터디 노트</h1>
+        <div class="subtitle">STUDY NOTE v0.1 — 초안 | 태균</div>
+      </div>
+      <div class="updated-badge">2026.04.21 초안</div>
+    </div>
+
+    <div class="summary-row">
+      <div class="s-card">
+        <div class="s-card-label">투자 성격</div>
+        <div class="s-card-value blue">장기 옵션</div>
+      </div>
+      <div class="s-card">
+        <div class="s-card-label">진입 타이밍</div>
+        <div class="s-card-value yellow">5월 이후 검토</div>
+      </div>
+      <div class="s-card">
+        <div class="s-card-label">밸류에이션</div>
+        <div class="s-card-value green">PER 11배</div>
+      </div>
+      <div class="s-card">
+        <div class="s-card-label">핵심 리스크</div>
+        <div class="s-card-value red">경영진 신뢰도</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview')">개요</button>
+    <button class="tab" onclick="showTab('india')">인도 사업</button>
+    <button class="tab" onclick="showTab('games')">신작 파이프라인</button>
+    <button class="tab" onclick="showTab('ai')">AI 전략</button>
+    <button class="tab" onclick="showTab('risk')">리스크</button>
+    <button class="tab" onclick="showTab('checklist')">모니터링</button>
+  </div>
+
+  <!-- 개요 탭 -->
+  <div class="tab-content active" id="tab-overview">
+
+    <div class="update-note">
+      <strong>📌 초안 노트</strong> — 오늘(4/21) 대화 기반 초안입니다. 실적 발표 후 업데이트 예정.
+    </div>
+
+    <div class="section">
+      <div class="section-title">Investment Thesis</div>
+      <div class="card">
+        <div class="callout callout-blue">
+          <strong>핵심 thesis:</strong> PUBG 캐시카우(연 영업이익 1조)를 기반으로, 인도 시장 수익화(2027~2028년)와 신작 모멘텀(서브노티카2·팰월드 모바일)을 옵션으로 가져가는 장기 베팅. PER 11배에 인도 옵션이 공짜로 딸려오는 구조.
+        </div>
+        <div class="callout callout-yellow" style="margin-top:8px;">
+          <strong>단, 경영진 신뢰도 문제가 지속적 모니터링 필요.</strong> 서브노티카2 소송 패소, AI First 명목 구조조정 등 내부 잡음이 상당함.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">4대 성장 줄기</div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">① PUBG / BGMI</div>
+            <span class="badge badge-green">현재 진행형</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+            연 영업이익 1조+ 캐시카우. 2025년 연간 매출 3.3조(역대 최대). PC 트래픽 구조적 재성장 중. 웰메이드 모드·UGC로 플랫폼화 추진.
+          </div>
+          <div class="tags">
+            <span class="tag">배틀로얄 독점</span>
+            <span class="tag">글로벌 1위</span>
+            <span class="tag">콜라보 IP</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">② 인도 사업</div>
+            <span class="badge badge-blue">2027~2028 수확</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+            BGMI 누적 유저 2.5억명. Real Cricket 수익화 본격화. 유니콘 펀드 1조원 운용. 크리켓 게임 FIFA급 성장 가능성.
+          </div>
+          <div class="tags">
+            <span class="tag">퍼스트무버</span>
+            <span class="tag">크리켓 게임</span>
+            <span class="tag">인도 스타트업 투자</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">③ 신작 파이프라인</div>
+            <span class="badge badge-yellow">2026 하반기~</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+            서브노티카2 얼리액세스(2026 하반기), 팰월드 모바일(2026). 26개 파이프라인 중 12개 2년 내 출시 목표.
+          </div>
+          <div class="tags">
+            <span class="tag">서브노티카2</span>
+            <span class="tag">팰월드 모바일</span>
+            <span class="tag">26개 파이프라인</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">④ AI First 전환</div>
+            <span class="badge badge-gray">교두보 단계</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+            GPU 클러스터 1,000장 구축(7월 완성). CPC·PUBG 앨라이 상반기 출시. 스튜디오 에이전트(AI 게임 제작 도구) 공개. 자체 AI 모델 개발 착수.
+          </div>
+          <div class="tags">
+            <span class="tag">GPU 1000장</span>
+            <span class="tag">PUBG 앨라이</span>
+            <span class="tag">개발비용 절감</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">재무 요약</div>
+      <div class="card">
+        <table class="data-table">
+          <tr>
+            <th>항목</th>
+            <th>2025년 실적</th>
+            <th>2026년 전망</th>
+            <th>비고</th>
+          </tr>
+          <tr>
+            <td>매출</td>
+            <td class="mono">3.3조원</td>
+            <td class="mono" style="color:var(--green)">4.7조원 (추정)</td>
+            <td style="color:var(--text3)">역대 최대 경신</td>
+          </tr>
+          <tr>
+            <td>영업이익</td>
+            <td class="mono">1.05조원</td>
+            <td class="mono" style="color:var(--green)">1.28조원 (추정)</td>
+            <td style="color:var(--text3)">전년比 -10.8%</td>
+          </tr>
+          <tr>
+            <td>순이익</td>
+            <td class="mono" style="color:var(--red)">7,337억원</td>
+            <td class="mono">-</td>
+            <td style="color:var(--red)">전년比 -43.6% ⚠️</td>
+          </tr>
+          <tr>
+            <td>PER</td>
+            <td class="mono">11배 수준</td>
+            <td class="mono">-</td>
+            <td style="color:var(--text3)">2023년 저점 근접</td>
+          </tr>
+        </table>
+        <div class="callout callout-yellow" style="margin-top:10px;">
+          <strong>⚠️ 주의:</strong> 순이익 급감은 M&A 비용·영업권 손상·외환손실 복합. 영업이익 자체는 1조 유지 중. 소송 비용 추가 발생 가능성 모니터링 필요.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 인도 사업 탭 -->
+  <div class="tab-content" id="tab-india">
+
+    <div class="section">
+      <div class="section-title">인도 사업 — 장기 베팅 핵심</div>
+      <div class="callout callout-blue">
+        <strong>핵심 포인트:</strong> 지금 주가에 인도 사업 가치가 거의 반영 안 됨. PER 11배에 인도 옵션이 공짜로 딸려오는 구조. 당장의 유형효과보다 2027~2028년 수익화 완성 시점을 보는 장기 투자.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">BGMI (배틀그라운드 모바일 인도)</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>지표</th><th>수치</th></tr>
+          <tr><td>누적 이용자</td><td class="mono" style="color:var(--green)">2억 5천만명</td></tr>
+          <tr><td>과금 이용자 성장률</td><td class="mono" style="color:var(--green)">+34% YoY</td></tr>
+          <tr><td>e스포츠 시청자</td><td class="mono">4억 8천만뷰 (BGIS 2025)</td></tr>
+          <tr><td>인도 게임 매출 순위</td><td class="mono">2위 (1위 Free Fire)</td></tr>
+          <tr><td>릴라이언스지오 제휴</td><td class="mono">통신사 요금제 연계</td></tr>
+        </table>
+        <div class="callout callout-green" style="margin-top:10px;">
+          <strong>과금 유저 +34%</strong> — 인도 결제 문화가 성숙하기 시작했다는 신호. 크래프톤이 이 타이밍을 보고 투자 집중하는 이유.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Real Cricket (노틸러스 모바일 인수)</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">노틸러스 모바일 인수 개요</div>
+          <span class="badge badge-green">2025.03 인수 완료</span>
+        </div>
+        <div class="grid2">
+          <div>
+            <div class="info-row">
+              <span class="info-label">인수가격</span>
+              <span class="info-value mono">$14M (약 200억원)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">지분</span>
+              <span class="info-value mono">75% 이상</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">설립</span>
+              <span class="info-value mono">2013년 (인도 푸네)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">직원</span>
+              <span class="info-value mono">45명</span>
+            </div>
+          </div>
+          <div>
+            <div class="info-row">
+              <span class="info-label">연매출</span>
+              <span class="info-value mono" style="color:var(--yellow)">39억원 (2025)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">누적 다운로드</span>
+              <span class="info-value mono">5,100만건</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">평점</span>
+              <span class="info-value mono">4.04점 / 62만 리뷰</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">IPL 라이선스</span>
+              <span class="info-value mono">5개 팀 보유</span>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-yellow" style="margin-top:10px;">
+          <strong>매출 39억이 작아 보이는 이유:</strong> 인도 유저가 돈을 안 냈던 구조. 지금은 결제 문화 성숙 중. 크래프톤 PUBG식 배틀패스·가챠 이식 시 FIFA 모바일 구조 완성 가능.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">크리켓 게임의 잠재력</div>
+      <div class="card">
+        <div style="font-size:12px; color:var(--text2); line-height:1.8; margin-bottom:10px;">
+          인도에서 크리켓은 종교. 파키스탄전 경기 당일은 사실상 공휴일. IPL은 경기당 가치 기준 세계 4위 스포츠 리그(NFL, MLB, NBA 다음).
+        </div>
+        <table class="data-table">
+          <tr><th>항목</th><th>크리켓 (인도)</th><th>축구 (유럽/남미)</th></tr>
+          <tr><td>팬 밀도</td><td style="color:var(--green)">종교적 수준</td><td>매우 높음</td></tr>
+          <tr><td>IPL 팀 수</td><td class="mono">10개팀</td><td>각 리그별 상이</td></tr>
+          <tr><td>선수단 규모</td><td class="mono">팀당 25명</td><td>팀당 23~26명</td></tr>
+          <tr><td>게임 라이선스</td><td style="color:var(--yellow)">일부만 확보</td><td>FIFA 완전 독점</td></tr>
+        </table>
+        <div class="callout callout-blue" style="margin-top:10px;">
+          <strong>IPL 전체 10개 팀 라이선스 + 비라트 콜리 등 슈퍼스타 카드 가챠</strong> → "크리켓판 FIFA 모바일" 완성. 트리거 뉴스: IPL 전체 라이선스 계약 발표.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">인도 투자 포트폴리오</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>투자처</th><th>분야</th><th>금액</th></tr>
+          <tr><td>노드윈 게이밍</td><td>e스포츠 기획사</td><td class="mono">약 257억원</td></tr>
+          <tr><td>로코(Loco)</td><td>게임 스트리밍 플랫폼</td><td class="mono">약 130억원</td></tr>
+          <tr><td>프라틸리피</td><td>웹소설 플랫폼</td><td class="mono">약 515억원</td></tr>
+          <tr><td>캐시프리페이먼츠</td><td>핀테크</td><td class="mono">미공개</td></tr>
+          <tr><td>노틸러스 모바일</td><td>크리켓 게임</td><td class="mono">약 200억원</td></tr>
+          <tr><td>유니콘 그로쓰 펀드</td><td>테크 스타트업 전반</td><td class="mono">2,000억원 LP 출자</td></tr>
+          <tr><td style="color:var(--text3)">인도 누적 투자</td><td style="color:var(--text3)">-</td><td class="mono" style="color:var(--yellow)">약 3,000억원+</td></tr>
+        </table>
+        <div class="callout callout-green" style="margin-top:10px;">
+          <strong>일부 포트폴리오 기업 IPO 준비 중</strong> (2025년 컨콜). 2027~2028년 인도 스타트업 IPO 러시 시 장부가치 재평가 가능.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">인도 규제 환경</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>항목</th><th>인도</th><th>중국</th></tr>
+          <tr><td>게임 허가</td><td style="color:var(--green)">사후 규제</td><td style="color:var(--red)">사전 판호 필수</td></tr>
+          <tr><td>외국기업 진입</td><td style="color:var(--green)">자유</td><td style="color:var(--red)">실질 장벽</td></tr>
+          <tr><td>금지 대상</td><td>현금 베팅 게임만</td><td>콘텐츠 검열 포함</td></tr>
+          <tr><td>정부 기조</td><td style="color:var(--green)">게임 산업 육성</td><td>강한 규제</td></tr>
+          <tr><td>크래프톤 리스크</td><td style="color:var(--green)">낮음</td><td style="color:var(--red)">PUBG 퇴출 경험</td></tr>
+        </table>
+        <div class="callout callout-green" style="margin-top:10px;">
+          <strong>Dream11 등 현금 베팅 게임 금지</strong> → 크래프톤 Real Cricket에 반사이익. IPL 스폰서 공백 기회 가능성.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 신작 파이프라인 탭 -->
+  <div class="tab-content" id="tab-games">
+
+    <div class="section">
+      <div class="section-title">2026년 핵심 신작</div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🌊 서브노티카2</div>
+          <span class="badge badge-yellow">2026 하반기 얼리액세스</span>
+        </div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.8; margin-bottom:12px;">
+          해양 생존 샌드박스. 바닷속 미지 외계 행성 탐험·생존 게임. 전작 누적 1,800만장 판매 검증 IP. 최대 4인 코옵 지원(전작은 솔로). 언리얼 엔진5 적용. Xbox Game Pass Day 1 출시 확정.
+        </div>
+        <div class="grid2">
+          <div>
+            <div class="info-row">
+              <span class="info-label">개발사</span>
+              <span class="info-value">언노운 월즈 (크래프톤 자회사)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">장르</span>
+              <span class="info-value">해양 생존 샌드박스</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">플랫폼</span>
+              <span class="info-value">PC + Xbox (크로스플레이)</span>
+            </div>
+          </div>
+          <div>
+            <div class="info-row">
+              <span class="info-label">얼리액세스</span>
+              <span class="info-value mono" style="color:var(--yellow)">2026 하반기</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">정식 출시</span>
+              <span class="info-value mono">2028~2029년 예상</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">경쟁작</span>
+              <span class="info-value" style="color:var(--green)">해당 장르 독점</span>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-red" style="margin-top:10px;">
+          <strong>⚠️ 소송 리스크 진행 중:</strong> 크래프톤이 1단계 소송 패소(3월). CEO 복직 명령. 2단계 소송에서 천문학적 배상(최대 3,300억원) 가능성. 서브노티카2 출시 자체에는 영향 없으나 비용 부담.
+        </div>
+        <div class="callout callout-blue" style="margin-top:8px;">
+          <strong>주가 트리거:</strong> 출시 첫 주 스팀 동시접속자 수. 전작 대비 반응 확인.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🐾 팰월드 모바일</div>
+          <span class="badge badge-yellow">2026년 출시 목표</span>
+        </div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.8; margin-bottom:12px;">
+          일본 포켓페어의 팰월드(누적 3,200만 플레이어) IP 기반 모바일 게임. 단순 이식이 아닌 독자적 게임. 크래프톤 펍지 스튜디오 개발. 강화된 슈터+팰 전략 전투+보스 레이드.
+        </div>
+        <div class="callout callout-yellow">
+          <strong>닌텐도 특허 소송 변수:</strong> 미국·일본 특허청 모두 닌텐도 특허 거절/기각 → 포켓페어에 유리한 흐름. 서비스 중단 시나리오는 점점 멀어지는 중. 최종 판결까지 시일 필요.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">신작 성적표 — 냉정한 평가</div>
+      <div class="card">
+        <table class="data-table">
+          <tr>
+            <th>게임</th>
+            <th>결과</th>
+            <th>비고</th>
+          </tr>
+          <tr>
+            <td>인조이</td>
+            <td><span class="badge badge-yellow">부진</span></td>
+            <td style="color:var(--text3)">초기 동접 8.7만 → 1,500명 급락</td>
+          </tr>
+          <tr>
+            <td>다크앤다커 모바일</td>
+            <td><span class="badge badge-red">서비스 종료</span></td>
+            <td style="color:var(--text3)">IP 소송 + 완성도 + 사업성 삼중고</td>
+          </tr>
+          <tr>
+            <td>딩컴 투게더</td>
+            <td><span class="badge badge-gray">표류</span></td>
+            <td style="color:var(--text3)">출시 일정 미정</td>
+          </tr>
+          <tr>
+            <td>서브노티카2</td>
+            <td><span class="badge badge-blue">2026 출시 예정</span></td>
+            <td style="color:var(--text3)">소송 변수 있으나 개발 진행 중</td>
+          </tr>
+          <tr>
+            <td>팰월드 모바일</td>
+            <td><span class="badge badge-blue">2026 출시 목표</span></td>
+            <td style="color:var(--text3)">닌텐도 소송 진행 중</td>
+          </tr>
+        </table>
+        <div class="callout callout-yellow" style="margin-top:10px;">
+          <strong>게임 산업 특성:</strong> 10개 만들어 1개 터지는 구조. 크래프톤만의 문제 아님. 다만 PUBG 이후 5년째 후속 히트작 부재는 밸류에이션 디스카운트 요인.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AI 전략 탭 -->
+  <div class="tab-content" id="tab-ai">
+
+    <div class="section">
+      <div class="section-title">AI First 전략 — 교두보 단계</div>
+      <div class="callout callout-yellow">
+        <strong>단기 수치 기대 금물.</strong> 지금은 인프라 구축 단계. 2027년 이후 개발 비용 구조 변화 여부 모니터링이 핵심.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">인프라 구축 — NHN클라우드 협력</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">GPU 클러스터 상세 스펙</div>
+          <span class="badge badge-blue">2026년 7월 가동</span>
+        </div>
+        <table class="data-table">
+          <tr>
+            <th>항목</th>
+            <th>내용</th>
+          </tr>
+          <tr>
+            <td>GPU 모델</td>
+            <td class="mono">엔비디아 블랙웰 울트라 (최신)</td>
+          </tr>
+          <tr>
+            <td>GPU 수량</td>
+            <td class="mono" style="color:var(--green)">1,000여장</td>
+          </tr>
+          <tr>
+            <td>네트워크</td>
+            <td class="mono">XDR-800G 인피니밴드 (초고속)</td>
+          </tr>
+          <tr>
+            <td>구성</td>
+            <td class="mono">멀티 클러스터 + 동적 자원 배분</td>
+          </tr>
+          <tr>
+            <td>위치</td>
+            <td>NHN클라우드 판교 NCC 데이터센터</td>
+          </tr>
+          <tr>
+            <td>운영 방식</td>
+            <td>GPUaaS (쓴 만큼 비용, 유연 확장)</td>
+          </tr>
+          <tr>
+            <td>가동일</td>
+            <td class="mono" style="color:var(--yellow)">2026년 7월</td>
+          </tr>
+        </table>
+        <div style="font-size:12px; color:var(--text3); margin-top:10px; line-height:1.7;">
+          💡 직접 구매 대신 GPUaaS 선택 이유: 안 쓸 때 비용 없음, 필요 시 즉시 확장, 관리 인력 불필요. AWS처럼 쓴 만큼 내는 방식.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">AI 적용 4대 축</div>
+      <div class="card">
+        <table class="data-table">
+          <tr>
+            <th>축</th>
+            <th>내용</th>
+            <th>시점</th>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">자체 AI 모델</td>
+            <td style="color:var(--text2)">SKT 컨소시엄, 5,000억 파라미터 파운데이션 모델 개발. 게임 특화 언어 에이전트 목표.</td>
+            <td><span class="badge badge-gray">개발 중</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">CPC / PUBG 앨라이</td>
+            <td style="color:var(--text2)">AI 동료 캐릭터. 유저와 함께 전략 소통. 솔로 플레이에 AI 팀원 개념.</td>
+            <td><span class="badge badge-blue">2026 상반기</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">스튜디오 에이전트</td>
+            <td style="color:var(--text2)">자연어 명령으로 게임 에디터 조작 → AI가 직접 게임 제작. 개발 인력 없이 가능.</td>
+            <td><span class="badge badge-green">2026.04 공개</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">전사 AI 내재화</td>
+            <td style="color:var(--text2)">연 300억 AI 툴 지원. AI 러닝 허브. 신규 채용 중단 → AI로 생산성 대체.</td>
+            <td><span class="badge badge-yellow">진행 중</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">AI 전략 기대 효과</div>
+      <div class="card">
+        <div class="grid2">
+          <div>
+            <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">개발 비용 절감</div>
+            <div class="risk-bar"><div class="risk-fill" style="width:35%; background:var(--green)"></div></div>
+            <div style="font-size:11px; color:var(--text3); margin-top:4px;">아직 초기 단계</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">게임 경험 차별화</div>
+            <div class="risk-bar"><div class="risk-fill" style="width:40%; background:var(--accent)"></div></div>
+            <div style="font-size:11px; color:var(--text3); margin-top:4px;">PUBG 앨라이 반응 확인 필요</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">개발 속도 향상</div>
+            <div class="risk-bar"><div class="risk-fill" style="width:30%; background:var(--yellow)"></div></div>
+            <div style="font-size:11px; color:var(--text3); margin-top:4px;">파이프라인 가속 여부 미확인</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">마진 개선 반영</div>
+            <div class="risk-bar"><div class="risk-fill" style="width:20%; background:var(--accent2)"></div></div>
+            <div style="font-size:11px; color:var(--text3); margin-top:4px;">2027년 이후 가시화 예상</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 리스크 탭 -->
+  <div class="tab-content" id="tab-risk">
+
+    <div class="section">
+      <div class="section-title">핵심 리스크 — 경영진 신뢰도 문제</div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔴 서브노티카2 소송 — 현재 진행 중</div>
+          <span class="badge badge-red">고위험</span>
+        </div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.8; margin-bottom:10px;">
+          서브노티카2 대박 가능성에 성과급(최대 3,300억원) 지급 회피 목적으로 창업자 3인 해고 → ChatGPT로 전략 수립 → '프로젝트 X' 실행 → 소송 패소(2026.03)
+        </div>
+        <table class="data-table">
+          <tr><th>단계</th><th>내용</th><th>시점</th></tr>
+          <tr>
+            <td>1단계 소송</td>
+            <td style="color:var(--red)">크래프톤 패소. CEO 복직 명령</td>
+            <td class="mono">2026.03</td>
+          </tr>
+          <tr>
+            <td>2단계 소송</td>
+            <td>고의 경영권 침해 + 손해배상 규모 결정</td>
+            <td class="mono" style="color:var(--yellow)">진행 예정</td>
+          </tr>
+          <tr>
+            <td>언아웃 기간</td>
+            <td>2026년 9월 15일로 연장 (최대 2027.03까지)</td>
+            <td class="mono">법원 결정</td>
+          </tr>
+          <tr>
+            <td>최대 배상액</td>
+            <td class="mono" style="color:var(--red)">$250M (약 3,300억원)</td>
+            <td class="mono">최악 시나리오</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🟡 IP 리스크 관리 실패 반복</div>
+          <span class="badge badge-yellow">중위험</span>
+        </div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.8;">
+          소송 중인 IP(다크앤다커, 팰월드) 연속 계약. 다크앤다커 모바일은 결국 서비스 종료. 팰월드 모바일도 닌텐도 소송 진행 중. 장기 안정성보다 시장 주목도 기준으로 IP 확보하는 패턴 반복 지적.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🟡 재무 악화 신호</div>
+          <span class="badge badge-yellow">모니터링</span>
+        </div>
+        <table class="data-table">
+          <tr><th>항목</th><th>변화</th></tr>
+          <tr><td>순이익</td><td style="color:var(--red)">전년比 -43.6%</td></tr>
+          <tr><td>영업비용</td><td style="color:var(--red)">+48.8% 급증</td></tr>
+          <tr><td>무형자산손상차손</td><td style="color:var(--red)">7배 증가 (M&A 후유증)</td></tr>
+          <tr><td>소송 비용</td><td style="color:var(--yellow)">추가 발생 가능</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🟡 PUBG 단일 의존도</div>
+          <span class="badge badge-yellow">구조적 문제</span>
+        </div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.8;">
+          5년째 PUBG 이후 후속 히트작 없음. 매출의 대부분이 여전히 PUBG IP에서 발생. 배틀필드6 등 경쟁작 출시로 트래픽 잠식 가능성 상존.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 모니터링 체크리스트 탭 -->
+  <div class="tab-content" id="tab-checklist">
+
+    <div class="section">
+      <div class="section-title">2026년 핵심 이벤트 타임라인</div>
+      <div class="card">
+        <div class="timeline">
+          <div class="tl-item done">
+            <div class="tl-date">2026.04.21</div>
+            <div class="tl-content">크래프톤 스터디 노트 초안 작성</div>
+            <div class="tl-sub">오늘 대화 기반 초안. 업데이트 필요</div>
+          </div>
+          <div class="tl-item active">
+            <div class="tl-date">2026.04~05</div>
+            <div class="tl-content">1분기 실적 발표 컨콜 확인</div>
+            <div class="tl-sub">AI 적용 효과, 소송 비용, 인도 지표 업데이트</div>
+          </div>
+          <div class="tl-item pending">
+            <div class="tl-date">2026.07</div>
+            <div class="tl-content">GPU 클러스터 판교 NCC 가동</div>
+            <div class="tl-sub">AI 인프라 완성. PUBG 앨라이 서비스 반응 확인</div>
+          </div>
+          <div class="tl-item pending">
+            <div class="tl-date">2026 하반기</div>
+            <div class="tl-content">서브노티카2 얼리액세스 출시</div>
+            <div class="tl-sub">스팀 동시접속자 수 확인 → 주가 트리거 여부 판단</div>
+          </div>
+          <div class="tl-item pending">
+            <div class="tl-date">2026년</div>
+            <div class="tl-content">팰월드 모바일 출시 목표</div>
+            <div class="tl-sub">닌텐도 소송 진행 상황 모니터링</div>
+          </div>
+          <div class="tl-item risk">
+            <div class="tl-date">2026.09.15</div>
+            <div class="tl-content">언아웃 산정 종료일 (소송)</div>
+            <div class="tl-sub">2단계 손해배상 규모 확정 → 최대 3,300억원 리스크</div>
+          </div>
+          <div class="tl-item pending">
+            <div class="tl-date">2027~2028</div>
+            <div class="tl-content">인도 수익화 본격화 예상</div>
+            <div class="tl-sub">Real Cricket 매출 성장, IPL 라이선스 확대 여부</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">분기별 체크 포인트</div>
+      <div class="card">
+        <table class="data-table">
+          <tr>
+            <th>항목</th>
+            <th>확인 내용</th>
+            <th>중요도</th>
+          </tr>
+          <tr>
+            <td>PUBG 트래픽</td>
+            <td>PC/모바일 MAU 유지 여부. 경쟁작 대비</td>
+            <td><span class="badge badge-red">최우선</span></td>
+          </tr>
+          <tr>
+            <td>소송 진행 상황</td>
+            <td>2단계 손해배상 규모. 언아웃 기간 추가 연장 여부</td>
+            <td><span class="badge badge-red">최우선</span></td>
+          </tr>
+          <tr>
+            <td>BGMI 과금 유저</td>
+            <td>인도 결제 문화 성숙 지표. YoY 성장률</td>
+            <td><span class="badge badge-yellow">중요</span></td>
+          </tr>
+          <tr>
+            <td>Real Cricket MAU</td>
+            <td>크래프톤 수익화 이식 후 지표 변화</td>
+            <td><span class="badge badge-yellow">중요</span></td>
+          </tr>
+          <tr>
+            <td>IPL 라이선스</td>
+            <td>전체 10개 팀 계약 진전 여부</td>
+            <td><span class="badge badge-blue">트리거</span></td>
+          </tr>
+          <tr>
+            <td>서브노티카2 반응</td>
+            <td>얼리액세스 스팀 동접자. 리뷰 점수</td>
+            <td><span class="badge badge-blue">트리거</span></td>
+          </tr>
+          <tr>
+            <td>AI 개발 비용</td>
+            <td>인건비·개발 기간 변화. 마진 개선 여부</td>
+            <td><span class="badge badge-gray">장기 모니터링</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">투자 판단 기준</div>
+      <div class="card">
+        <div class="callout callout-green">
+          <strong>✅ 매수 고려 조건:</strong> PUBG 트래픽 안정 + 서브노티카2 초기 반응 긍정적 + 소송 합의 or 배상액 확정(불확실성 해소) + BGMI 과금 유저 지속 성장
+        </div>
+        <div class="callout callout-red" style="margin-top:8px;">
+          <strong>🚫 관망 유지 조건:</strong> 2단계 소송 배상액 천문학적 확정 + PUBG 트래픽 구조적 하락 + 서브노티카2 출시 재연기 + 인도 규제 급변
+        </div>
+        <div class="callout callout-blue" style="margin-top:8px;">
+          <strong>💡 현재 결론:</strong> PER 11배에 인도 옵션 매력적이나 경영진 신뢰도 문제 해소 전까지 소량 관심 종목 유지. 5월 실적 컨콜 후 포지션 재검토.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">업데이트 이력</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>날짜</th><th>내용</th></tr>
+          <tr>
+            <td class="mono">2026.04.21</td>
+            <td>초안 작성 — 4대 줄기(PUBG, 인도, 신작, AI), 리스크, 모니터링 체크리스트</td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:var(--text3)">예정</td>
+            <td style="color:var(--text3)">1Q 실적 발표 후 업데이트</td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:var(--text3)">예정</td>
+            <td style="color:var(--text3)">서브노티카2 출시 후 반응 업데이트</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
