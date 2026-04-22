@@ -201,10 +201,10 @@ canvas{display:block;}
     </div>
   </div>
 
-  <!-- 히스토리 저장 & 다운로드 -->
-  <button onclick="autoSaveHistory();downloadHTML();" style="width:100%;margin-top:6px;padding:12px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(77,139,255,0.08));border:1px solid rgba(0,229,255,0.25);border-radius:12px;color:#00e5ff;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    히스토리 저장 & HTML 다운로드 → GitHub 업로드
+  <!-- Gist 히스토리 저장 -->
+  <button onclick="autoSaveHistory();" id="gist-save-btn" style="width:100%;margin-top:6px;padding:12px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(77,139,255,0.08));border:1px solid rgba(0,229,255,0.25);border-radius:12px;color:#00e5ff;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    오늘 기록 저장 (Gist 자동 업로드)
   </button>
 </div>
 
@@ -1113,10 +1113,93 @@ function renderStockChart(id){
   chartInstances['stockChart']=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:lineColor,backgroundColor:grad,fill:true,tension:0.4,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:lineColor,pointBorderColor:'#0b1020',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(7,10,23,0.95)',borderColor:lineColor,borderWidth:1,titleColor:'#9aafd4',bodyColor:'#dde6ff',titleFont:{size:9},bodyFont:{family:'JetBrains Mono',size:11},callbacks:{label:c=>` ${c.raw>=0?'+':''}${c.raw}%`}}},scales:{x:{ticks:{color:'#6a80aa',font:{size:9}},grid:{color:'rgba(79,143,255,0.06)'},border:{color:'rgba(79,143,255,0.15)'}},y:{ticks:{color:'#6a80aa',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(79,143,255,0.08)'},border:{color:'rgba(79,143,255,0.15)'},afterDataLimits(s){const pad=Math.max(Math.abs(s.max-s.min)*0.15,0.5);s.min-=pad;s.max+=pad;}}}}});
 }
 
+// ── GitHub Gist 설정 ──
+const GIST_TOKEN='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';
+const GIST_ID='a161c2fe3aca1ae00f8abbd2b9d30d0f';
+const GIST_FILE='tk_portfolio_history.json';
+
+// ── Gist에서 히스토리 불러오기 ──
+async function loadHistoryFromGist(){
+  try{
+    const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+      headers:{'Authorization':`token ${GIST_TOKEN}`,'Accept':'application/vnd.github.v3+json'}
+    });
+    const data=await res.json();
+    const content=data.files?.[GIST_FILE]?.content;
+    if(!content) return;
+    const saved=JSON.parse(content);
+    if(!Array.isArray(saved)||saved.length===0) return;
+
+    // 기존 HISTORY에 Gist 데이터 병합 (날짜 기준 중복 제거, 최신 우선)
+    saved.forEach(snap=>{
+      const idx=HISTORY.findIndex(h=>h.date===snap.date);
+      if(idx>=0) HISTORY[idx]=snap;
+      else HISTORY.push(snap);
+    });
+    // 날짜순 정렬
+    HISTORY.sort((a,b)=>{
+      const [am,ad]=a.date.split('/').map(Number);
+      const [bm,bd]=b.date.split('/').map(Number);
+      return am!==bm?am-bm:ad-bd;
+    });
+    console.log(`Gist에서 ${saved.length}개 히스토리 로드 완료`);
+  }catch(e){
+    console.warn('Gist 불러오기 실패:', e);
+  }
+}
+
+// ── Gist에 히스토리 저장 ──
+async function saveHistoryToGist(){
+  const btn=document.getElementById('gist-save-btn');
+  if(btn){btn.textContent='저장 중...';btn.style.opacity='0.6';}
+  try{
+    const body=JSON.stringify({
+      files:{[GIST_FILE]:{content:JSON.stringify(HISTORY,null,2)}}
+    });
+    await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+      method:'PATCH',
+      headers:{
+        'Authorization':`token ${GIST_TOKEN}`,
+        'Accept':'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
+      body
+    });
+    if(btn){
+      btn.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 저장 완료!';
+      btn.style.background='rgba(0,245,180,0.12)';
+      btn.style.color='#00f5b4';
+      btn.style.borderColor='rgba(0,245,180,0.35)';
+      btn.style.opacity='1';
+      setTimeout(()=>{
+        btn.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 오늘 기록 저장 (Gist 자동 업로드)';
+        btn.style.background='linear-gradient(135deg,rgba(0,229,255,0.1),rgba(77,139,255,0.08))';
+        btn.style.color='#00e5ff';
+        btn.style.borderColor='rgba(0,229,255,0.25)';
+      },2500);
+    }
+    console.log('Gist 저장 완료');
+  }catch(e){
+    if(btn){btn.textContent='⚠ 저장 실패';btn.style.opacity='1';}
+    console.warn('Gist 저장 실패:', e);
+  }
+}
+
+// ── autoSaveHistory 오버라이드: Gist까지 저장 ──
+const _origAutoSave=autoSaveHistory;
+autoSaveHistory=function(){
+  _origAutoSave();
+  saveHistoryToGist();
+};
+
 (function(){
   const s=document.createElement('script');
   s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-  s.onload=()=>{renderDash();renderCharts();};
+  s.onload=async()=>{
+    await loadHistoryFromGist(); // Gist에서 히스토리 먼저 로드
+    renderDash();
+    renderCharts();
+  };
   document.head.appendChild(s);
   setDate();setInterval(setDate,60000);
 })();
