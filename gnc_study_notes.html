@@ -469,6 +469,193 @@
     border-top: 1px solid var(--border);
   }
 
+  /* 오버행 프라이스 바 */
+  .price-bar-wrap {
+    margin: 20px 0;
+  }
+
+  .price-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .price-bar-track {
+    position: relative;
+    height: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .price-bar-zone {
+    position: absolute;
+    top: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .price-bar-zone.danger-zone {
+    background: rgba(239, 68, 68, 0.15);
+    border-right: 2px dashed rgba(239,68,68,0.5);
+    color: var(--danger);
+    left: 0;
+    width: 38%;
+  }
+
+  .price-bar-zone.warn-zone {
+    background: rgba(255, 209, 102, 0.12);
+    border-right: 2px solid var(--warn);
+    color: var(--warn);
+    left: 38%;
+    width: 22%;
+  }
+
+  .price-bar-zone.current-zone {
+    background: rgba(0, 212, 255, 0.1);
+    color: var(--accent);
+    left: 60%;
+    width: 18%;
+  }
+
+  .price-bar-zone.free-zone {
+    background: rgba(0, 255, 157, 0.07);
+    color: var(--accent2);
+    left: 78%;
+    width: 22%;
+  }
+
+  .price-bar-marker {
+    position: absolute;
+    top: -4px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+  }
+
+  .price-bar-marker .marker-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    white-space: nowrap;
+    margin-bottom: 2px;
+  }
+
+  .price-bar-marker .marker-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  .price-bar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* 오버행 시나리오 카드 */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .scenario-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .scenario-card.bull { border-top: 2px solid var(--accent2); }
+  .scenario-card.bear { border-top: 2px solid var(--danger); }
+  .scenario-card.base { border-top: 2px solid var(--accent); }
+  .scenario-card.trigger { border-top: 2px solid var(--warn); }
+
+  .scenario-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .scenario-card.bull .scenario-tag { color: var(--accent2); }
+  .scenario-card.bear .scenario-tag { color: var(--danger); }
+  .scenario-card.base .scenario-tag { color: var(--accent); }
+  .scenario-card.trigger .scenario-tag { color: var(--warn); }
+
+  .scenario-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .scenario-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* 교환사채 구조 테이블 */
+  .eb-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+
+  .eb-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eb-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(30, 45, 69, 0.5);
+    font-size: 13px;
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .eb-table tr:last-child td { border-bottom: none; }
+  .eb-table td:first-child { color: var(--text-dim); font-size: 11px; width: 28%; }
+  .eb-table td:nth-child(2) { color: #fff; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  @media (max-width: 600px) {
+    .scenario-grid { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 600px) {
     .two-col { grid-template-columns: 1fr; }
     .verdict-grid { grid-template-columns: 1fr; }
@@ -488,7 +675,7 @@
       <div class="meta-item"><strong>섹터</strong> · 전기·전자 / 발전설비</div>
       <div class="meta-item"><strong>시장</strong> · 코스닥</div>
       <div class="meta-item"><strong>작성일</strong> · 2026.04.24</div>
-      <div class="meta-item"><strong>현재가</strong> · 34,950원</div>
+      <div class="meta-item"><strong>현재가</strong> · 35,950원</div>
     </div>
   </div>
 
@@ -498,8 +685,8 @@
     <div class="stat-grid">
       <div class="stat-box">
         <div class="stat-label">현재가</div>
-        <div class="stat-value blue">34,950원</div>
-        <div class="stat-sub">2026.04.24 기준</div>
+        <div class="stat-value blue">35,950원</div>
+        <div class="stat-sub">2026.04.27 기준</div>
       </div>
       <div class="stat-box">
         <div class="stat-label">시가총액</div>
@@ -658,6 +845,136 @@
     </table>
   </div>
 
+  <!-- 교환사채 오버행 심층 분석 -->
+  <div class="section red">
+    <div class="section-title"><span class="dot"></span>교환사채(EB) 오버행 심층 분석</div>
+
+    <!-- 구조 테이블 -->
+    <table class="eb-table">
+      <tr>
+        <th>항목</th>
+        <th>내용</th>
+        <th style="color:var(--text-muted);font-size:10px;letter-spacing:1px;text-transform:uppercase">의미</th>
+      </tr>
+      <tr>
+        <td>교환가액</td>
+        <td>34,450원</td>
+        <td style="color:var(--danger);font-size:12px">현재가(35,950) 대비 -4.2% — 교환 즉시 수익</td>
+      </tr>
+      <tr>
+        <td>잠재 매물</td>
+        <td>100만주 (247억)</td>
+        <td style="color:var(--warn);font-size:12px">시가총액 대비 약 4.1% 희석 압력</td>
+      </tr>
+      <tr>
+        <td>만기일</td>
+        <td>2028년</td>
+        <td style="color:var(--text-dim);font-size:12px">2028년까지 순차적 물량 출회 가능</td>
+      </tr>
+      <tr>
+        <td>현재가 vs 교환가</td>
+        <td>+1,500원 (+4.4%)</td>
+        <td style="color:var(--danger);font-size:12px">교환 후 즉시 매도 시 수익 — 매도 유인 존재</td>
+      </tr>
+      <tr>
+        <td>일평균 거래대금</td>
+        <td>약 30~50억 추정</td>
+        <td style="color:var(--text-dim);font-size:12px">247억 소화에 최소 5~8거래일 이상 필요</td>
+      </tr>
+    </table>
+
+    <div class="divider"></div>
+
+    <!-- 가격 구간 시각화 -->
+    <div style="font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">현재가 포지션 맵</div>
+    <div class="price-bar-wrap">
+      <div class="price-bar-label">
+        <span>27,500원 (52주저점)</span>
+        <span>46,750원 (52주고점)</span>
+      </div>
+      <div class="price-bar-track">
+        <div class="price-bar-zone danger-zone">진입 목표</div>
+        <div class="price-bar-zone warn-zone">오버행 구간</div>
+        <div class="price-bar-zone current-zone">현재가</div>
+        <div class="price-bar-zone free-zone">돌파 시</div>
+      </div>
+      <div class="price-bar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>30,000~32,000원 · 목표 진입 구간</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div>34,450원 · 교환가액 (유리천장)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>35,950원 · 현재가</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div>38,000원↑ · 오버행 소화 후 자유 구간</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 오버행 메커니즘 설명 -->
+    <div class="text-block" style="margin-bottom:16px">
+      <strong>오버행이 주가에 미치는 메커니즘</strong><br><br>
+      교환사채(EB) 보유자는 34,450원에 주식으로 교환 후 시장에서 매도할 수 있어.
+      현재가 35,950원에서 교환하면 즉시 <strong class="highlight">+1,500원(+4.4%) 수익</strong>이 나.
+      이 말은 주가가 35,000~37,000원 구간에서 오를 때마다 교환+매도 물량이 자동으로 나온다는 뜻이야.
+      시장 참여자 모두가 이 구조를 알기 때문에 매수자들도 이 구간에서 적극 매수를 꺼려 —
+      이게 <strong class="warn">유리천장</strong>이 만들어지는 이유야.
+      100만주(247억)가 완전 소화될 때까지 이 압력은 지속돼.
+    </div>
+
+    <!-- 시나리오 카드 -->
+    <div style="font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">오버행 해소 시나리오</div>
+    <div class="scenario-grid">
+      <div class="scenario-card bull">
+        <div class="scenario-tag">🟢 Bull · 빠른 소화</div>
+        <div class="scenario-title">대형 수주 + 거래량 폭증</div>
+        <div class="scenario-desc">
+          500억↑ 수주 공시로 거래량이 일평균 5배 이상 터지면 247억 물량이 1~2주 내 소화 가능.
+          오버행 해소 후 주가 38,000~42,000원으로 레벨업.
+          <strong style="color:var(--accent2)">→ 이때가 추격 매수 타이밍</strong>
+        </div>
+      </div>
+      <div class="scenario-card base">
+        <div class="scenario-tag">🔵 Base · 점진적 소화</div>
+        <div class="scenario-title">실적 성장 + 자연 소화</div>
+        <div class="scenario-desc">
+          2026년 영업이익 893억 달성 확인되며 분기마다 조금씩 소화.
+          2027년 초까지 오버행 80% 해소 예상.
+          <strong style="color:var(--accent)">→ 30,000~32,000원 진입 + 장기홀딩 전략</strong>
+        </div>
+      </div>
+      <div class="scenario-card trigger">
+        <div class="scenario-tag">🟡 Trigger · 조건부 소화</div>
+        <div class="scenario-title">해외 발전소 추가 인수 공시</div>
+        <div class="scenario-desc">
+          파푸아뉴기니 모델 복제로 동남아 신규 발전소 인수 공시 시 밸류에이션 리레이팅.
+          시장 인식 전환 → 오버행 무력화 + 목표가 60,000~70,000원 가시화.
+          <strong style="color:var(--warn)">→ 이 공시 뜨는 순간이 가장 강한 매수 트리거</strong>
+        </div>
+      </div>
+      <div class="scenario-card bear">
+        <div class="scenario-tag">🔴 Bear · 소화 지연</div>
+        <div class="scenario-title">수주 공백 + 실적 미달</div>
+        <div class="scenario-desc">
+          DC 투자 둔화로 수주 공백 발생 시 주가 34,450원 이하로 이탈.
+          교환가액 아래에선 교환 유인 사라져 오버행 부담 오히려 감소.
+          <strong style="color:var(--danger)">→ 역설적으로 30,000원 이하가 더 안전한 진입 구간</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 핵심 결론 -->
+    <div class="text-block">
+      <strong>📌 오버행 분석 결론</strong><br><br>
+      현재 35,950원은 교환가액(34,450원) 위의 <strong class="warn">가장 부담스러운 구간</strong>이야.
+      진입하면 단기 상승이 막히는 구조에서 물려 있는 것과 같아.
+      <strong class="highlight2">두 가지 접근만 유효해.</strong><br><br>
+      ① <strong>조정 기다리기</strong> — 30,000~32,000원 조정 시 분할 진입.
+      교환가액 아래라 오버행 부담 해소 + 업사이드 40~50% 확보.<br><br>
+      ② <strong>돌파 추격</strong> — 대형 수주 공시 + 거래량 폭증으로 38,000원 돌파 확인 시 추격 매수.
+      오버행 소화 완료 신호 = 다음 레벨 진입 시작.
+    </div>
+  </div>
+
   <!-- 주가 포지션 분석 -->
   <div class="section orange">
     <div class="section-title"><span class="dot"></span>주가 포지션 분석</div>
@@ -685,7 +1002,7 @@
     </div>
     <div class="divider"></div>
     <div class="text-block">
-      현재 <strong class="highlight">34,950원</strong>은 교환사채 교환가액(34,450원) 바로 위에 위치해 <strong class="warn">유리천장 구간</strong>이야.
+      현재 <strong class="highlight">35,950원</strong>은 교환사채 교환가액(34,450원) 바로 위에 위치해 <strong class="warn">유리천장 구간</strong>이야.
       잠재 매물 100만주(247억)가 단기 상승을 억제하는 구조. 조정 시 <strong class="highlight2">30,000~32,000원</strong>이 이상적 진입 구간 —
       교환가액 아래라 오버행 부담 감소 + 목표가 대비 업사이드 40~50% 확보.
     </div>
@@ -790,7 +1107,7 @@
   </div>
 
   <div class="update-note">
-    Last Updated · 2026.04.24 · 태균님 포트폴리오 스터디 노트<br>
+    Last Updated · 2026.04.27 · 태균님 포트폴리오 스터디 노트<br>
     본 문서는 투자 참고용이며 투자 판단의 최종 책임은 본인에게 있습니다.
   </div>
 
