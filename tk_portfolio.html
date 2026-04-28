@@ -203,6 +203,25 @@ canvas{display:block;}
     </div>
   </div>
 
+  <!-- ⑥ AI 브리핑 카드 -->
+  <div id="briefing-card" style="background:linear-gradient(135deg,rgba(11,16,32,0.98),rgba(7,10,23,0.98));border:1px solid rgba(77,139,255,0.3);border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4d8bff,#a855f7,#00f5b4,transparent);"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;">📋</span>
+        <span style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--text3);">TODAY'S BRIEFING</span>
+      </div>
+      <button id="ai-briefing-btn" onclick="runAIBriefing()" style="display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:8px;padding:4px 10px;border-radius:10px;background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.3);cursor:pointer;white-space:nowrap;">
+        ✦ AI 심층분석
+      </button>
+    </div>
+    <div id="briefing-rules" style="display:flex;flex-direction:column;gap:6px;"></div>
+    <div id="briefing-ai" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(79,143,255,0.1);">
+      <div style="font-family:var(--mono);font-size:7.5px;letter-spacing:1px;color:#a855f7;margin-bottom:6px;">✦ CLAUDE AI 분석</div>
+      <div id="briefing-ai-text" style="font-size:10px;color:var(--text2);line-height:1.7;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
   <!-- ① HERO TOTAL -->
   <div onclick="openTrendModal('total')" style="background:linear-gradient(135deg,rgba(11,16,32,0.97),rgba(7,10,23,0.97));border:1px solid rgba(79,143,255,0.3);border-radius:18px;padding:20px 20px 16px;margin-bottom:10px;position:relative;overflow:hidden;text-align:center;cursor:pointer;">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4d8bff,#00e5ff,#00f5b4,transparent);box-shadow:0 0 12px rgba(77,139,255,0.6);"></div>
@@ -991,7 +1010,7 @@ async function autoFetchPrices(){
 
   if(successCount===0)throw new Error('전체 실패');
 
-  renderDash();setDate();autoSaveHistory();refreshExtras();renderProfitBars();fetchMacroData();
+  renderDash();setDate();autoSaveHistory();refreshExtras();renderProfitBars();fetchMacroData();renderRuleBriefing();
 
   /* ── 보유 종목 관심탭 현재가 동기화 (PRICES에서 바로) ── */
   Object.entries(WATCH_FROM_PRICES).forEach(([id,elId])=>{
@@ -1155,7 +1174,7 @@ function showPage(name,btn){document.querySelectorAll('.page').forEach(p=>p.clas
 function openModal(){Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)el.value=PRICES[k].toLocaleString('ko-KR');});document.getElementById('p-cash-k').value=CASH.kiwoom.toLocaleString('ko-KR');document.getElementById('p-cash-t').value=CASH.toss.toLocaleString('ko-KR');document.getElementById('modal-bg').classList.add('open');}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 function closeModalOutside(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
-function saveUpdate(){PRICES_PREV={...PRICES};Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)PRICES[k]=unFmt(el.value)||PRICES[k];});CASH.kiwoom=unFmt(document.getElementById('p-cash-k').value)||CASH.kiwoom;CASH.toss=unFmt(document.getElementById('p-cash-t').value)||CASH.toss;closeModal();renderDash();setDate();refreshExtras();renderProfitBars();}
+function saveUpdate(){PRICES_PREV={...PRICES};Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)PRICES[k]=unFmt(el.value)||PRICES[k];});CASH.kiwoom=unFmt(document.getElementById('p-cash-k').value)||CASH.kiwoom;CASH.toss=unFmt(document.getElementById('p-cash-t').value)||CASH.toss;closeModal();renderDash();setDate();refreshExtras();renderProfitBars();renderRuleBriefing();}
 
 function renderDash(){
   let kPnl=0,kCost=0,kVal=0,tPnl=0,tCost=0,tVal=0;
@@ -1534,6 +1553,138 @@ function renderCumulativeChart(){
 }
 
 /* ── ⑤ 매크로 위젯 (코스피/환율/유가) ── */
+/* ━━ 브리핑 시스템 ━━ */
+
+function renderRuleBriefing(){
+  const el=document.getElementById('briefing-rules');
+  if(!el)return;
+  const items=[];
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+
+  /* 현금비중 체크 */
+  let totalVal=0;
+  all.forEach(h=>totalVal+=PRICES[h.id]*h.qty);
+  const cashTotal=CASH.kiwoom+CASH.toss;
+  const cashPct=cashTotal/(totalVal+cashTotal)*100;
+  if(cashPct<20)items.push({color:'#ff3060',icon:'🔴',text:`현금비중 ${cashPct.toFixed(1)}% — 목표(25~30%) 미달. 신규 진입 자제`});
+  else if(cashPct>35)items.push({color:'#ffb938',icon:'🟡',text:`현금비중 ${cashPct.toFixed(1)}% — 과다. 관심종목 진입 검토 가능`});
+
+  /* 종목별 체크 */
+  all.forEach(h=>{
+    const cur=PRICES[h.id];
+    const d=SIM_DEFAULTS[h.id];
+    if(!d||!cur)return;
+    const pctVal=((cur-h.avg)/h.avg*100);
+
+    if(d.target&&cur>=d.target){
+      items.push({color:'#ff3060',icon:'🔴',text:`${h.name} 목표가(${(d.target/10000).toFixed(0)}만) 도달 — 매도 실행 or 목표가 상향 검토`});
+    } else if(d.target&&cur>=d.target*0.92){
+      items.push({color:'#ffb938',icon:'🟡',text:`${h.name} 목표가 92% 도달(현재 ${(cur/10000).toFixed(0)}만) — 매도 준비`});
+    } else if(d.stop&&cur<=d.stop*1.05){
+      items.push({color:'#ff3060',icon:'🔴',text:`${h.name} 손절선(${(d.stop/10000).toFixed(0)}만) 5% 근접 — 즉각 대응 필요`});
+    } else if(d.stop&&cur<=d.stop*1.12){
+      items.push({color:'#ffb938',icon:'🟡',text:`${h.name} 손절선 근접(현재 ${(cur/10000).toFixed(0)}만) — 모니터링 강화`});
+    } else if(pctVal>=40){
+      items.push({color:'#ffb938',icon:'🟡',text:`${h.name} +${pctVal.toFixed(0)}% 고수익 구간 — 일부 차익실현 검토`});
+    } else if(pctVal>0){
+      items.push({color:'#00f5b4',icon:'🟢',text:`${h.name} +${pctVal.toFixed(0)}% 순항 중`});
+    } else {
+      items.push({color:'#6a80aa',icon:'⚪',text:`${h.name} ${pctVal.toFixed(0)}% — 홀딩 유지`});
+    }
+  });
+
+  if(items.length===0){
+    el.innerHTML=`<div style="font-size:10px;color:var(--text3);text-align:center;padding:4px 0;">포트폴리오 정상 상태</div>`;
+    return;
+  }
+
+  /* 우선순위 정렬: 🔴 → 🟡 → 🟢 → ⚪ */
+  const order={'🔴':0,'🟡':1,'🟢':2,'⚪':3};
+  items.sort((a,b)=>(order[a.icon]||9)-(order[b.icon]||9));
+
+  el.innerHTML=items.map(item=>`
+    <div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid rgba(79,143,255,0.07);">
+      <span style="font-size:11px;flex-shrink:0;margin-top:1px;">${item.icon}</span>
+      <span style="font-size:10px;color:${item.color};line-height:1.5;">${item.text}</span>
+    </div>`).join('');
+}
+
+async function runAIBriefing(){
+  const btn=document.getElementById('ai-briefing-btn');
+  const aiBox=document.getElementById('briefing-ai');
+  const aiText=document.getElementById('briefing-ai-text');
+  if(!btn||!aiBox||!aiText)return;
+
+  btn.textContent='✦ 분석 중...';
+  btn.style.opacity='0.6';
+  btn.disabled=true;
+  aiBox.style.display='block';
+  aiText.textContent='Claude가 포트폴리오를 분석 중입니다...';
+
+  /* 포트폴리오 데이터 구성 */
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  let totalVal=0;
+  all.forEach(h=>totalVal+=PRICES[h.id]*h.qty);
+  const cashTotal=CASH.kiwoom+CASH.toss;
+  const cashPct=(cashTotal/(totalVal+cashTotal)*100).toFixed(1);
+
+  const holdings=all.map(h=>{
+    const cur=PRICES[h.id];
+    const d=SIM_DEFAULTS[h.id]||{};
+    const pct=((cur-h.avg)/h.avg*100).toFixed(1);
+    return `- ${h.name}(${h.id}): ${h.qty}주, 평단 ${(h.avg/10000).toFixed(0)}만, 현재 ${(cur/10000).toFixed(0)}만, 수익률 ${pct}%, 목표가 ${d.target?(d.target/10000).toFixed(0)+'만':'미설정'}, 손절가 ${d.stop?(d.stop/10000).toFixed(0)+'만':'미설정'}`;
+  }).join('\n');
+
+  const kospi=document.getElementById('macro-kospi')?.textContent||'—';
+  const usd=document.getElementById('macro-usd')?.textContent||'—';
+  const wti=document.getElementById('macro-wti')?.textContent||'—';
+
+  const prompt=`당신은 25년 경력의 한국 주식 투자 전문가입니다. 아래 포트폴리오를 분석하고 오늘 당장 해야 할 액션을 간결하게 브리핑해주세요.
+
+[매크로]
+- KOSPI: ${kospi}
+- USD/KRW: ${usd}
+- WTI: ${wti}
+
+[포트폴리오]
+- 현금비중: ${cashPct}% (목표 25~30%)
+- 2026 확정수익: +3,620만원
+${holdings}
+
+[투자 원칙]
+- 비펀더멘털 조정 = 매수 기회
+- 이벤트 드리븐 청산 선호 (실적발표, 배당락 전 정리)
+- 현금 25~30% 유지 원칙
+- 에이피알 5/8 실적발표 예정
+- 미래에셋증권은 SpaceX IPO 이벤트 드리븐 홀딩
+
+다음 형식으로 답변해주세요 (총 200자 이내, 핵심만):
+🔴 즉시 액션 필요한 종목과 이유
+🟡 모니터링 강화 종목과 이유
+💡 오늘의 핵심 전략 한 줄`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data?.content?.[0]?.text||'분석 결과를 가져올 수 없습니다.';
+    aiText.textContent=text;
+  }catch(e){
+    aiText.textContent='AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  }
+
+  btn.textContent='✦ AI 심층분석';
+  btn.style.opacity='1';
+  btn.disabled=false;
+}
+
 async function fetchMacroData(){
   const proxyWrap=url=>`https://corsproxy.io/?${encodeURIComponent(url)}`;
   const proxyWrap2=url=>`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
@@ -1598,13 +1749,42 @@ async function fetchMacroData(){
     }
   }catch(e){}
 
-  /* ── 원달러: 네이버 환율 API ── */
+  /* ── 원달러: 네이버 환율 API (다중 엔드포인트) ── */
   try{
-    const data=await fetchJson('https://m.stock.naver.com/api/forex/FX_USDKRW/basic');
-    if(data?.closePrice){
-      const v=parseFloat(String(data.closePrice).replace(/,/g,''));
-      const ch=data.compareToPreviousClosePrice?parseFloat(String(data.compareToPreviousClosePrice).replace(/,/g,'')):null;
-      setMacro('usd',Math.round(v).toLocaleString('ko-KR'),ch?ch/v*100:null);
+    /* 1차: 네이버 금융 환율 페이지 파싱 */
+    const text=await fetchText('https://finance.naver.com/marketindex/exchangeDetail.naver?marketindexCd=FX_USDKRW');
+    const m=text.match(/value="([\d,.]+)"[^>]*id="[^"]*now/)||
+             text.match(/class="[^"]*num[^"]*"[^>]*>([\d,]+\.\d+)/)||
+             text.match(/<span[^>]*class="[^"]*blind[^"]*"[^>]*>([\d,]+\.\d+)/);
+    if(m){
+      const v=parseFloat(m[1].replace(/,/g,''));
+      if(v>900&&v<2000)setMacro('usd',Math.round(v).toLocaleString('ko-KR'),null);
+    }
+  }catch(e){}
+
+  /* 2차 폴백: 네이버 모바일 환율 JSON */
+  try{
+    const usdEl=document.getElementById('macro-usd');
+    if(!usdEl||usdEl.textContent==='—'){
+      const data=await fetchJson('https://m.stock.naver.com/front-api/v1/marketIndex/FX_USDKRW/basic');
+      const price=data?.result?.closePrice||data?.closePrice||data?.result?.currentPrice;
+      if(price){
+        const v=parseFloat(String(price).replace(/,/g,''));
+        if(v>900&&v<2000)setMacro('usd',Math.round(v).toLocaleString('ko-KR'),null);
+      }
+    }
+  }catch(e){}
+
+  /* 3차 폴백: Yahoo KRW=X */
+  try{
+    const usdEl=document.getElementById('macro-usd');
+    if(!usdEl||usdEl.textContent==='—'){
+      const data=await fetchJson('https://query2.finance.yahoo.com/v8/finance/chart/KRW%3DX?interval=1d&range=1d');
+      const price=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      const prev=data?.chart?.result?.[0]?.meta?.chartPreviousClose;
+      if(price&&price>900){
+        setMacro('usd',Math.round(price).toLocaleString('ko-KR'),prev?((price-prev)/prev*100):null);
+      }
     }
   }catch(e){}
 
@@ -1770,6 +1950,7 @@ async function saveHistoryToGist(){
   async function init(){
     try{ await loadHistoryFromGist(); }catch(e){ console.warn('Gist 실패, 기본값 사용:', e); }
     renderDash();
+    renderRuleBriefing();
     fetchMacroData();
   }
   init();
