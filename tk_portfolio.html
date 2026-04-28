@@ -1528,7 +1528,6 @@ function renderAnalysis() {
       </button>`;
     }).join('');
   }
-}
 
 function openModal(){Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)el.value=PRICES[k].toLocaleString('ko-KR');});document.getElementById('p-cash-k').value=CASH.kiwoom.toLocaleString('ko-KR');document.getElementById('p-cash-t').value=CASH.toss.toLocaleString('ko-KR');document.getElementById('modal-bg').classList.add('open');}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
