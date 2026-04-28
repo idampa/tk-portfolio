@@ -106,6 +106,54 @@ canvas{display:block;}
 .sc-tab:nth-child(1).active{background:rgba(255,185,56,0.09);border-color:var(--gold);color:var(--gold);}
 .sc-tab:nth-child(3).active{background:rgba(0,245,180,0.08);border-color:var(--profit);color:var(--profit);}
 .sim-chart-wrap{background:rgba(4,6,15,0.8);border-radius:10px;padding:12px;margin-top:10px;border:1px solid var(--border);}
+
+/* ══ GLASSMORPHISM UPGRADES ══ */
+.card{background:rgba(11,16,34,0.75)!important;border:1px solid rgba(79,143,255,0.18)!important;border-radius:16px!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;box-shadow:0 4px 28px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.045)!important;}
+.card.green{border-color:rgba(0,245,180,0.28)!important;}
+.card.red{border-color:rgba(255,48,96,0.28)!important;}
+.card.gold{border-color:rgba(255,185,56,0.28)!important;}
+.card.blue{border-color:rgba(77,139,255,0.32)!important;}
+
+/* ══ GAUGE BAR ══ */
+.gauge-wrap{margin:4px 0 10px;position:relative;}
+.gauge-track{height:11px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:visible;position:relative;}
+.gauge-track-inner{height:11px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;position:relative;}
+.gauge-zone{position:absolute;top:0;height:100%;background:rgba(0,245,180,0.13);border-left:1.5px dashed rgba(0,245,180,0.5);border-right:1.5px dashed rgba(0,245,180,0.5);}
+.gauge-fill{height:100%;border-radius:6px;transition:width 1.3s cubic-bezier(0.34,1.56,0.64,1);position:relative;}
+.gauge-pin{position:absolute;top:-20px;transform:translateX(-50%);font-family:var(--mono);font-size:10px;font-weight:700;white-space:nowrap;transition:left 1.3s cubic-bezier(0.34,1.56,0.64,1);}
+.gauge-ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:4px;}
+
+/* ══ DONUT CHART ══ */
+.donut-row{display:flex;align-items:center;gap:14px;}
+.donut-canvas-box{position:relative;flex-shrink:0;width:130px;height:130px;}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:5px;}
+.d-leg-item{display:flex;align-items:center;gap:6px;font-size:9.5px;}
+.d-leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* ══ PROFIT SUMMARY CHART ══ */
+.profit-bars{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.profit-bar-row{display:flex;align-items:center;gap:8px;}
+.profit-bar-label{font-family:var(--mono);font-size:9px;width:62px;text-align:right;flex-shrink:0;}
+.profit-bar-track{flex:1;height:18px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;position:relative;}
+.profit-bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;transition:width 1s cubic-bezier(0.34,1.56,0.64,1);}
+.profit-bar-val{font-family:var(--mono);font-size:9px;white-space:nowrap;font-weight:600;}
+
+/* ══ TRADE FILTER ══ */
+.trade-filter-row{display:flex;gap:6px;margin-bottom:12px;}
+.tfilter{flex:1;padding:7px 4px;background:rgba(4,6,15,0.8);border:1px solid rgba(79,143,255,0.12);border-radius:8px;color:var(--text3);font-size:11px;font-weight:600;font-family:var(--sans);cursor:pointer;text-align:center;transition:all .2s;}
+.tfilter.fa{background:rgba(79,143,255,0.1);border-color:var(--accent);color:var(--accent);}
+.tfilter.fs{background:rgba(0,245,180,0.08);border-color:var(--profit);color:var(--profit);}
+.tfilter.fl{background:rgba(255,48,96,0.08);border-color:var(--loss);color:var(--loss);}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes countPulse{0%,100%{opacity:1}50%{opacity:.7}}
+.anim{opacity:0;animation:fadeUp .55s ease forwards;}
+.anim:nth-child(1){animation-delay:.05s}.anim:nth-child(2){animation-delay:.13s}
+.anim:nth-child(3){animation-delay:.21s}.anim:nth-child(4){animation-delay:.29s}
+.anim:nth-child(5){animation-delay:.37s}.anim:nth-child(6){animation-delay:.45s}
+.anim:nth-child(7){animation-delay:.53s}
 </style>
 </head>
 <body>
@@ -135,16 +183,20 @@ canvas{display:block;}
 </div>
 
 <div class="page active" id="page-dash">
-  <div onclick="openTrendModal('total')" style="background:linear-gradient(135deg,rgba(11,16,32,0.97),rgba(7,10,23,0.97));border:1px solid rgba(79,143,255,0.3);border-radius:18px;padding:22px 20px 18px;margin-bottom:10px;position:relative;overflow:hidden;text-align:center;cursor:pointer;">
+
+  <!-- ① HERO TOTAL -->
+  <div onclick="openTrendModal('total')" style="background:linear-gradient(135deg,rgba(11,16,32,0.97),rgba(7,10,23,0.97));border:1px solid rgba(79,143,255,0.3);border-radius:18px;padding:20px 20px 16px;margin-bottom:10px;position:relative;overflow:hidden;text-align:center;cursor:pointer;">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4d8bff,#00e5ff,#00f5b4,transparent);box-shadow:0 0 12px rgba(77,139,255,0.6);"></div>
-    <div style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--text3);margin-bottom:10px;">TOTAL PORTFOLIO VALUE</div>
-    <div style="display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:6px;">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--text3);margin-bottom:8px;">TOTAL PORTFOLIO VALUE</div>
+    <div style="display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:5px;">
       <div class="hero-total" id="total-val" style="font-size:32px;">—</div>
       <div id="total-diff" style="font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:6px;display:none;"></div>
     </div>
     <div class="hero-pnl" id="total-pnl">—</div>
-    <div style="font-size:10px;color:var(--text3);margin-top:6px;">키움 + 토스 + 현금 합산</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:5px;">키움 + 토스 + 현금 합산</div>
   </div>
+
+  <!-- ② STAT MINI CARDS (2x2) -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
     <div onclick="openTrendModal('cashPct')" style="background:rgba(77,139,255,0.07);border:1px solid rgba(77,139,255,0.25);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;cursor:pointer;">
       <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--cyan));"></div>
@@ -171,7 +223,75 @@ canvas{display:block;}
       <div style="font-size:9px;color:var(--text3);margin-top:2px;">키움+토스 예수금</div>
     </div>
   </div>
+
+  <!-- ⑥ 분석 섹션 (접기/펼치기) -->
   <div style="display:none;"><div id="cash-bar-fill"></div></div>
+  <button onclick="toggleAnalytics()" id="analytics-toggle-btn" style="width:100%;margin-bottom:10px;padding:11px 16px;background:rgba(11,16,34,0.75);border:1px solid rgba(79,143,255,0.22);border-radius:14px;color:var(--text2);font-size:11px;font-weight:600;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);">
+    <span style="display:flex;align-items:center;gap:7px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+      분석 대시보드
+    </span>
+    <span id="analytics-chevron" style="font-size:10px;color:var(--text3);transition:transform .3s;">▼</span>
+  </button>
+
+  <div id="analytics-panel" style="overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);margin-bottom:0;">
+    <div style="padding-bottom:10px;">
+
+      <!-- GAUGE CARD -->
+      <div class="card" style="margin-bottom:10px;">
+        <div class="s-label" style="margin-bottom:12px;">현금 비중 목표 게이지</div>
+        <div class="gauge-wrap">
+          <div style="position:relative;">
+            <span class="gauge-pin" id="g-pin">—</span>
+            <div class="gauge-track-inner">
+              <div class="gauge-zone" id="g-zone"></div>
+              <div class="gauge-fill" id="g-fill"></div>
+            </div>
+          </div>
+          <div class="gauge-ticks"><span>0%</span><span style="color:rgba(0,245,180,0.65);">◀ 목표 25~30% ▶</span><span>50%+</span></div>
+        </div>
+        <div id="g-status" style="font-family:var(--mono);font-size:9px;padding:5px 8px;border-radius:6px;text-align:center;margin-top:2px;"></div>
+      </div>
+
+      <!-- DONUT CARD -->
+      <div class="card" style="margin-bottom:10px;">
+        <div class="s-label" style="margin-bottom:10px;">보유 종목 비중</div>
+        <div class="donut-row">
+          <div class="donut-canvas-box">
+            <canvas id="donutChart" width="130" height="130"></canvas>
+            <div class="donut-center">
+              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);">TOTAL</div>
+              <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--text);" id="donut-mid">—</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donut-leg"></div>
+        </div>
+      </div>
+
+      <!-- PROFIT CHART CARD -->
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="s-label" style="margin-bottom:0;">2026 수익 실현 내역</div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span style="font-family:var(--mono);font-size:8px;color:var(--text3);" id="profit-mode-lbl">종목별</span>
+            <div onclick="toggleProfitMode()" id="profit-toggle" style="width:34px;height:18px;background:rgba(79,143,255,0.15);border:1px solid rgba(79,143,255,0.3);border-radius:9px;position:relative;cursor:pointer;transition:background .25s;">
+              <div id="profit-toggle-knob" style="position:absolute;top:2px;left:2px;width:12px;height:12px;background:#4d8bff;border-radius:50%;transition:left .25s;box-shadow:0 0 6px rgba(77,139,255,0.6);"></div>
+            </div>
+            <span style="font-family:var(--mono);font-size:8px;color:var(--text3);">월별</span>
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;">익절 합계 <span style="color:var(--profit);font-weight:700;">+3,625만</span>　손절 합계 <span style="color:var(--loss);">-208만</span></div>
+        <div class="profit-bars" id="profit-bars"></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(79,143,255,0.1);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:var(--text2);">2026 누적 순확정손익</span>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--profit);text-shadow:0 0 12px rgba(0,245,180,0.6);">+3,419만</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ③ KIWOOM 종목 -->
   <div class="sec-head"><div class="sec-title">KIWOOM</div><div class="sec-badge" id="kiwoom-badge">—</div></div>
   <div class="card">
     <div id="kiwoom-stocks"></div>
@@ -180,6 +300,8 @@ canvas{display:block;}
       <span style="font-family:var(--mono);font-size:11px;color:var(--accent);" id="kiwoom-cash-lbl">—</span>
     </div>
   </div>
+
+  <!-- ④ TOSS 종목 -->
   <div class="sec-head"><div class="sec-title">TOSS</div><div class="sec-badge" id="toss-badge">—</div></div>
   <div class="card">
     <div id="toss-stocks"></div>
@@ -188,6 +310,8 @@ canvas{display:block;}
       <span style="font-family:var(--mono);font-size:11px;color:var(--purple);" id="toss-cash-lbl">—</span>
     </div>
   </div>
+
+  <!-- ⑤ 수익 요약 -->
   <div class="sec-head"><div class="sec-title">수익 요약</div></div>
   <div class="card">
     <div class="sum-row"><span class="sum-key">키움 평가손익</span><span class="sum-val" id="sum-kiwoom-pnl">—</span></div>
@@ -200,7 +324,9 @@ canvas{display:block;}
       <span class="sum-val up" style="font-size:13px;">+34,198,732원</span>
     </div>
   </div>
-  <button onclick="autoSaveHistory();" id="gist-save-btn" style="width:100%;margin-top:6px;padding:12px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(77,139,255,0.08));border:1px solid rgba(0,229,255,0.25);border-radius:12px;color:#00e5ff;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+
+  <!-- ⑦ GIST 저장 버튼 -->
+  <button onclick="autoSaveHistory();" id="gist-save-btn" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(77,139,255,0.08));border:1px solid rgba(0,229,255,0.25);border-radius:12px;color:#00e5ff;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
     오늘 기록 저장 (Gist 자동 업로드)
   </button>
@@ -375,7 +501,8 @@ canvas{display:block;}
 
 <div class="page" id="page-log">
   <div class="sec-head"><div class="sec-title">2026 매매일지</div><div class="sec-badge">누적 +3,660만</div></div>
-  <div class="card green">
+  <div class="trade-filter-row"><button class="tfilter fa" id="tf-all" onclick="filterTrades('all')">전체</button><button class="tfilter" id="tf-sell" onclick="filterTrades('sell')">매도익절</button><button class="tfilter" id="tf-loss" onclick="filterTrades('loss')">손절</button></div>
+  <div id="log-sell"><div class="card green">
     <div class="s-label">수익 실현</div>
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">에이피알</div><div class="trade-detail">01.29 · 13주 · 227,500→270,000</div></div><div class="trade-pnl up">+55만</div></div>
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">02.20 · 15주 · 430,500→949,000</div></div><div class="trade-pnl up">+778만</div></div>
@@ -399,11 +526,12 @@ canvas{display:block;}
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.14 · 3주 · +54.05%</div></div><div class="trade-pnl up">+118만</div></div>
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.15 · 3주 · +56.66%</div></div><div class="trade-pnl up">+123만</div></div>
   </div>
-  <div class="card red">
+  </div><div id="log-loss"><div class="card red">
     <div class="s-label">손실 확정</div>
     <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">펄어비스</div><div class="trade-detail">03.19 · 83주 · 60,628→47,550</div></div><div class="trade-pnl dn">-109만</div></div>
     <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">미래에셋벤처투자</div><div class="trade-detail">02.23~02.27 · 400주</div></div><div class="trade-pnl dn">-95만</div></div>
     <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">한화솔루션</div><div class="trade-detail">03.06~03.12 · 67주</div></div><div class="trade-pnl dn">-4만</div></div>
+  </div>
   </div>
 </div>
 
@@ -702,7 +830,7 @@ async function autoFetchPrices(){
     if(quotes.length===0)throw new Error('데이터 없음');
     PRICES_PREV={...PRICES};
     quotes.forEach(q=>{const id=Object.keys(YAHOO_TICKERS).find(k=>YAHOO_TICKERS[k]===q.symbol);if(id&&q.regularMarketPrice)PRICES[id]=Math.round(q.regularMarketPrice);});
-    renderDash();setDate();autoSaveHistory();
+    renderDash();setDate();autoSaveHistory();refreshExtras();renderProfitBars();
     btn.textContent='✓ 조회완료';btn.style.background='rgba(0,245,180,0.15)';btn.style.color='#00f5b4';btn.style.borderColor='rgba(0,245,180,0.4)';
     setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9"/></svg>자동조회';btn.style.background='rgba(0,229,255,0.07)';btn.style.color='#00e5ff';btn.style.borderColor='rgba(0,229,255,0.25)';btn.style.opacity='1';btn.disabled=false;},2500);
   }catch(e){
@@ -808,7 +936,7 @@ function showPage(name,btn){document.querySelectorAll('.page').forEach(p=>p.clas
 function openModal(){Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)el.value=PRICES[k].toLocaleString('ko-KR');});document.getElementById('p-cash-k').value=CASH.kiwoom.toLocaleString('ko-KR');document.getElementById('p-cash-t').value=CASH.toss.toLocaleString('ko-KR');document.getElementById('modal-bg').classList.add('open');}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 function closeModalOutside(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
-function saveUpdate(){PRICES_PREV={...PRICES};Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)PRICES[k]=unFmt(el.value)||PRICES[k];});CASH.kiwoom=unFmt(document.getElementById('p-cash-k').value)||CASH.kiwoom;CASH.toss=unFmt(document.getElementById('p-cash-t').value)||CASH.toss;closeModal();renderDash();setDate();}
+function saveUpdate(){PRICES_PREV={...PRICES};Object.keys(PRICES).forEach(k=>{const el=document.getElementById('p-'+k);if(el)PRICES[k]=unFmt(el.value)||PRICES[k];});CASH.kiwoom=unFmt(document.getElementById('p-cash-k').value)||CASH.kiwoom;CASH.toss=unFmt(document.getElementById('p-cash-t').value)||CASH.toss;closeModal();renderDash();setDate();refreshExtras();renderProfitBars();}
 
 function renderDash(){
   let kPnl=0,kCost=0,kVal=0,tPnl=0,tCost=0,tVal=0;
@@ -818,7 +946,7 @@ function renderDash(){
   HOLDINGS.toss.forEach(h=>{const cur=PRICES[h.id],val=cur*h.qty,cost=h.avg*h.qty;tPnl+=val-cost;tCost+=cost;tVal+=val;tHTML+=makeStockHTML(h);});
   document.getElementById('kiwoom-stocks').innerHTML=kHTML;document.getElementById('toss-stocks').innerHTML=tHTML;
   const grand=kVal+tVal+CASH.kiwoom+CASH.toss,cashTotal=CASH.kiwoom+CASH.toss,cashPct=(cashTotal/grand*100).toFixed(1),totalPnl=kPnl+tPnl;
-  document.getElementById('total-val').textContent=Math.round(grand/10000).toLocaleString('ko-KR')+'만원';
+  countUp(document.getElementById('total-val'),Math.round(grand/10000),'만원',950);
   let prevVal=0;HOLDINGS.kiwoom.forEach(h=>{prevVal+=(PRICES_PREV[h.id]||PRICES[h.id])*h.qty;});HOLDINGS.toss.forEach(h=>{prevVal+=(PRICES_PREV[h.id]||PRICES[h.id])*h.qty;});prevVal+=CASH.kiwoom+CASH.toss;
   const diffWon=grand-prevVal,diffMan=Math.round(diffWon/10000),diffEl=document.getElementById('total-diff');
   if(diffEl&&Math.abs(diffMan)>0){const isUp=diffWon>=0;diffEl.style.display='inline-block';diffEl.textContent=(isUp?'▲ +':'▼ ')+Math.abs(diffMan).toLocaleString('ko-KR')+'만';diffEl.style.background=isUp?'rgba(0,245,180,0.12)':'rgba(255,48,96,0.12)';diffEl.style.color=isUp?'var(--profit)':'var(--loss)';diffEl.style.border=`1px solid ${isUp?'rgba(0,245,180,0.3)':'rgba(255,48,96,0.3)'}`;}
@@ -948,6 +1076,175 @@ function renderStockChart(id){
   if(isUp){grad.addColorStop(0,'rgba(0,245,180,0.28)');grad.addColorStop(1,'rgba(0,245,180,0.01)');}else{grad.addColorStop(0,'rgba(255,48,96,0.28)');grad.addColorStop(1,'rgba(255,48,96,0.01)');}
   const lineColor=isUp?'#00f5b4':'#ff3060';
   chartInstances['stockChart']=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:lineColor,backgroundColor:grad,fill:true,tension:0.4,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:lineColor,pointBorderColor:'#0b1020',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(7,10,23,0.95)',borderColor:lineColor,borderWidth:1,bodyColor:'#dde6ff',bodyFont:{family:'JetBrains Mono',size:11},callbacks:{label:c=>` ${c.raw>=0?'+':''}${c.raw}%`}}},scales:{x:{ticks:{color:'#6a80aa',font:{size:9}},grid:{color:'rgba(79,143,255,0.06)'}},y:{ticks:{color:'#6a80aa',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(79,143,255,0.08)'},afterDataLimits(s){const pad=Math.max(Math.abs(s.max-s.min)*0.15,0.5);s.min-=pad;s.max+=pad;}}}}});
+}
+
+
+/* ━━ GAUGE ━━ */
+function renderGauge(pv){
+  const fill=document.getElementById('g-fill'),zone=document.getElementById('g-zone'),pin=document.getElementById('g-pin'),st=document.getElementById('g-status');
+  if(!fill)return;
+  pv=Math.min(Math.max(pv,0),100);
+  const MAX=50; // 게이지 표시 최대값 50%
+  const dispPct=Math.min(pv,MAX)/MAX*100; // 실제 바 너비 (0~100%)
+  const inZ=pv>=25&&pv<=30,low=pv<25;
+  const col=inZ?'#00f5b4':low?'#ff3060':'#ffb938';
+  const glow=inZ?'rgba(0,245,180,0.55)':low?'rgba(255,48,96,0.55)':'rgba(255,185,56,0.55)';
+  fill.style.width=dispPct+'%';
+  fill.style.background='linear-gradient(90deg,'+col+'66,'+col+')';
+  fill.style.boxShadow='0 0 14px '+glow;
+  zone.style.left=(25/MAX*100)+'%';zone.style.width=((30-25)/MAX*100)+'%';
+  pin.style.left=dispPct+'%';pin.textContent=pv.toFixed(1)+'%';pin.style.color=col;
+  if(inZ){st.textContent='✅ 목표 범위 내 (25~30%)';st.style.cssText='background:rgba(0,245,180,0.07);color:#00f5b4;border:1px solid rgba(0,245,180,0.2);border-radius:6px;padding:5px;text-align:center;font-family:var(--mono);font-size:9px;';}
+  else if(low){st.textContent='⚠️ 현금 부족 — 목표보다 '+(25-pv).toFixed(1)+'% 낮음';st.style.cssText='background:rgba(255,48,96,0.07);color:#ff3060;border:1px solid rgba(255,48,96,0.2);border-radius:6px;padding:5px;text-align:center;font-family:var(--mono);font-size:9px;';}
+  else{st.textContent='💰 현금 과다 — 목표보다 '+(pv-30).toFixed(1)+'% 높음';st.style.cssText='background:rgba(255,185,56,0.07);color:#ffb938;border:1px solid rgba(255,185,56,0.2);border-radius:6px;padding:5px;text-align:center;font-family:var(--mono);font-size:9px;';}
+}
+
+/* ━━ DONUT ━━ */
+const DC=['#4d8bff','#00f5b4','#ffb938','#a855f7','#00e5ff','#ff3060','#ff9f40','#c9cbcf'];
+function renderDonut(){
+  if(chartInstances.donutChart){chartInstances.donutChart.destroy();delete chartInstances.donutChart;}
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  const lbls=[],vals=[],cols=[];let tot=0;
+  all.forEach((h,i)=>{const v=PRICES[h.id]*h.qty;tot+=v;lbls.push(h.name);vals.push(v);cols.push(DC[i%DC.length]);});
+  const ct=CASH.kiwoom+CASH.toss;tot+=ct;lbls.push('현금');vals.push(ct);cols.push('#4a5a7a');
+  const cvs=document.getElementById('donutChart');if(!cvs)return;
+  chartInstances.donutChart=new Chart(cvs.getContext('2d'),{
+    type:'doughnut',
+    data:{labels:lbls,datasets:[{data:vals,backgroundColor:cols.map(c=>c+'bb'),borderColor:cols,borderWidth:1.5,hoverOffset:5}]},
+    options:{responsive:false,cutout:'66%',animation:{duration:900,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(4,6,15,0.95)',borderColor:'rgba(79,143,255,0.3)',borderWidth:1,titleColor:'#9aafd4',bodyColor:'#dde6ff',callbacks:{label:c=>' '+c.label+': '+Math.round(c.raw/10000).toLocaleString()+'만 ('+(c.raw/tot*100).toFixed(1)+'%)'}}}}
+  });
+  const mid=document.getElementById('donut-mid');if(mid)mid.textContent=Math.round(tot/10000).toLocaleString()+'만';
+  const leg=document.getElementById('donut-leg');if(!leg)return;leg.innerHTML='';
+  all.forEach((h,i)=>{const p=(vals[i]/tot*100).toFixed(1),nm=h.name.length>5?h.name.slice(0,5)+'..':h.name;
+    leg.innerHTML+='<div class="d-leg-item"><div class="d-leg-dot" style="background:'+cols[i]+';box-shadow:0 0 5px '+cols[i]+'88;"></div><span style="color:var(--text2);flex:1;">'+nm+'</span><span style="font-family:var(--mono);font-size:9px;color:var(--text3);">'+p+'%</span></div>';});
+  leg.innerHTML+='<div class="d-leg-item"><div class="d-leg-dot" style="background:#4a5a7a;"></div><span style="color:var(--text2);flex:1;">현금</span><span style="font-family:var(--mono);font-size:9px;color:var(--text3);">'+(ct/tot*100).toFixed(1)+'%</span></div>';
+}
+
+/* ━━ PROFIT BARS ━━ */
+const PROFIT_DATA=[
+  {name:'현대모비스',pnl:18670000,type:'sell'},
+  {name:'SK하이닉스',pnl:12330000,type:'sell'},
+  {name:'에이피알',pnl:2160000,type:'sell'},
+  {name:'ISC',pnl:720000,type:'sell'},
+  {name:'한화에어로',pnl:430000,type:'sell'},
+  {name:'두산에너빌',pnl:70000,type:'sell'},
+  {name:'네이버',pnl:50000,type:'sell'},
+  {name:'펄어비스(익)',pnl:160000,type:'sell'},
+  {name:'펄어비스(손)',pnl:-1090914,type:'loss'},
+  {name:'미래에셋벤처',pnl:-945912,type:'loss'},
+  {name:'한화솔루션',pnl:-40000,type:'loss'},
+];
+const PROFIT_MONTHLY=[
+  {name:'1월',pnl:550000,type:'sell'},
+  {name:'2월',pnl:26780000,type:'sell'},
+  {name:'3월',pnl:-775914,type:'loss'},
+  {name:'3월(익)',pnl:160000,type:'sell'},
+  {name:'4월',pnl:7490000,type:'sell'},
+];
+// 월별 실제 계산: 1월+55만, 2월+778+5+1867+7=2657만→+2683만, 3월+16+233-109-95-4=-41만→순, 4월+34+144+80+43+38+81+118+123=661만→순
+const PROFIT_MONTHLY_REAL=[
+  {name:'1월',pnl:550000},
+  {name:'2월',pnl:26830000},
+  {name:'3월',pnl:-739000},
+  {name:'4월',pnl:6610000},
+];
+
+let profitMode='stock'; // 'stock' | 'monthly'
+
+function toggleProfitMode(){
+  profitMode=profitMode==='stock'?'monthly':'stock';
+  const knob=document.getElementById('profit-toggle-knob');
+  const tog=document.getElementById('profit-toggle');
+  const lbl=document.getElementById('profit-mode-lbl');
+  if(profitMode==='monthly'){
+    knob.style.left='18px';
+    tog.style.background='rgba(0,245,180,0.15)';
+    tog.style.borderColor='rgba(0,245,180,0.35)';
+    knob.style.background='#00f5b4';
+    knob.style.boxShadow='0 0 6px rgba(0,245,180,0.6)';
+    lbl.style.color='var(--profit)';
+  } else {
+    knob.style.left='2px';
+    tog.style.background='rgba(79,143,255,0.15)';
+    tog.style.borderColor='rgba(79,143,255,0.3)';
+    knob.style.background='#4d8bff';
+    knob.style.boxShadow='0 0 6px rgba(77,139,255,0.6)';
+    lbl.style.color='var(--text3)';
+  }
+  renderProfitBars();
+}
+
+function renderProfitBars(){
+  const el=document.getElementById('profit-bars');if(!el)return;
+  const data=profitMode==='monthly'?PROFIT_MONTHLY_REAL:PROFIT_DATA;
+  const maxAbs=Math.max(...data.map(d=>Math.abs(d.pnl)));
+  el.innerHTML='';
+  data.forEach((d,i)=>{
+    const isPos=d.pnl>=0;
+    const barPct=Math.abs(d.pnl)/maxAbs*100;
+    const col=isPos?'#00f5b4':'#ff3060';
+    const glow=isPos?'rgba(0,245,180,0.35)':'rgba(255,48,96,0.35)';
+    const sign=isPos?'+':'';
+    const valStr=sign+Math.round(d.pnl/10000)+'만';
+    const row=document.createElement('div');row.className='profit-bar-row';
+    row.innerHTML='<div class="profit-bar-label" style="color:'+col+';font-size:8.5px;">'+d.name+'</div><div class="profit-bar-track"><div class="profit-bar-fill" id="pb-'+i+'" style="width:0%;background:linear-gradient(90deg,'+col+'44,'+col+'99);box-shadow:0 0 8px '+glow+';"><span class="profit-bar-val" style="color:'+col+';">'+valStr+'</span></div></div>';
+    el.appendChild(row);
+    setTimeout(()=>{const f=document.getElementById('pb-'+i);if(f)f.style.width=barPct+'%';},80+i*70);
+  });
+}
+
+/* ━━ ANALYTICS TOGGLE ━━ */
+let analyticsOpen=false;
+function toggleAnalytics(){
+  analyticsOpen=!analyticsOpen;
+  const panel=document.getElementById('analytics-panel');
+  const chevron=document.getElementById('analytics-chevron');
+  const btn=document.getElementById('analytics-toggle-btn');
+  if(analyticsOpen){
+    panel.style.maxHeight=panel.scrollHeight+600+'px';
+    chevron.style.transform='rotate(180deg)';
+    btn.style.borderColor='rgba(79,143,255,0.4)';
+    btn.style.color='var(--accent)';
+    // 패널 열릴 때 차트/게이지 렌더
+    setTimeout(()=>{
+      refreshExtras();
+      renderProfitBars();
+    },150);
+  } else {
+    panel.style.maxHeight='0';
+    chevron.style.transform='rotate(0deg)';
+    btn.style.borderColor='rgba(79,143,255,0.22)';
+    btn.style.color='var(--text2)';
+  }
+}
+
+/* ━━ TRADE FILTER ━━ */
+function filterTrades(t){
+  ['all','sell','loss'].forEach(x=>{const b=document.getElementById('tf-'+x);if(b)b.className='tfilter'+(t===x?' f'+t[0]:'');});
+  const sell=document.getElementById('log-sell'),loss=document.getElementById('log-loss');
+  if(t==='all'){sell.style.display='';loss.style.display='';}
+  else if(t==='sell'){sell.style.display='';loss.style.display='none';}
+  else{sell.style.display='none';loss.style.display='';}
+}
+
+/* ━━ COUNT-UP ANIMATION ━━ */
+function countUp(el,target,suffix='만원',dur=900){
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
+    const v=Math.round(target*e);
+    el.textContent=v.toLocaleString('ko-KR')+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ━━ REFRESH EXTRAS ━━ */
+function refreshExtras(){
+  let sv=0;[...HOLDINGS.kiwoom,...HOLDINGS.toss].forEach(h=>{sv+=PRICES[h.id]*h.qty;});
+  const ct=CASH.kiwoom+CASH.toss,gt=sv+ct,cp=parseFloat((ct/gt*100).toFixed(1));
+  setTimeout(()=>renderGauge(cp),300);
+  setTimeout(()=>renderDonut(),450);
 }
 
 const GIST_TOKEN='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';
