@@ -1668,16 +1668,21 @@ ${holdings}
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-6',
         max_tokens:1000,
         messages:[{role:'user',content:prompt}]
       })
     });
     const data=await res.json();
-    const text=data?.content?.[0]?.text||'분석 결과를 가져올 수 없습니다.';
-    aiText.textContent=text;
+    if(!res.ok){
+      const errMsg=data?.error?.message||JSON.stringify(data);
+      aiText.textContent=`API 오류 (${res.status}): ${errMsg}`;
+    } else {
+      const text=data?.content?.[0]?.text||'분석 결과를 가져올 수 없습니다.';
+      aiText.textContent=text;
+    }
   }catch(e){
-    aiText.textContent='AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    aiText.textContent=`연결 오류: ${e.message}`;
   }
 
   btn.textContent='✦ AI 심층분석';
