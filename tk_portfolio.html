@@ -443,6 +443,7 @@ canvas{display:block;}
       <option value="DSE">두산에너빌리티</option>
       <option value="MIA">미래에셋증권</option>
       <option value="TIG">TIGER 미국우주테크</option>
+      <option value="ABL">에이비엘바이오</option>
     </select>
     <div id="sim-body" style="display:none;">
       <div style="background:linear-gradient(135deg,rgba(11,16,32,0.97),rgba(7,10,23,0.97));border:1px solid rgba(79,143,255,0.3);border-radius:12px;padding:14px;margin-bottom:12px;">
@@ -572,6 +573,10 @@ canvas{display:block;}
     <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/14~04/15 SKH 분할 매도</div>
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.14 · 3주 · +54.05%</div></div><div class="trade-pnl up">+118만</div></div>
     <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.15 · 3주 · +56.66%</div></div><div class="trade-pnl up">+123만</div></div>
+    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
+    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/28 두산에너빌 익절 · 에이비엘 신규진입</div>
+    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">두산에너빌리티</div><div class="trade-detail">04.28 · 30주 · 100,442→128,200</div></div><div class="trade-pnl up">+83만</div></div>
+    <div class="trade-item"><div class="trade-badge sell" style="background:rgba(77,139,255,0.12);color:var(--accent);border:1px solid rgba(77,139,255,0.2);">매수</div><div class="trade-info"><div class="trade-name">에이비엘바이오 <span style="font-size:9px;color:var(--gold);">★바이오 첫진입</span></div><div class="trade-detail">04.28 · 13주 · 139,100원 · 손절 97,000</div></div><div class="trade-pnl" style="color:var(--accent);">-신규-</div></div>
   </div>
   </div><div id="log-loss"><div class="card red">
     <div class="s-label">손실 확정</div>
@@ -613,7 +618,7 @@ canvas{display:block;}
       <div style="width:3px;background:var(--purple);border-radius:2px;margin-right:12px;flex-shrink:0;align-self:stretch;min-height:40px;"></div>
       <div style="flex:1;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="watch-name">두산에너빌리티 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">42주</span></div>
+          <div class="watch-name">두산에너빌리티 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">12주</span></div>
           <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.25);">+26%</span>
         </div>
         <div class="watch-sub">현재 <span id="wp-DSE">126,500</span>원 · SMR 카탈리스트</div>
@@ -629,6 +634,17 @@ canvas{display:block;}
         </div>
         <div class="watch-sub">평단 62,791원 · 현재 <span id="wp-TWI">61,400</span>원</div>
         <div class="watch-cond">손절가 40,000원 · Q2 큐브프로버 미확인 시 매도</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;padding:10px 0;border-top:1px solid rgba(79,143,255,0.07);">
+      <div style="width:3px;background:var(--gold);border-radius:2px;margin-right:12px;flex-shrink:0;align-self:stretch;min-height:40px;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="watch-name">에이비엘바이오 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">13주</span></div>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,185,56,0.1);color:var(--gold);border:1px solid rgba(255,185,56,0.25);">바이오 첫진입</span>
+        </div>
+        <div class="watch-sub">평단 139,100원 · 현재 <span id="wp-ABL">140,100</span>원</div>
+        <div class="watch-cond">손절 97,000원(-30%) · ABL111 하반기 결과까지 홀딩</div>
       </div>
     </div>
   </div>
@@ -660,6 +676,7 @@ canvas{display:block;}
       <div class="price-item"><label>두산에너빌리티</label><input id="p-DSE" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>미래에셋증권</label><input id="p-MIA" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>TIGER 미국우주테크</label><input id="p-TIG" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
+      <div class="price-item"><label>에이비엘바이오</label><input id="p-ABL" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
     </div>
     <div class="s-label">예수금</div>
     <div class="cash-grid">
@@ -842,14 +859,15 @@ const HOLDINGS={
     {id:'APR',name:'에이피알',qty:53,avg:385650},
   ],
   toss:[
-    {id:'DSE',name:'두산에너빌리티',qty:42,avg:100442},
+    {id:'DSE',name:'두산에너빌리티',qty:12,avg:100442},
     {id:'MIA',name:'미래에셋증권',qty:60,avg:71927},
     {id:'TIG',name:'TIGER 미국우주테크',qty:320,avg:10859},
+    {id:'ABL',name:'에이비엘바이오',qty:13,avg:139100},
   ]
 };
-let PRICES={SKH:1281000,HWA:1454000,TWI:61400,ISC:240000,APR:447000,DSE:126500,MIA:66500,TIG:10300};
-let PRICES_PREV={SKH:1281000,HWA:1454000,TWI:61400,ISC:240000,APR:447000,DSE:126500,MIA:66500,TIG:10300};
-let CASH={kiwoom:12000000,toss:890000};
+let PRICES={SKH:1281000,HWA:1454000,TWI:61400,ISC:240000,APR:447000,DSE:128200,MIA:66500,TIG:10300,ABL:140100};
+let PRICES_PREV={SKH:1281000,HWA:1454000,TWI:61400,ISC:240000,APR:447000,DSE:128200,MIA:66500,TIG:10300,ABL:140100};
+let CASH={kiwoom:12000000,toss:2930000};
 
 const HISTORY=[
   {date:'03/05',total:7200,cashPct:28,pnl:{SKH:30,HWA:8,TWI:-2,ISC:5,APR:12,DSE:-5.4,MIA:0.1,TIG:0}},
@@ -867,7 +885,7 @@ const HISTORY=[
   {date:'04/16',total:11180,cashPct:30,pnl:{SKH:54,HWA:13,TWI:-12,ISC:7,APR:25,DSE:11.0,MIA:-5.9,TIG:2.8}},
   {date:'04/17',total:11320,cashPct:29,pnl:{SKH:57,HWA:14,TWI:-11,ISC:8,APR:26,DSE:12.3,MIA:-5.5,TIG:3.0}},
   {date:'04/24',total:9436,cashPct:24.5,pnl:{SKH:51.9,HWA:19.8,TWI:-3.2,ISC:6.5,APR:31.5,DSE:26.1,MIA:-7.1,TIG:0.7}},
-  {date:'04/28',total:9708,cashPct:12.4,pnl:{SKH:63.9,HWA:17.2,TWI:-3.7,ISC:8.8,APR:17.9,DSE:27.1,MIA:-3.9,TIG:-4.4}},
+  {date:'04/28',total:9708,cashPct:18.2,pnl:{SKH:63.9,HWA:17.2,TWI:-3.7,ISC:8.8,APR:17.9,DSE:27.6,MIA:-3.9,TIG:-4.4,ABL:0.7}},
 ];
 
 const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS'};
@@ -876,7 +894,7 @@ const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340
 const NAVER_CODES={
   SKH:'000660', HWA:'012450', TWI:'089030',
   ISC:'095340', APR:'278470', DSE:'034020',
-  MIA:'006800', TIG:'0183J0'
+  MIA:'006800', TIG:'0183J0', ABL:'298380'
 };
 
 /* 관심/스터디 종목 코드 → DOM id 매핑 (elIds: 배열로 다중 업데이트 지원) */
@@ -1031,7 +1049,7 @@ async function autoFetchPrices(){
   }));
 
   /* 실패 종목 목록 추출 */
-  const DISPLAY_NAMES={SKH:'하이닉스',HWA:'한화에어로',TWI:'테크윙',ISC:'ISC',APR:'에이피알',DSE:'두산에너빌',MIA:'미래에셋',TIG:'TIGER우주'};
+  const DISPLAY_NAMES={SKH:'하이닉스',HWA:'한화에어로',TWI:'테크윙',ISC:'ISC',APR:'에이피알',DSE:'두산에너빌',MIA:'미래에셋',TIG:'TIGER우주',ABL:'에이비엘'};
   const failedIds=results
     .filter(r=>r.status!=='fulfilled'||!r.value.price)
     .map(r=>r.status==='fulfilled'?DISPLAY_NAMES[r.value.id]||r.value.id:'unknown');
@@ -1664,7 +1682,9 @@ ${holdings}
 💡 오늘의 핵심 전략 한 줄`;
 
   try{
-    const res=await fetch('https://tk-claude-proxy.nachal20.workers.dev',{
+    const apiUrl='https://api.anthropic.com/v1/messages';
+    const proxiedUrl=`https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+    const res=await fetch(proxiedUrl,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
