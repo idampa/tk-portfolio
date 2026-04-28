@@ -1664,9 +1664,7 @@ ${holdings}
 💡 오늘의 핵심 전략 한 줄`;
 
   try{
-    const apiUrl='https://api.anthropic.com/v1/messages';
-    const proxiedUrl=`https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
-    const res=await fetch(proxiedUrl,{
+    const res=await fetch('https://tk-claude-proxy.nachal20.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
