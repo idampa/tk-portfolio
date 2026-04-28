@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>종목분석 — 태균 포트폴리오</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0d0f14;
+  --bg2: #13161e;
+  --bg3: #1a1e2a;
+  --border: #252a38;
+  --border2: #2e3447;
+  --text: #e8ecf4;
+  --text2: #8b92a8;
+  --text3: #555e78;
+  --accent: #4f8ef7;
+  --accent2: #6366f1;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --orange: #fb923c;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* 헤더 */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+.header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.header-title span { color: var(--accent); }
+.header-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+.header-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 종목 탭 */
+.stock-tabs {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.stock-tabs::-webkit-scrollbar { display: none; }
+.stock-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stock-tab:hover { color: var(--text2); }
+.stock-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.stock-tab .acct {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.acct.kiwoom { background: rgba(79,142,247,.15); color: var(--accent); }
+.acct.toss { background: rgba(99,102,241,.15); color: var(--accent2); }
+
+/* 메인 레이아웃 */
+.main { padding: 14px; max-width: 1400px; margin: 0 auto; }
+
+/* 종목 패널 */
+.stock-panel { display: none; }
+.stock-panel.active { display: block; }
+
+/* 종목 헤더 */
+.stock-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.stock-name-block { flex: 1; }
+.stock-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stock-code {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+.stock-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.my-position {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+.position-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+  letter-spacing: .5px;
+  grid-column: 1 / -1;
+}
+.position-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.position-key { font-size: 11px; color: var(--text2); }
+.position-val {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.val-green { color: var(--green); }
+.val-red { color: var(--red); }
+.val-blue { color: var(--accent); }
+
+@media (min-width: 600px) {
+  .stock-header {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .stock-name { font-size: 22px; white-space: normal; }
+  .my-position {
+    display: block;
+    min-width: 200px;
+  }
+  .position-label { margin-bottom: 8px; }
+  .position-row { margin-bottom: 4px; }
+}
+
+/* KPI 카드 */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media (min-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+}
+.kpi-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+  transition: border-color .2s;
+}
+.kpi-card:hover { border-color: var(--border2); }
+.kpi-label {
+  font-size: 10px;
+  color: var(--text3);
+  margin-bottom: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .3px;
+}
+.kpi-value {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  line-height: 1;
+}
+.kpi-change {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.kpi-card.positive .kpi-value { color: var(--green); }
+.kpi-card.negative .kpi-value { color: var(--red); }
+.kpi-card.neutral .kpi-value { color: var(--accent); }
+.kpi-card.warning .kpi-value { color: var(--yellow); }
+
+/* 섹션 */
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.section-grid.triple {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.section-grid.full {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 768px) {
+  .section-grid, .section-grid.triple { grid-template-columns: 1fr; }
+}
+
+.section-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.section-title {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .3px;
+}
+.section-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(79,142,247,.1);
+  color: var(--accent);
+}
+.section-badge.green { background: rgba(52,211,153,.1); color: var(--green); }
+.section-badge.red { background: rgba(248,113,113,.1); color: var(--red); }
+.section-badge.yellow { background: rgba(251,191,36,.1); color: var(--yellow); }
+
+/* 차트 래퍼 */
+.chart-wrap {
+  padding: 16px;
+  height: 200px;
+  position: relative;
+}
+.chart-wrap.tall { height: 240px; }
+
+/* 테이블 */
+.fin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.fin-table th {
+  padding: 8px 12px;
+  text-align: right;
+  font-weight: 500;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.fin-table th:first-child { text-align: left; }
+.fin-table td {
+  padding: 7px 12px;
+  text-align: right;
+  color: var(--text2);
+  border-bottom: 1px solid rgba(37,42,56,.5);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.fin-table td:first-child {
+  text-align: left;
+  color: var(--text);
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+}
+.fin-table tr:last-child td { border-bottom: none; }
+.fin-table tr:hover td { background: rgba(255,255,255,.02); }
+.num-pos { color: var(--green); }
+.num-neg { color: var(--red); }
+
+/* 인사이트 블록 */
+.insight-block {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+}
+.insight-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.insight-row:last-child { margin-bottom: 0; }
+.insight-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.dot-green { background: var(--green); }
+.dot-red { background: var(--red); }
+.dot-yellow { background: var(--yellow); }
+.dot-blue { background: var(--accent); }
+
+/* 밸류에이션 카드 */
+.val-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.val-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+@media (min-width: 600px) {
+  .val-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.val-item {
+  padding: 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.val-item:last-child { border-right: none; }
+.val-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 5px;
+  letter-spacing: .3px;
+}
+.val-num {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.val-sub {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 종합점수 섹션 */
+.score-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.score-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.score-header-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .3px;
+}
+.score-body {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.score-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  min-width: 120px;
+  border-right: 1px solid var(--border);
+}
+.score-circle {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 10px;
+}
+.score-circle svg {
+  transform: rotate(-90deg);
+}
+.score-circle-bg {
+  fill: none;
+  stroke: var(--bg3);
+  stroke-width: 8;
+}
+.score-circle-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+.score-num {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.score-num-val {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-num-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+.score-grade {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .5px;
+}
+.score-right {
+  flex: 1;
+  padding: 16px;
+}
+.radar-wrap {
+  height: 200px;
+  position: relative;
+}
+.score-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 4px 0;
+}
+.score-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.score-bar-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  width: 52px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.score-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .8s ease;
+}
+.score-bar-val {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* PBR 게이지 바 */
+.pbr-gauge-wrap {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+}
+.pbr-gauge-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+.pbr-gauge-bar {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  position: relative;
+  margin-bottom: 6px;
+}
+.pbr-gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .6s ease;
+}
+.pbr-gauge-marker {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: var(--text3);
+  border-radius: 1px;
+}
+.pbr-gauge-marker-label {
+  position: absolute;
+  top: 14px;
+  font-size: 9px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.pbr-note {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+/* 섹션 타이틀 구분선 */
+.divider {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  padding: 16px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">📊 종목분석</div>
+  <div class="header-sub">DartLab · DART</div>
+  <div class="header-badge">2025Q4 · 2026.04.28</div>
+</div>
+
+<div class="stock-tabs">
+  <div class="stock-tab active" onclick="showStock('skh')">SK하이닉스 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('hwa')">한화에어로 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('tw')">테크윙 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('isc')">ISC <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('apr')">에이피알 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('doe')">두산에너빌리티 <span class="acct toss">토스</span></div>
+  <div class="stock-tab" onclick="showStock('mia')">미래에셋증권 <span class="acct toss">토스</span></div>
+  <div class="stock-tab" onclick="showStock('abl')">에이비엘바이오 <span class="acct toss">토스</span></div>
+</div>
+
+<div class="main">
+
+<!-- ========== SK하이닉스 ========== -->
+<div id="panel-skh" class="stock-panel active">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">SK하이닉스</div>
+      <div class="stock-code">000660 · KOSPI · 반도체</div>
+      <div class="stock-desc">HBM(고대역폭메모리) 세계 1위. 4개 생산기지·3개 R&D법인 보유. AI 가속기용 HBM3E 공급 확대 중. 2023년 적자 골짜기 완전 탈출, 2025년 역대 최고 실적 갱신.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">24주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">726,074원</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">1,301,000원</span></div>
+      <div class="position-row"><span class="position-key">평가손익</span><span class="position-val val-green">+13,798,176원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익률 ★26Q1</div>
+      <div class="kpi-value">72%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 창사 이래 최고 (25Q4 58%↑)</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">매출액 ★26Q1</div>
+      <div class="kpi-value">52.6조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 분기 첫 50조 돌파 · YoY +198%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익 ★26Q1</div>
+      <div class="kpi-value">37.6조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +96% · YoY +405%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">순이익 ★26Q1</div>
+      <div class="kpi-value">40.3조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 순이익률 77%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">현금성자산 ★26Q1말</div>
+      <div class="kpi-value">54.3조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +19.4조 · 순현금 35조</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">차입금비율 ★26Q1</div>
+      <div class="kpi-value">12%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 25Q1 29% → 12%로 급감</div>
+    </div>
+  </div>
+
+  <div class="divider">손익계산서 (IS)</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge green">★26Q1 확정</span></div>
+      <div class="chart-wrap">
+        <canvas id="skh-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">수익성 비율 추이</div>
+      <div class="chart-wrap">
+        <canvas id="skh-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">재무상태표 (BS) · 비율</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge green">안정</span></div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>★26Q1</th><th>2025Q4</th><th>2025Q3</th><th>2024Q4</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (조)</td><td class="num-pos">52.6</td><td class="num-pos">32.8</td><td class="num-pos">24.4</td><td class="num-pos">19.8</td></tr>
+          <tr><td>영업이익 (조)</td><td class="num-pos">37.6</td><td class="num-pos">19.2</td><td class="num-pos">11.4</td><td class="num-pos">4.3</td></tr>
+          <tr><td>영업이익률 (%)</td><td class="num-pos">72</td><td class="num-pos">58.4</td><td class="num-pos">46.6</td><td class="num-pos">40.9</td></tr>
+          <tr><td>순이익 (조)</td><td class="num-pos">40.3</td><td class="num-pos">15.2</td><td class="num-pos">12.6</td><td>—</td></tr>
+          <tr><td>현금성자산 (조)</td><td class="num-pos">54.3</td><td class="num-pos">34.9</td><td>—</td><td>—</td></tr>
+          <tr><td>차입금비율 (%)</td><td class="num-pos">12</td><td>18</td><td>—</td><td>29</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-green"></div>★26Q1 영업이익률 72% — 비수기에 TSMC(58%)를 압도. 4분기 연속 역대 최고 경신. HBM 슈퍼사이클 정점 돌파.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>26Q1말 현금성자산 54.3조, 순현금 35조 달성. 차입금비율 12%로 재무 완전 정상화.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>D램 ASP 60%중반, 낸드 ASP 70%중반 급등 — 가격 모멘텀 2분기도 지속 전망.</div>
+        <div class="insight-row"><div class="insight-dot dot-yellow"></div>2분기 HBM4 양산 본격화 시 영업이익 60조 돌파 가능성. M15X·용인 클러스터 투자 확대.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>분할매도 전략 유효. 현재 24주 보유 — 목표가 구간에서 단계적 청산 검토.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 한화에어로스페이스 ========== -->
+<div id="panel-hwa" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">한화에어로스페이스</div>
+      <div class="stock-code">012450 · KOSPI · 방산/항공</div>
+      <div class="stock-desc">항공엔진·방산·시큐리티 핵심 방산 기업. 폴란드 K9 자주포 등 유럽 방산 수출 급성장 중. 지정학 리스크 수혜 장기홀딩 기조.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">3주</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">1,396,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익률</div>
+      <div class="kpi-value">9.59%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 과거 2~5% 대비 급상승</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">ROE</div>
+      <div class="kpi-value">10.26%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 2025Q4</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">매출액 (2025Q4)</div>
+      <div class="kpi-value">8.42조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +74%</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">현금 (2025Q4)</div>
+      <div class="kpi-value">7.7조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +81%</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">유동자산</div>
+      <div class="kpi-value">30.7조</div>
+      <div class="kpi-change" style="color:var(--text3)">수주 실행 여력 충분</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">영업현금흐름</div>
+      <div class="kpi-value">4.1조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 플러스 전환</div>
+    </div>
+  </div>
+
+  <div class="divider">손익 · 비율 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이</div>
+      <div class="chart-wrap">
+        <canvas id="hwa-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">영업이익률 추이</div>
+      <div class="chart-wrap">
+        <canvas id="hwa-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율</div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>26Q1(E)</th><th>2025Q4</th><th>2025Q3</th><th>2024Q4</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (조)</td><td class="num-pos">6.0</td><td class="num-pos">8.42</td><td class="num-pos">6.49</td><td class="num-pos">4.83</td></tr>
+          <tr><td>영업이익 (억)</td><td class="num-pos">7,100</td><td class="num-pos">8,076</td><td class="num-pos">8,564</td><td class="num-pos">2,274</td></tr>
+          <tr><td>영업이익률 (%)</td><td class="num-pos">11.8</td><td class="num-pos">9.59</td><td class="num-pos">13.2</td><td class="num-pos">18.65</td></tr>
+          <tr><td>수주잔고 (조)</td><td class="num-pos">37.2+</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>ROE (%)</td><td>—</td><td class="num-pos">10.26</td><td>—</td><td class="num-pos">41.22</td></tr>
+          <tr><td>현금 (조)</td><td>—</td><td class="num-pos">7.71</td><td class="num-pos">4.24</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-green"></div>영업이익률 9.59% — 과거 2~5% 대비 구조적 상승. 방산 수출 믹스 개선 효과.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>2025Q4 현금 7.7조, 유동자산 30.7조 — 대규모 수주 실행 여력 충분.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>ROA가 낮은(1.84%) 건 방산업 특성상 자산 무거운 구조 — 펀더멘털 문제 아님.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>지정학 리스크 수혜 장기홀딩 기조 유지. NATO 방산 수요 지속 전망.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 테크윙 ========== -->
+<div id="panel-tw" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">테크윙</div>
+      <div class="stock-code">089030 · KOSDAQ · 반도체 장비</div>
+      <div class="stock-desc">2002년 설립. 반도체 전 분야 검사장비 개발·제조. HBM 테스트 핸들러 독점 구조. 큐브프로버 신제품 매출 확인이 핵심 트리거.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">110주</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">60,400원</span></div>
+      <div class="position-row"><span class="position-key">하드스탑</span><span class="position-val val-red">50,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card warning">
+      <div class="kpi-label">영업이익률 (2025Q4)</div>
+      <div class="kpi-value">1.72%</div>
+      <div class="kpi-change" style="color:var(--red)">▼ 2025Q3 17%에서 급락</div>
+    </div>
+    <div class="kpi-card negative">
+      <div class="kpi-label">ROE (2025Q4)</div>
+      <div class="kpi-value">-2.07%</div>
+      <div class="kpi-change" style="color:var(--red)">▼ 적자 전환</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">매출액 (2025Q4)</div>
+      <div class="kpi-value">338억</div>
+      <div class="kpi-change" style="color:var(--red)">▼ QoQ -19%</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">유동자산</div>
+      <div class="kpi-value">2,641억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +41%</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-label">영업현금흐름</div>
+      <div class="kpi-value">28억</div>
+      <div class="kpi-change" style="color:var(--text3)">간신히 플러스</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">총자산</div>
+      <div class="kpi-value">6,337억</div>
+      <div class="kpi-change" style="color:var(--text3)">2025Q4</div>
+    </div>
+  </div>
+
+  <div class="divider">손익 · 비율 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge red">Q4 급락</span></div>
+      <div class="chart-wrap">
+        <canvas id="tw-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">영업이익률 추이</div>
+      <div class="chart-wrap">
+        <canvas id="tw-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge red">주의</span></div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th><th>2024Q4</th></tr></thead>
+        <tbody>
+          <tr><td>ROE (%)</td><td class="num-neg">-2.07</td><td class="num-neg">-3.34</td><td class="num-pos">10.56</td><td class="num-neg">-13.86</td></tr>
+          <tr><td>영업이익률 (%)</td><td class="num-pos">1.72</td><td class="num-pos">17.03</td><td class="num-pos">13.01</td><td class="num-pos">9.41</td></tr>
+          <tr><td>ROA (%)</td><td class="num-neg">-0.70</td><td class="num-neg">-1.21</td><td class="num-pos">4.01</td><td class="num-neg">-5.22</td></tr>
+          <tr><td>순이익률 (%)</td><td class="num-neg">-13.14</td><td class="num-neg">-16.01</td><td class="num-pos">44.43</td><td class="num-neg">-55.45</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-red"></div>2025Q4 영업이익률 1.72% — Q3(17%) 대비 급락. 비수기 + 큐브프로버 매출 미확인.</div>
+        <div class="insight-row"><div class="insight-dot dot-red"></div>순이익 -13% — 일회성 손실 포함 가능성 있으나 펀더멘털 주시 필요.</div>
+        <div class="insight-row"><div class="insight-dot dot-yellow"></div>HBM 테스트 핸들러 독점 구조는 훼손 없음. Q2 실적에서 큐브프로버 매출 확인 필수.</div>
+        <div class="insight-row"><div class="insight-dot dot-red"></div>50,000원 하드스탑 유지. 큐브프로버 미확인 시 매도 트리거 작동.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ISC ========== -->
+<div id="panel-isc" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">ISC</div>
+      <div class="stock-code">095340 · KOSDAQ · 반도체 소켓</div>
+      <div class="stock-desc">글로벌 반도체 테스트솔루션 기업. HBM 소켓 핵심 부품 독점 공급. 4개 생산·판매법인 보유. HBM·고급패키징 수혜 핵심 종목.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">20주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">220,500원</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">238,500원</span></div>
+      <div class="position-row"><span class="position-key">평가손익</span><span class="position-val val-green">+360,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익률 ★26Q1</div>
+      <div class="kpi-value">34.6%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 역대 분기 최고</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">매출액 ★26Q1</div>
+      <div class="kpi-value">683억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +115%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익 ★26Q1</div>
+      <div class="kpi-value">236억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +237% · 역대 최고</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">AI GPU 소켓 성장</div>
+      <div class="kpi-value">+191%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY · SLT 비중 60%↑</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">단기금융상품 (25Q4)</div>
+      <div class="kpi-value">2,622억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 현금 여력 탁월</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">구조적 성장 판단</div>
+      <div class="kpi-value">✅</div>
+      <div class="kpi-change" style="color:var(--green)">비수기에도 역대 최고 달성</div>
+    </div>
+  </div>
+
+  <div class="divider">손익 · 비율 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge green">★26Q1 확정</span></div>
+      <div class="chart-wrap">
+        <canvas id="isc-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">영업이익률 추이</div>
+      <div class="chart-wrap">
+        <canvas id="isc-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge green">최우수</span></div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>★26Q1</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (억)</td><td class="num-pos">683</td><td class="num-pos">723</td><td class="num-pos">645</td><td class="num-pos">517</td></tr>
+          <tr><td>영업이익 (억)</td><td class="num-pos">236</td><td class="num-pos">219</td><td class="num-pos">174</td><td class="num-pos">137</td></tr>
+          <tr><td>영업이익률 (%)</td><td class="num-pos">34.6</td><td class="num-pos">30.32</td><td class="num-pos">27.00</td><td class="num-pos">26.54</td></tr>
+          <tr><td>순이익률 (%)</td><td>—</td><td class="num-pos">30.06</td><td class="num-pos">25.14</td><td class="num-pos">22.36</td></tr>
+          <tr><td>YoY 매출성장</td><td class="num-pos">+115%</td><td class="num-pos">+82%</td><td class="num-pos">+27%</td><td class="num-pos">+44%</td></tr>
+          <tr><td>YoY 영업이익성장</td><td class="num-pos">+237%</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-green"></div>★26Q1 영업이익 236억 YoY +237% — 계절적 비수기에 역대 분기 최고. 구조적 성장 본격화 신호.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>AI GPU·ASIC 소켓 매출 YoY +191%, SLT 비중 60% 돌파 — 고부가 수익 구조 전환 가속화.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>단기금융 2,622억 + 현금 — 재무 탄탄. HBM 소켓 독점 구조 펀더멘털 훼손 없음 재확인.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>평단 220,500원 대비 현재 238,500원. 26Q1 서프라이즈로 추가 비중 확대 검토 가능.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 에이피알 ========== -->
+<div id="panel-apr" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">에이피알</div>
+      <div class="stock-code">278470 · KOSDAQ · 화장품/뷰티디바이스</div>
+      <div class="stock-desc">메디큐브(더마) 화장품 + 홈뷰티 디바이스 사업. 별도 생산시설 없이 외주 생산. 해외 매출 급성장 중. 분할매도 후 배당락 재진입 전략.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">53주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">325,000원</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">461,000원</span></div>
+      <div class="position-row"><span class="position-key">평가손익</span><span class="position-val val-green">+7,208,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익률</div>
+      <div class="kpi-value">23.79%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 지속 성장</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">ROE</div>
+      <div class="kpi-value">22.16%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 우수한 자본효율</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">매출액 (2025Q4)</div>
+      <div class="kpi-value">5,476억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +124%</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">영업이익 (2025Q4)</div>
+      <div class="kpi-value">1,302억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +228%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">현금 (2025Q4)</div>
+      <div class="kpi-value">1,543억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +147%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업현금흐름</div>
+      <div class="kpi-value">1,560억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 강력한 현금창출</div>
+    </div>
+  </div>
+
+  <div class="divider">성장 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge green">고성장</span></div>
+      <div class="chart-wrap">
+        <canvas id="apr-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">수익성 비율 추이</div>
+      <div class="chart-wrap">
+        <canvas id="apr-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge green">우수</span></div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>26Q1(E)</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (억)</td><td class="num-pos">5,895</td><td class="num-pos">5,476</td><td class="num-pos">3,859</td><td class="num-pos">3,277</td></tr>
+          <tr><td>영업이익 (억)</td><td class="num-pos">1,436</td><td class="num-pos">1,302</td><td class="num-pos">961</td><td class="num-pos">846</td></tr>
+          <tr><td>영업이익률 (%)</td><td class="num-pos">24.4</td><td class="num-pos">23.79</td><td class="num-pos">24.91</td><td class="num-pos">25.80</td></tr>
+          <tr><td>YoY 매출성장</td><td class="num-pos">+122%</td><td class="num-pos">+124%</td><td class="num-pos">—</td><td>—</td></tr>
+          <tr><td>ROE (%)</td><td>—</td><td class="num-pos">22.16</td><td class="num-pos">21.40</td><td class="num-pos">16.25</td></tr>
+          <tr><td>ROA (%)</td><td>—</td><td class="num-pos">12.80</td><td class="num-pos">12.09</td><td class="num-pos">10.18</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-green"></div>매출 YoY +124%, 영업이익 YoY +228% — 폭발적 성장세 지속.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>ROE 22.16%, ROA 12.80% — 자본효율과 자산효율 모두 최상위권.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>영업이익률 23~25% 안정권 — 뷰티디바이스 마진 개선 구조 확인.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>분할매도 후 배당락 재진입 전략 반복 적용 중. 이벤트 드리븐 청산 프레임 유지.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 두산에너빌리티 ========== -->
+<div id="panel-doe" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">두산에너빌리티</div>
+      <div class="stock-code">034020 · KOSPI · 원전/에너지</div>
+      <div class="stock-desc">주조·단조 기반 원자력·복합화력 발전설비 설계·제작. NSSS·BOP 원전 핵심 부품 공급. SMR 신시장 진입 모색 중. 수주잔고 비즈니스.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">12주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">100,442원</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">127,900원</span></div>
+      <div class="position-row"><span class="position-key">평가손익</span><span class="position-val val-green">+329,496원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card warning">
+      <div class="kpi-label">영업이익률</div>
+      <div class="kpi-value">4.36%</div>
+      <div class="kpi-change" style="color:var(--text3)">수주잔고 업종 특성</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-label">ROE</div>
+      <div class="kpi-value">0.67%</div>
+      <div class="kpi-change" style="color:var(--text3)">수익성 회복 초기</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">매출액 (2025Q4)</div>
+      <div class="kpi-value">4.86조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +6%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">현금 (2025Q4)</div>
+      <div class="kpi-value">3.08조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ QoQ +28%</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업현금흐름</div>
+      <div class="kpi-value">1.40조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 플러스 전환</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">총자산</div>
+      <div class="kpi-value">27.5조</div>
+      <div class="kpi-change" style="color:var(--text3)">자본 12.0조</div>
+    </div>
+  </div>
+
+  <div class="divider">손익 · 현금흐름</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이</div>
+      <div class="chart-wrap">
+        <canvas id="doe-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">영업이익률 추이</div>
+      <div class="chart-wrap">
+        <canvas id="doe-margin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율</div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>26Q1(E)</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (조)</td><td>3.8</td><td class="num-pos">4.86</td><td class="num-pos">3.88</td><td class="num-pos">4.57</td></tr>
+          <tr><td>영업이익 (억)</td><td class="num-pos">1,449</td><td class="num-pos">2,121</td><td class="num-pos">1,371</td><td class="num-pos">2,709</td></tr>
+          <tr><td>영업이익률 (%)</td><td>3.8</td><td class="num-pos">4.36</td><td class="num-pos">3.53</td><td class="num-pos">5.93</td></tr>
+          <tr><td>YoY 영업이익성장</td><td class="num-pos">+400%</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>수주잔고 (조)</td><td class="num-pos">16+</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>영업현금흐름 (조)</td><td>—</td><td class="num-pos">1.40</td><td class="num-neg">-0.06</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-yellow"></div>영업이익률 4~6% — 낮아 보이지만 수주잔고 비즈니스 특성. 이익률보다 수주잔고가 핵심.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>2025Q4 영업현금흐름 1.4조 플러스 — 실질 현금창출 능력 회복 신호.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>현금 3.08조 — 재무 안정성 개선. 부채비율 모니터링 지속.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>원전·SMR 장기 수혜 기조. 수주 공시 나올 때마다 주가 반응 확인 필요.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 미래에셋증권 ========== -->
+<div id="panel-mia" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">미래에셋증권</div>
+      <div class="stock-code">006800 · KOSPI · 증권</div>
+      <div class="stock-desc">글로벌 투자전문기업. 미국·홍콩·인도·베트남 등 11개국 진출. SpaceX IPO 이벤트 드리븐 홀딩. 목표 75,000원 sell-the-news 전략.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">60주</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">68,550원</span></div>
+      <div class="position-row"><span class="position-key">목표가</span><span class="position-val val-green">75,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive">
+      <div class="kpi-label">영업이익률 (2025Q4)</div>
+      <div class="kpi-value">9.54%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 분기 최고</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">ROE</div>
+      <div class="kpi-value">4.27%</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 개선 추세</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">매출액 (2025Q4)</div>
+      <div class="kpi-value">8.86조</div>
+      <div class="kpi-change" style="color:var(--green)">▲ YoY +53%</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">영업이익 (2025Q4)</div>
+      <div class="kpi-value">8,456억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 분기 최고</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">총자산</div>
+      <div class="kpi-value">150조</div>
+      <div class="kpi-change" style="color:var(--text3)">금융자산 대규모</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">지배기업지분</div>
+      <div class="kpi-value">13.3조</div>
+      <div class="kpi-change" style="color:var(--text3)">자본 탄탄</div>
+    </div>
+  </div>
+
+  <div class="divider">손익 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge green">SpaceX 기대</span></div>
+      <div class="chart-wrap">
+        <canvas id="mia-is-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">주요 재무비율</div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>26Q1(E)</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th></tr></thead>
+        <tbody>
+          <tr><td>영업이익 (억)</td><td class="num-pos">9,782</td><td class="num-pos">8,457</td><td class="num-pos">2,228</td><td class="num-pos">5,004</td></tr>
+          <tr><td>YoY 영업이익성장</td><td class="num-pos">+182%</td><td class="num-pos">+209%</td><td>—</td><td>—</td></tr>
+          <tr><td>영업이익률 (%)</td><td>—</td><td class="num-pos">9.54</td><td class="num-pos">3.34</td><td class="num-pos">6.50</td></tr>
+          <tr><td>ROE (%)</td><td>—</td><td class="num-pos">4.27</td><td class="num-pos">2.66</td><td class="num-pos">3.27</td></tr>
+          <tr><td>SpaceX 평가이익</td><td class="num-pos">반영중</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>총자산 (조)</td><td>—</td><td>150</td><td>145</td><td>140</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-card" style="margin-bottom:16px">
+    <div class="section-title">투자 인사이트</div>
+    <div class="insight-block">
+      <div class="insight-row"><div class="insight-dot dot-green"></div>2025Q4 영업이익 8,456억 — 분기 최고치. 글로벌 시장 환경 개선 수혜.</div>
+      <div class="insight-row"><div class="insight-dot dot-blue"></div>SpaceX IPO 이벤트 드리븐 홀딩. IPO 발표 시 sell-the-news 75,000원 목표.</div>
+      <div class="insight-row"><div class="insight-dot dot-yellow"></div>증권사 특성상 ROA 낮은 건 구조적. 총자산 150조 레버리지 비즈니스 모델.</div>
+      <div class="insight-row"><div class="insight-dot dot-green"></div>글로벌 11개국 네트워크 — SpaceX 지분 보유로 우주 테마 프리미엄 기대.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 에이비엘바이오 ========== -->
+<div id="panel-abl" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">에이비엘바이오</div>
+      <div class="stock-code">298380 · KOSDAQ · 바이오</div>
+      <div class="stock-desc">이중항체 플랫폼 'Grabody™' 기반. BBB(혈뇌장벽) 셔틀 기술 사노피·GSK·릴리 기술이전 검증 완료. ABL111 하반기 임상 1b상 결과 대기. 바이오 첫 진입 종목.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">13주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">139,100원</span></div>
+      <div class="position-row"><span class="position-key">손절선</span><span class="position-val val-red">97,000원</span></div>
+      <div class="position-row"><span class="position-key">목표</span><span class="position-val val-green">ABL111 결과 후 판단</span></div>
+    </div>
+  </div>
+
+  <!-- 현금런웨이 강조 카드 -->
+  <div style="background: linear-gradient(135deg, rgba(52,211,153,.08), rgba(79,142,247,.08)); border: 1px solid rgba(52,211,153,.2); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 20px;">
+    <div style="flex:1">
+      <div style="font-size:11px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-bottom:6px; letter-spacing:.5px;">⚡ CASH RUNWAY 분석</div>
+      <div style="font-size:13px; color:var(--text2); line-height:1.7">
+        현금+단기금융 <strong style="color:var(--green)">약 1,700억원</strong> 보유 · 분기 소진액 <strong style="color:var(--yellow)">약 236억원</strong><br>
+        예상 런웨이 <strong style="color:var(--accent); font-size:15px;">약 7분기 (1.7년)</strong> — ABL111 임상 결과(하반기) 전에 현금 소진 없음
+      </div>
+    </div>
+    <div style="text-align:center; padding: 12px 20px; background:rgba(79,142,247,.1); border-radius:10px; border:1px solid rgba(79,142,247,.2)">
+      <div style="font-size:28px; font-weight:700; color:var(--accent)">7Q</div>
+      <div style="font-size:11px; color:var(--text3)">런웨이</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card negative">
+      <div class="kpi-label">영업손실 (2025Q4)</div>
+      <div class="kpi-value">-296억</div>
+      <div class="kpi-change" style="color:var(--text3)">R&D 바이오 특성</div>
+    </div>
+    <div class="kpi-card negative">
+      <div class="kpi-label">ROE</div>
+      <div class="kpi-value">-18.23%</div>
+      <div class="kpi-change" style="color:var(--text3)">기술이전 수익 제외</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">현금 (2025Q4)</div>
+      <div class="kpi-value">1,120억</div>
+      <div class="kpi-change" style="color:var(--green)">▲ 유동자산 1,760억</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">기타단기금융</div>
+      <div class="kpi-value">591억</div>
+      <div class="kpi-change" style="color:var(--text3)">총 유동현금 ~1,700억</div>
+    </div>
+    <div class="kpi-card negative">
+      <div class="kpi-label">분기 현금소진</div>
+      <div class="kpi-value">-236억</div>
+      <div class="kpi-change" style="color:var(--yellow)">영업현금흐름 기준</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">자본총계</div>
+      <div class="kpi-value">1,567억</div>
+      <div class="kpi-change" style="color:var(--text3)">총자산 2,809억</div>
+    </div>
+  </div>
+
+  <div class="divider">현금 런웨이 · 손익 추이</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">현금잔고 추이 <span class="section-badge yellow">런웨이 모니터링</span></div>
+      <div class="chart-wrap">
+        <canvas id="abl-cash-chart"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">분기 영업손실 추이</div>
+      <div class="chart-wrap">
+        <canvas id="abl-loss-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 지표 <span class="section-badge red">바이오 적자 정상</span></div>
+      <table class="fin-table">
+        <thead><tr><th>항목</th><th>2025Q4</th><th>2025Q3</th><th>2025Q2</th><th>2024Q4</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (억)</td><td>0</td><td>14</td><td>757</td><td>91</td></tr>
+          <tr><td>영업손실 (억)</td><td class="num-neg">-296</td><td class="num-neg">-224</td><td class="num-pos">+407</td><td class="num-neg">-191</td></tr>
+          <tr><td>현금 (억)</td><td class="num-pos">1,120</td><td class="num-pos">1,243</td><td class="num-pos">1,327</td><td class="num-pos">563</td></tr>
+          <tr><td>영업현금흐름(억)</td><td class="num-neg">-236</td><td class="num-neg">-275</td><td class="num-pos">+383</td><td class="num-neg">-155</td></tr>
+          <tr><td>ROE (%)</td><td class="num-neg">-18.23</td><td class="num-neg">-11.69</td><td class="num-pos">21.64</td><td class="num-neg">-11.36</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-card">
+      <div class="section-title">투자 인사이트</div>
+      <div class="insight-block">
+        <div class="insight-row"><div class="insight-dot dot-green"></div>현금 런웨이 약 7분기(1.7년) — ABL111 임상 결과(하반기) 전에 현금 소진 없음. 홀딩 논리 유효.</div>
+        <div class="insight-row"><div class="insight-dot dot-green"></div>2025Q2 기술이전 마일스톤 수령 시 흑자 전환(ROE +21.64%) — Grabody-B 가치 검증.</div>
+        <div class="insight-row"><div class="insight-dot dot-yellow"></div>분기 적자(-236~296억)는 R&D 바이오 정상 패턴. 손실 확대 추이만 주시.</div>
+        <div class="insight-row"><div class="insight-dot dot-red"></div>손절선 97,000원 유지. 추가매수 없이 ABL111 결과까지 홀딩+모니터링 포지션.</div>
+        <div class="insight-row"><div class="insight-dot dot-blue"></div>ABL111 1b상 결과 Good → 250,000원+ 재평가 가능. 바이오 첫 진입 종목 특성상 결과 전 비중 유지.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// 공통 차트 옵션
+const commonOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#1a1e2a',
+      borderColor: '#252a38',
+      borderWidth: 1,
+      titleColor: '#8b92a8',
+      bodyColor: '#e8ecf4',
+      padding: 10,
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(37,42,56,.5)', drawBorder: false },
+      ticks: { color: '#555e78', font: { size: 10, family: 'JetBrains Mono' } }
+    },
+    y: {
+      grid: { color: 'rgba(37,42,56,.5)', drawBorder: false },
+      ticks: { color: '#555e78', font: { size: 10, family: 'JetBrains Mono' } }
+    }
+  }
+};
+
+const quarters = ['23Q1','23Q2','23Q3','23Q4','24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'];
+const qShort9 = ['24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'];
+const qShort8 = ['24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4'];
+
+// 26Q1 데이터 포인트 색상 강조 (최신 실적)
+function makeBar(id, labels, sales, op, unit='조', highlightLast=false) {
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  const n = sales.length;
+  const salesBg = sales.map((_, i) => i === n-1 && highlightLast ? 'rgba(79,142,247,.5)' : 'rgba(79,142,247,.25)');
+  const opBg = op.map((_, i) => i === n-1 && highlightLast ? 'rgba(52,211,153,.5)' : 'rgba(52,211,153,.25)');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '매출', data: sales, backgroundColor: salesBg, borderColor: 'rgba(79,142,247,.6)', borderWidth: 1, borderRadius: 3 },
+        { label: '영업이익', data: op, backgroundColor: opBg, borderColor: 'rgba(52,211,153,.6)', borderWidth: 1, borderRadius: 3 }
+      ]
+    },
+    options: {
+      ...commonOpts,
+      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#8b92a8', font: { size: 10 }, boxWidth: 10 } } },
+      scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, ticks: { ...commonOpts.scales.y.ticks, callback: v => v + unit } } }
+    }
+  });
+}
+
+function makeLine(id, labels, datasets) {
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      ...commonOpts,
+      plugins: { ...commonOpts.plugins, legend: { display: datasets.length > 1, labels: { color: '#8b92a8', font: { size: 10 }, boxWidth: 10 } } },
+      scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, ticks: { ...commonOpts.scales.y.ticks, callback: v => v + '%' } } }
+    }
+  });
+}
+
+// ★ SKH — 26Q1 발표 완료: 매출 52.6조, 영업이익 37.6조, OPM 72%
+makeBar('skh-is-chart', quarters,
+  [5.1,7.3,9.1,11.3,12.4,16.4,17.6,19.8,17.6,22.2,24.4,32.8,52.6],
+  [-3.4,-1.2,0.1,0.3,0.3,0.7,1.1,0.3,1.9,4.2,5.6,19.2,37.6],
+  '조', true
+);
+makeLine('skh-margin-chart', quarters,
+  [{ label:'영업이익률', data:[-66,-39,-20,3,23,33,40,41,42,41,47,58,72], borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:3 },
+   { label:'ROE', data:[-5,-5,-4,-3,3,7,9,11,10,8,13,13,null], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.05)', tension:.4, fill:false, pointRadius:3 }]
+);
+
+// ★ 한화에어로 — 26Q1 컨센서스: 매출 6.0~6.4조, 영업이익 7,100~8,200억 (4/30 발표)
+makeBar('hwa-is-chart', qShort9,
+  [1.8,2.8,2.6,4.8,5.5,6.3,6.5,8.4,6.0],
+  [0.04,0.36,0.11,0.23,0.56,0.87,0.86,0.81,0.71],
+  '조', true
+);
+makeLine('hwa-margin-chart', qShort9,
+  [{ label:'영업이익률', data:[2.0,12.9,4.6,18.7,10.2,13.7,13.2,9.6,11.8], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.08)', tension:.4, fill:true, pointRadius:3 }]
+);
+
+// 테크윙 — 26Q1 미발표
+makeBar('tw-is-chart', qShort8,
+  [403,507,467,477,346,489,418,339],
+  [56,72,86,45,18,64,71,5.8],
+  '억'
+);
+makeLine('tw-margin-chart', qShort8,
+  [{ label:'영업이익률', data:[13.8,14.1,13.2,9.4,5.2,13.0,17.0,1.7], borderColor:'#fbbf24', backgroundColor:'rgba(251,191,36,.08)', tension:.4, fill:true, pointRadius:3 }]
+);
+
+// ★ ISC — 26Q1 발표 완료(4/27): 매출 683억, 영업이익 236억, OPM 35%
+makeBar('isc-is-chart', quarters,
+  [464,549,492,333,351,498,504,393,317,517,645,723,683],
+  [81,213,150,47,85,149,138,75,70,137,174,219,236],
+  '억', true
+);
+makeLine('isc-margin-chart', quarters,
+  [{ label:'영업이익률', data:[17.9,38.9,23.6,9.9,24.4,29.9,27.4,19.1,22.1,26.5,27.0,30.3,34.6], borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:3 }]
+);
+
+// ★ 에이피알 — 26Q1 컨센서스: 매출 5,895억, 영업이익 1,436억, OPM 24.4%
+makeBar('apr-is-chart', qShort9,
+  [1489,1555,1741,2442,2660,3277,3859,5476,5895],
+  [278,280,272,397,546,846,961,1302,1436],
+  '억', true
+);
+makeLine('apr-margin-chart', qShort9,
+  [{ label:'영업이익률', data:[18.6,18.0,15.7,16.3,20.5,25.8,24.9,23.8,24.4], borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:3 },
+   { label:'ROE', data:[8.1,7.8,5.7,13.4,14.5,16.3,21.4,22.2,null], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.05)', tension:.4, fill:false, pointRadius:3 }]
+);
+
+// ★ 두산에너빌리티 — 26Q1 컨센서스: 매출 3.8조, 영업이익 1,449억 YoY +400% (4/29 발표)
+makeBar('doe-is-chart', qShort9,
+  [4.1,4.2,3.4,4.6,3.7,4.6,3.9,4.9,3.8],
+  [0.36,0.30,0.11,0.24,0.14,0.27,0.14,0.21,0.14],
+  '조', true
+);
+makeLine('doe-margin-chart', qShort9,
+  [{ label:'영업이익률', data:[8.7,7.5,3.4,5.1,3.8,5.9,3.5,4.4,3.8], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.08)', tension:.4, fill:true, pointRadius:3 }]
+);
+
+// ★ 미래에셋증권 — 26Q1 컨센서스: 영업이익 9,782억 YoY +182% (5/7 발표)
+makeBar('mia-is-chart', qShort9,
+  [6279,4725,5449,5790,6053,7695,6672,8863,null],
+  [270,273,371,274,346,500,223,846,978],
+  '억', true
+);
+
+// ABL바이오 현금추이
+const ablQuarters = ['21Q4','22Q1','22Q2','22Q3','22Q4','23Q1','23Q2','23Q3','23Q4','24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4'];
+const ablCash = [216,828,485,219,251,312,160,275,281,139,10,15,563,232,1328,1244,1120];
+new Chart(document.getElementById('abl-cash-chart'), {
+  type: 'line',
+  data: {
+    labels: ablQuarters,
+    datasets: [{
+      label: '현금(억)',
+      data: ablCash,
+      borderColor: '#34d399',
+      backgroundColor: 'rgba(52,211,153,.08)',
+      tension: .4,
+      fill: true,
+      pointRadius: 3
+    }]
+  },
+  options: {
+    ...commonOpts,
+    scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, ticks: { ...commonOpts.scales.y.ticks, callback: v => v+'억' } } }
+  }
+});
+
+const ablLoss = [-178,-113,-21,250,-113,231,-103,-52,-102,-143,-113,-147,-191,-290,407,-224,-296];
+new Chart(document.getElementById('abl-loss-chart'), {
+  type: 'bar',
+  data: {
+    labels: ablQuarters,
+    datasets: [{
+      label: '영업손익(억)',
+      data: ablLoss,
+      backgroundColor: ablLoss.map(v => v>=0 ? 'rgba(52,211,153,.3)' : 'rgba(248,113,113,.25)'),
+      borderColor: ablLoss.map(v => v>=0 ? 'rgba(52,211,153,.7)' : 'rgba(248,113,113,.6)'),
+      borderWidth: 1,
+      borderRadius: 2
+    }]
+  },
+  options: {
+    ...commonOpts,
+    scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, ticks: { ...commonOpts.scales.y.ticks, callback: v => v+'억' } } }
+  }
+});
+
+// ============================================================
+// 종합점수 데이터 — 6개 축 절대평가 + 업종 보정
+// 각 축 0~100점
+// ============================================================
+const SCORE_DATA = {
+  skh: {
+    axes: {
+      수익성:   { score: 95, note: 'OPM 72% — 반도체 역대 최고' },
+      성장성:   { score: 98, note: 'YoY +198% · 4분기 연속 최고' },
+      재무안정: { score: 90, note: '차입금비율 12% · 순현금 35조' },
+      자본효율: { score: 72, note: 'ROE 12.6% / FY26E 89.5%' },
+      밸류에이션:{ score: 55, note: 'PBR 7.85배 · FY26E 기준 적정' },
+      모멘텀:   { score: 95, note: 'HBM 슈퍼사이클 · AI 수요 구조적' },
+    },
+    sector: '반도체',
+    highlight: 'HBM 슈퍼사이클 정점. 26Q1 OPM 72% · 순현금 35조 달성.',
+  },
+  hwa: {
+    axes: {
+      수익성:   { score: 72, note: 'OPM 9~13% — 방산업 우수 수준' },
+      성장성:   { score: 85, note: 'YoY +74% · 수주잔고 37조+' },
+      재무안정: { score: 65, note: '유동자산 30.7조 · 부채 관리 중' },
+      자본효율: { score: 60, note: 'ROE 10.3% / ROA 1.8%' },
+      밸류에이션:{ score: 45, note: 'PBR 3.76배 · 수주 프리미엄 반영' },
+      모멘텀:   { score: 92, note: 'NATO 방산 수요 · 수주잔고 4~5년치' },
+    },
+    sector: '방산',
+    highlight: '수주잔고 37조 — 4~5년치 가시성. 지정학 수혜 장기홀딩 유효.',
+  },
+  tw: {
+    axes: {
+      수익성:   { score: 28, note: 'OPM 1.7% — 25Q4 급락 (Q3 17%)' },
+      성장성:   { score: 42, note: 'YoY 보합 · 큐브프로버 미확인' },
+      재무안정: { score: 68, note: '유동자산 2,641억 · PBR 0.77배' },
+      자본효율: { score: 30, note: 'ROE -2.1% — 일시 적자' },
+      밸류에이션:{ score: 78, note: 'PBR 0.77배 — 청산가치 이하' },
+      모멘텀:   { score: 55, note: 'HBM 핸들러 독점 · Q2 실적 확인 필요' },
+    },
+    sector: '반도체 장비',
+    highlight: '⚠️ 50,000원 하드스탑. Q2 큐브프로버 매출 확인이 핵심 트리거.',
+  },
+  isc: {
+    axes: {
+      수익성:   { score: 92, note: 'OPM 34.6% 역대 최고 · 26Q1 확정' },
+      성장성:   { score: 90, note: 'YoY +115% · 비수기 역대 최고' },
+      재무안정: { score: 88, note: '현금+단기금융 3,421억 · 무차입' },
+      자본효율: { score: 52, note: 'ROE 4.1% — 이익 자본 축적 진행중' },
+      밸류에이션:{ score: 82, note: 'PBR 1.0배 — 순자산 수준 거래' },
+      모멘텀:   { score: 88, note: 'AI GPU·ASIC 소켓 +191% · SLT 60%↑' },
+    },
+    sector: '반도체 소켓',
+    highlight: '26Q1 비수기 역대 최고. HBM·AI 구조적 성장 본격화 신호.',
+  },
+  apr: {
+    axes: {
+      수익성:   { score: 85, note: 'OPM 24% — 뷰티 D2C 구조 우수' },
+      성장성:   { score: 92, note: 'YoY +122% · 유럽 아마존 진출' },
+      재무안정: { score: 78, note: '현금 1,543억 · 무부채 구조' },
+      자본효율: { score: 88, note: 'ROE 22.2% — 보유종목 최고' },
+      밸류에이션:{ score: 90, note: 'PBR 1.45배 · 기대수익률 15.3%' },
+      모멘텀:   { score: 80, note: '미국·유럽 채널 확장 · 배당락 전략' },
+    },
+    sector: '뷰티',
+    highlight: '보유종목 중 밸류에이션 최우수. ROE 22% + PBR 1.45배 = 기대수익 15%.',
+  },
+  doe: {
+    axes: {
+      수익성:   { score: 42, note: 'OPM 4% — 수주잔고 업종 특성' },
+      성장성:   { score: 78, note: '26Q1E YoY +400% · 원전·가스터빈' },
+      재무안정: { score: 62, note: '현금 3.1조 · 부채비율 개선 중' },
+      자본효율: { score: 30, note: 'ROE 0.7% — 수익성 회복 초기' },
+      밸류에이션:{ score: 35, note: 'PBR 7.2배 · SMR 기대치 반영' },
+      모멘텀:   { score: 90, note: '수주잔고 16조 · SMR·체코 원전 수주' },
+    },
+    sector: '원전/에너지',
+    highlight: '수주잔고 16조 — 수익성보다 수주 모멘텀이 투자 근거. 4/29 실적 확인.',
+  },
+  mia: {
+    axes: {
+      수익성:   { score: 65, note: 'OPM 9.5% — 증권업 우수 수준' },
+      성장성:   { score: 82, note: '26Q1E YoY +182% · 거래대금 폭증' },
+      재무안정: { score: 72, note: '총자산 150조 · 레버리지 구조 정상' },
+      자본효율: { score: 45, note: 'ROE 4.3% / ROA 0.4% — 증권사 정상' },
+      밸류에이션:{ score: 38, note: 'PBR 6.6배 · SpaceX 기대치 반영' },
+      모멘텀:   { score: 88, note: 'SpaceX IPO 6월 기대 · 평가이익 반영' },
+    },
+    sector: '증권',
+    highlight: 'SpaceX IPO 이벤트 드리븐. 6월 상장 시 sell-the-news 75,000원 목표.',
+  },
+  abl: {
+    axes: {
+      수익성:   { score: 15, note: '영업손실 -296억 — 바이오 R&D 정상' },
+      성장성:   { score: 62, note: 'GSK 기술이전 · ABL111 임상 대기' },
+      재무안정: { score: 70, note: '현금 런웨이 7분기 · 소진 위험 낮음' },
+      자본효율: { score: 10, note: 'ROE -18% — 적자 바이오 특성' },
+      밸류에이션:{ score: 55, note: 'PBR 1.69배 · 파이프라인 가치 반영' },
+      모멘텀:   { score: 72, note: 'ABL111 임상 1b상 하반기 결과 대기' },
+    },
+    sector: '바이오',
+    highlight: '바이너리 이벤트(ABL111) 전 홀딩. 런웨이 7분기 — 손절선 97,000원 유지.',
+  },
+};
+
+function calcTotalScore(axes) {
+  const vals = Object.values(axes).map(a => a.score);
+  return Math.round(vals.reduce((a,b)=>a+b,0) / vals.length);
+}
+
+function getGrade(score) {
+  if (score >= 85) return { label: 'A+', color: '#34d399' };
+  if (score >= 75) return { label: 'A',  color: '#34d399' };
+  if (score >= 65) return { label: 'B+', color: '#4f8ef7' };
+  if (score >= 55) return { label: 'B',  color: '#fbbf24' };
+  if (score >= 45) return { label: 'C+', color: '#fb923c' };
+  return             { label: 'C',  color: '#f87171' };
+}
+
+function renderScore(stockId) {
+  const d = SCORE_DATA[stockId];
+  if (!d) return '';
+  const total = calcTotalScore(d.axes);
+  const grade = getGrade(total);
+  const r = 38, cx = 45, cy = 45;
+  const circ = 2 * Math.PI * r;
+  const filled = circ * (total / 100);
+
+  const axisEntries = Object.entries(d.axes);
+
+  const bars = axisEntries.map(([name, {score, note}]) => {
+    const pct = score;
+    const col = pct >= 80 ? '#34d399' : pct >= 60 ? '#4f8ef7' : pct >= 40 ? '#fbbf24' : '#f87171';
+    return `
+    <div class="score-bar-row">
+      <div class="score-bar-label">${name}</div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" style="width:${pct}%;background:${col}"></div>
+      </div>
+      <div class="score-bar-val" style="color:${col}">${pct}</div>
+    </div>`;
+  }).join('');
+
+  // 레이더 차트 캔버스 id
+  const radarId = `radar-${stockId}`;
+
+  return `
+  <div class="score-section">
+    <div class="score-header">
+      <div class="score-header-title">📊 종합 투자점수 · 6축 절대평가</div>
+      <span class="section-badge" style="background:${grade.color}22;color:${grade.color};font-size:12px;font-weight:700">${grade.label} ${total}점</span>
+    </div>
+    <div class="score-body">
+      <div class="score-left">
+        <div class="score-circle">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="score-circle-bg" cx="${cx}" cy="${cy}" r="${r}"/>
+            <circle class="score-circle-fill"
+              cx="${cx}" cy="${cy}" r="${r}"
+              stroke="${grade.color}"
+              stroke-dasharray="${circ}"
+              stroke-dashoffset="${circ - filled}"/>
+          </svg>
+          <div class="score-num">
+            <div class="score-num-val" style="color:${grade.color}">${total}</div>
+            <div class="score-num-label">/100</div>
+          </div>
+        </div>
+        <div class="score-grade" style="color:${grade.color}">${grade.label} · ${d.sector}</div>
+      </div>
+      <div class="score-right">
+        <div style="height:200px;position:relative">
+          <canvas id="${radarId}"></canvas>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 16px">
+      <div class="score-bars">${bars}</div>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.6;margin-top:10px">
+      💡 ${d.highlight}
+    </div>
+  </div>`;
+}
+
+// 레이더 차트 그리기 (종합점수 렌더 후 호출)
+function drawRadar(stockId) {
+  const d = SCORE_DATA[stockId];
+  if (!d) return;
+  const ctx = document.getElementById(`radar-${stockId}`);
+  if (!ctx || ctx._radarDrawn) return;
+  ctx._radarDrawn = true;
+  const axisEntries = Object.entries(d.axes);
+  const grade = getGrade(calcTotalScore(d.axes));
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: axisEntries.map(([k]) => k),
+      datasets: [{
+        data: axisEntries.map(([,v]) => v.score),
+        backgroundColor: grade.color + '22',
+        borderColor: grade.color,
+        borderWidth: 2,
+        pointBackgroundColor: grade.color,
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 25 },
+          grid: { color: 'rgba(37,42,56,.8)' },
+          angleLines: { color: 'rgba(37,42,56,.8)' },
+          pointLabels: {
+            color: '#8b92a8',
+            font: { size: 10, family: 'Pretendard' }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+// 자본총계(2025Q4) 기준 계산
+// ============================================================
+const VAL_DATA = {
+  skh: {
+    bps: 165797, currentPrice: 1301000,
+    pbr: 7.85, roe: 12.65,
+    fwdRoe: 89.5,   // FY26 예상 ROE (증권사 컨센서스)
+    reqReturn: 12,
+    note: '현재 ROE 12.65%는 분기 기준. FY26 예상 ROE 89.5% 적용 시 적정 PBR 7.5배 → 현재 7.85배로 거의 적정 수준. HBM 사이클 이익이 자본으로 쌓이며 BPS 급증 → PBR 자연 하락 구조.',
+    sector: '반도체',
+  },
+  hwa: {
+    bps: 370804, currentPrice: 1396000,
+    pbr: 3.76, roe: 10.26,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '수주잔고가 장부에 미반영. 방산 특성상 PBR 단독 판단 부적합. ROE 10.26% 기준 적정 PBR 0.85배 → 현재 3.76배는 수주 프리미엄 + 방산 성장 기대치 반영.',
+    sector: '방산',
+  },
+  tw: {
+    bps: 78563, currentPrice: 60400,
+    pbr: 0.77, roe: -2.07,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '현재 ROE 음수(적자). PBR 0.77배 = 순자산보다 싸게 거래 중. 청산가치 이하 구간. 큐브프로버 매출 확인으로 수익성 회복 시 리레이팅 기대.',
+    sector: '반도체 장비',
+  },
+  isc: {
+    bps: 238782, currentPrice: 238500,
+    pbr: 1.00, roe: 4.05,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '현재 PBR 1.0배 = 순자산 대비 딱 적정가. 그러나 영업이익률 30%는 ROE 4%보다 훨씬 높은 수준 — HBM 수혜가 아직 자본 축적으로 충분히 반영 안 됨. 이익이 쌓이면 ROE↑ → 적정PBR↑ 구조.',
+    sector: '반도체 소켓',
+  },
+  apr: {
+    bps: 318429, currentPrice: 461000,
+    pbr: 1.45, roe: 22.16,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '기대수익률 15.3% — 보유 종목 중 최고. 브랜드·채널 가치가 장부에 미반영. ROE 22% 기업이 PBR 1.45배에 거래되는 건 명확한 저평가. 적정 PBR 1.85배 대비 23% 업사이드 여지.',
+    sector: '뷰티',
+  },
+  doe: {
+    bps: 17765, currentPrice: 127900,
+    pbr: 7.20, roe: 0.67,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '수주잔고 비즈니스 특성상 PBR/ROE 단독 판단 부적합. 현재 ROE 극히 낮아 이론 적정PBR 0.06배 → 현재 7.2배는 원전·SMR 성장 기대치가 반영된 것. 수주잔고와 수익성 회복 추이가 핵심.',
+    sector: '에너지',
+  },
+  mia: {
+    bps: 10456, currentPrice: 68550,
+    pbr: 6.56, roe: 4.27,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '증권사 특성상 총자산 150조 레버리지 구조. ROA 0.38%는 정상 범위. SpaceX IPO 이벤트 드리븐으로 PBR 프리미엄 형성 중. 목표 75,000원 sell-the-news 전략 유지.',
+    sector: '증권',
+  },
+  abl: {
+    bps: 82474, currentPrice: 139100,
+    pbr: 1.69, roe: -18.23,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: '적자 바이오 특성상 PBR·ROE 판단 불가. PBR 1.69배는 파이프라인 가치(Grabody-B 기술이전 + ABL111 임상)를 반영한 수치. 현금 런웨이 7분기 확보 — 바이너리 이벤트(ABL111) 전까지 홀딩.',
+    sector: '바이오',
+  },
+};
+
+function renderValuation(stockId) {
+  const d = VAL_DATA[stockId];
+  if (!d) return '';
+
+  const pbr = d.pbr;
+  const roe = d.roe;
+  const fairPbr = roe > 0 ? (roe / d.reqReturn) : null;
+  const expectedReturn = roe / pbr;
+  const useRoe = d.fwdRoe || roe;
+  const fairPbrDisplay = useRoe > 0 ? (useRoe / d.reqReturn).toFixed(2) : 'N/A';
+
+  // 게이지 계산 (0 ~ max 범위)
+  const maxPbr = Math.max(pbr * 1.5, fairPbr ? fairPbr * 2 : pbr * 2, 2);
+  const currentPct = Math.min((pbr / maxPbr) * 100, 100);
+  const fairPct = fairPbr ? Math.min((fairPbr / maxPbr) * 100, 100) : null;
+
+  // 색상 결정
+  let pbrColor, pbrLabel, erColor;
+  if (roe <= 0) {
+    pbrColor = '#555e78'; pbrLabel = 'ROE 음수';
+  } else if (fairPbr && pbr <= fairPbr * 0.9) {
+    pbrColor = '#34d399'; pbrLabel = '저평가';
+  } else if (fairPbr && pbr <= fairPbr * 1.3) {
+    pbrColor = '#fbbf24'; pbrLabel = '적정';
+  } else {
+    pbrColor = '#f87171'; pbrLabel = '고평가(기대치 포함)';
+  }
+
+  erColor = expectedReturn > 10 ? '#34d399' : expectedReturn > 5 ? '#fbbf24' : expectedReturn > 0 ? '#8b92a8' : '#f87171';
+  const roeColor = roe > 15 ? '#34d399' : roe > 8 ? '#fbbf24' : roe > 0 ? '#8b92a8' : '#f87171';
+
+  const fwdNote = d.fwdRoe ? `<span style="color:var(--accent);font-size:10px"> *FY26 예상 ROE ${d.fwdRoe}% 기준</span>` : '';
+
+  return `
+  <div class="val-section">
+    <div class="section-title">
+      밸류에이션 분석 · PBR/ROE
+      <span class="section-badge" style="background:${pbrColor}22;color:${pbrColor}">${pbrLabel}</span>
+    </div>
+    <div class="val-grid">
+      <div class="val-item">
+        <div class="val-label">BPS (주당순자산)</div>
+        <div class="val-num" style="color:var(--accent)">${d.bps.toLocaleString()}원</div>
+        <div class="val-sub">자본총계 ÷ 발행주식수</div>
+      </div>
+      <div class="val-item">
+        <div class="val-label">PBR (현재)</div>
+        <div class="val-num" style="color:${pbrColor}">${pbr.toFixed(2)}배</div>
+        <div class="val-sub">현재가 ÷ BPS</div>
+      </div>
+      <div class="val-item">
+        <div class="val-label">ROE</div>
+        <div class="val-num" style="color:${roeColor}">${roe.toFixed(2)}%</div>
+        <div class="val-sub">2025Q4 기준</div>
+      </div>
+      <div class="val-item" style="border-right:none">
+        <div class="val-label">기대수익률 (ROE÷PBR)</div>
+        <div class="val-num" style="color:${erColor}">${expectedReturn.toFixed(1)}%</div>
+        <div class="val-sub">이론적 연간 기대수익</div>
+      </div>
+    </div>
+    <div class="pbr-gauge-wrap">
+      <div class="pbr-gauge-label">
+        <span>PBR 위치</span>
+        <span>적정PBR = ROE(${useRoe.toFixed(1)}%) ÷ 요구수익률(12%) = <strong style="color:${pbrColor}">${fairPbrDisplay}배</strong>${d.fwdRoe ? ' *FY26 예상' : ''}</span>
+      </div>
+      <div class="pbr-gauge-bar">
+        <div class="pbr-gauge-fill" style="width:${currentPct}%;background:${pbrColor}88"></div>
+        ${fairPct !== null ? `
+        <div class="pbr-gauge-marker" style="left:${fairPct}%"></div>
+        <div class="pbr-gauge-marker-label" style="left:${fairPct}%">적정 ${fairPbrDisplay}배</div>
+        ` : ''}
+        <div class="pbr-gauge-marker" style="left:${currentPct}%;background:${pbrColor}"></div>
+        <div class="pbr-gauge-marker-label" style="left:${currentPct}%;color:${pbrColor}">현재 ${pbr.toFixed(2)}배</div>
+      </div>
+      <div style="height:18px"></div>
+      <div class="pbr-note">${d.note}</div>
+    </div>
+  </div>`;
+}
+
+// 탭 전환
+function showStock(id) {
+  document.querySelectorAll('.stock-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.stock-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  // 종합점수 섹션 동적 삽입
+  const panel = document.getElementById('panel-' + id);
+  if (!panel.querySelector('.score-section')) {
+    const kpiGrid = panel.querySelector('.kpi-grid');
+    if (kpiGrid) {
+      kpiGrid.insertAdjacentHTML('beforebegin', renderScore(id));
+    }
+  }
+  setTimeout(() => drawRadar(id), 50);
+
+  // 밸류에이션 섹션 동적 삽입
+  const existing = panel.querySelector('.val-section');
+  if (!existing) {
+    const divider = panel.querySelector('.divider');
+    if (divider) {
+      divider.insertAdjacentHTML('beforebegin', renderValuation(id));
+    }
+  }
+}
+
+// 초기 로드 시 첫 번째 패널
+window.addEventListener('DOMContentLoaded', () => {
+  const firstPanel = document.querySelector('.stock-panel.active');
+  if (firstPanel) {
+    const id = firstPanel.id.replace('panel-', '');
+
+    // 종합점수 삽입
+    const kpiGrid = firstPanel.querySelector('.kpi-grid');
+    if (kpiGrid && !firstPanel.querySelector('.score-section')) {
+      kpiGrid.insertAdjacentHTML('beforebegin', renderScore(id));
+    }
+    setTimeout(() => drawRadar(id), 100);
+
+    // 밸류에이션 삽입
+    const divider = firstPanel.querySelector('.divider');
+    if (divider && !firstPanel.querySelector('.val-section')) {
+      divider.insertAdjacentHTML('beforebegin', renderValuation(id));
+    }
+  }
+});
+</script>
+</body>
+</html>
