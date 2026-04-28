@@ -824,26 +824,44 @@ const NAVER_CODES={
 };
 
 async function fetchNaverPrice(code){
-  const target=`https://finance.naver.com/item/sise.naver?code=${code}`;
-  const proxies=[
-    `https://corsproxy.io/?${encodeURIComponent(target)}`,
-    `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`,
-    `https://thingproxy.freeboard.io/fetch/${target}`
+  /* ── 1순위: 네이버 모바일 JSON API (가장 안정적) ── */
+  const mobileApi=`https://m.stock.naver.com/api/stock/${code}/basic`;
+  const mobileProxies=[
+    `https://corsproxy.io/?${encodeURIComponent(mobileApi)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(mobileApi)}`
   ];
-  for(const url of proxies){
+  for(const url of mobileProxies){
     try{
-      const res=await fetch(url,{signal:AbortSignal.timeout(6000)});
+      const res=await fetch(url,{signal:AbortSignal.timeout(7000)});
+      let data;
+      if(url.includes('allorigins')){const j=await res.json();data=JSON.parse(j.contents||'{}');}
+      else{data=await res.json();}
+      /* closePrice(종가) 또는 localTradedAt 기준 현재가 */
+      const price=data?.closePrice||data?.currentPrice||data?.price;
+      if(price){
+        const v=parseInt(String(price).replace(/,/g,''));
+        if(v>100)return v;
+      }
+    }catch(e){}
+  }
+
+  /* ── 2순위: 네이버 PC sise_time (실제 가격 데이터 iframe) ── */
+  const siseTime=`https://finance.naver.com/item/sise_time.naver?code=${code}&thistime=&page=1`;
+  const siseProxies=[
+    `https://corsproxy.io/?${encodeURIComponent(siseTime)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(siseTime)}`
+  ];
+  for(const url of siseProxies){
+    try{
+      const res=await fetch(url,{signal:AbortSignal.timeout(7000)});
       let text='';
       if(url.includes('allorigins')){const j=await res.json();text=j.contents||'';}
       else{text=await res.text();}
-      /* 네이버 금융 sise 페이지 현재가 파싱 패턴들 */
+      /* sise_time 테이블 첫 번째 가격 파싱 */
       const patterns=[
-        /id="_nowVal"[^>]*>([\d,]+)</,           // 표준 패턴
-        /nowVal[^>]*>([\d,]+)</,                   // 변형
-        /<em[^>]*id="[^"]*now[^"]*"[^>]*>([\d,]+)/, // em 태그
-        /현재가[^\d]+([\d,]{4,})/,                 // 텍스트 기반
-        /"close":"([\d]+)"/,                       // JSON 내장
-        /stockprice[^>]*>([\d,]+)/i
+        /<td class="num"[^>]*>([\d,]+)<\/td>/,
+        /class="num">([\d,]+)</,
+        /([\d]{2,3},[\d]{3})/   /* XXX,XXX 형태 (코스닥 소형주) */
       ];
       for(const pat of patterns){
         const m=text.match(pat);
@@ -851,6 +869,25 @@ async function fetchNaverPrice(code){
       }
     }catch(e){}
   }
+
+  /* ── 3순위: 네이버 금융 공시 JSON API ── */
+  const chartApi=`https://fchart.stock.naver.com/sise.nhn?symbol=${code}&timeframe=day&count=1&requestType=0`;
+  const chartProxies=[
+    `https://corsproxy.io/?${encodeURIComponent(chartApi)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(chartApi)}`
+  ];
+  for(const url of chartProxies){
+    try{
+      const res=await fetch(url,{signal:AbortSignal.timeout(7000)});
+      let text='';
+      if(url.includes('allorigins')){const j=await res.json();text=j.contents||'';}
+      else{text=await res.text();}
+      /* XML: <item data="날짜|시가|고가|저가|종가|거래량" /> */
+      const m=text.match(/data="[\d]+\|([\d]+)\|([\d]+)\|([\d]+)\|([\d]+)\|/);
+      if(m){const v=parseInt(m[4]);if(v>100)return v;}
+    }catch(e){}
+  }
+
   return null;
 }
 
