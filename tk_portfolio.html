@@ -145,6 +145,7 @@ canvas{display:block;}
 .tfilter.fa{background:rgba(79,143,255,0.1);border-color:var(--accent);color:var(--accent);}
 .tfilter.fs{background:rgba(0,245,180,0.08);border-color:var(--profit);color:var(--profit);}
 .tfilter.fl{background:rgba(255,48,96,0.08);border-color:var(--loss);color:var(--loss);}
+.tfilter.fb{background:rgba(0,229,255,0.08);border-color:var(--cyan);color:var(--cyan);}
 
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -196,7 +197,7 @@ canvas{display:block;}
       </div>
       <div style="text-align:right">
         <div style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-bottom:4px">2026 확정수익</div>
-        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--profit)">+3,343만원</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--profit)">+3,660만원</div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px" id="an-cash-pct">현금비중 —</div>
       </div>
     </div>
@@ -291,7 +292,7 @@ canvas{display:block;}
     <div style="background:rgba(0,245,180,0.06);border:1px solid rgba(0,245,180,0.22);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;">
       <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--profit),var(--cyan));"></div>
       <div style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:5px;">2026 확정수익</div>
-      <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--profit);">+3,620만</div>
+      <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--profit);">+3,660만</div>
       <div style="font-size:9px;color:var(--text3);margin-top:2px;">누적 실현손익</div>
     </div>
     <div onclick="openTrendModal('kiwoomPnl')" style="background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.22);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;cursor:pointer;">
@@ -594,46 +595,28 @@ canvas{display:block;}
     </div>
     <canvas id="cumulative-chart" height="110"></canvas>
   </div>
-  <div class="sec-head"><div class="sec-title">2026 매매일지</div><div class="sec-badge">누적 +3,660만</div></div>
-  <div class="trade-filter-row"><button class="tfilter fa" id="tf-all" onclick="filterTrades('all')">전체</button><button class="tfilter" id="tf-sell" onclick="filterTrades('sell')">매도익절</button><button class="tfilter" id="tf-loss" onclick="filterTrades('loss')">손절</button></div>
-  <div id="log-sell"><div class="card green">
-    <div class="s-label">수익 실현</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">에이피알</div><div class="trade-detail">01.29 · 13주 · 227,500→270,000</div></div><div class="trade-pnl up">+55만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">02.20 · 15주 · 430,500→949,000</div></div><div class="trade-pnl up">+778만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">네이버</div><div class="trade-detail">02.25 · 5주 · 241,900→252,500</div></div><div class="trade-pnl up">+5만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">펄어비스</div><div class="trade-detail">03.05 · 66주 · 51,306→53,800</div></div><div class="trade-pnl up">+16만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">03.11 · 8주 · 668,367→960,000</div></div><div class="trade-pnl up">+233만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">현대모비스 (현대차증권)</div><div class="trade-detail">02.27 · 69주 · 246,428→517,000</div></div><div class="trade-pnl up">+1,867만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">두산에너빌리티 (현대차증권)</div><div class="trade-detail">03.06 · 15주 · 88,000→92,500</div></div><div class="trade-pnl up">+7만</div></div>
-    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/02 익절 — 전쟁 불안 회피</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">ISC</div><div class="trade-detail">04.02 · 5주 · 176,300→244,500</div></div><div class="trade-pnl up">+34만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.02 · 10주 · 713,562→860,000</div></div><div class="trade-pnl up">+144만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">에이피알</div><div class="trade-detail">04.02 · 15주 · 289,654→344,000</div></div><div class="trade-pnl up">+80만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">한화에어로스페이스</div><div class="trade-detail">04.02 · 2주 · 1,220,000→1,439,000</div></div><div class="trade-pnl up">+43만</div></div>
-    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/10 분할 익절</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">ISC</div><div class="trade-detail">04.10 · 10주 · +17.57%</div></div><div class="trade-pnl up">+38만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">에이피알</div><div class="trade-detail">04.10 · 12주 · +20.99%</div></div><div class="trade-pnl up">+81만</div></div>
-    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/14~04/15 SKH 분할 매도</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.14 · 3주 · +54.05%</div></div><div class="trade-pnl up">+118만</div></div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.15 · 3주 · +56.66%</div></div><div class="trade-pnl up">+123만</div></div>
-    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/28 두산에너빌 익절 · 에이비엘 신규진입</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">두산에너빌리티</div><div class="trade-detail">04.28 · 30주 · 100,442→128,200</div></div><div class="trade-pnl up">+83만</div></div>
-    <div class="trade-item"><div class="trade-badge sell" style="background:rgba(77,139,255,0.12);color:var(--accent);border:1px solid rgba(77,139,255,0.2);">매수</div><div class="trade-info"><div class="trade-name">에이비엘바이오 <span style="font-size:9px;color:var(--gold);">★바이오 첫진입</span></div><div class="trade-detail">04.28 · 13주 · 139,100원 · 손절 97,000</div></div><div class="trade-pnl" style="color:var(--accent);">-신규-</div></div>
-    <div style="height:1px;background:rgba(0,245,180,0.15);margin:8px 0;"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">04/30 SKH 분할 익절 (+63% 구간)</div>
-    <div class="trade-item"><div class="trade-badge sell">매도</div><div class="trade-info"><div class="trade-name">SK하이닉스</div><div class="trade-detail">04.30 · 3주 · 802,812→1,292,000</div></div><div class="trade-pnl up">+147만</div></div>
+  <div class="sec-head"><div class="sec-title">2026 매매일지</div><div class="sec-badge" id="log-badge">누적 +3,660만</div></div>
+
+  <!-- 월별 필터 -->
+  <div style="display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px;" id="month-filter-row">
+    <button class="tfilter fa" id="mf-all"  onclick="filterMonth('all')" style="flex-shrink:0;min-width:36px;">전체</button>
+    <button class="tfilter"    id="mf-5"    onclick="filterMonth('5')"   style="flex-shrink:0;min-width:36px;">5월</button>
+    <button class="tfilter"    id="mf-4"    onclick="filterMonth('4')"   style="flex-shrink:0;min-width:36px;">4월</button>
+    <button class="tfilter"    id="mf-3"    onclick="filterMonth('3')"   style="flex-shrink:0;min-width:36px;">3월</button>
+    <button class="tfilter"    id="mf-2"    onclick="filterMonth('2')"   style="flex-shrink:0;min-width:36px;">2월</button>
+    <button class="tfilter"    id="mf-1"    onclick="filterMonth('1')"   style="flex-shrink:0;min-width:36px;">1월</button>
   </div>
-  </div><div id="log-loss"><div class="card red">
-    <div class="s-label">손실 확정</div>
-    <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">펄어비스</div><div class="trade-detail">03.19 · 83주 · 60,628→47,550</div></div><div class="trade-pnl dn">-109만</div></div>
-    <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">미래에셋벤처투자</div><div class="trade-detail">02.23~02.27 · 400주</div></div><div class="trade-pnl dn">-95만</div></div>
-    <div class="trade-item"><div class="trade-badge loss">손절</div><div class="trade-info"><div class="trade-name">한화솔루션</div><div class="trade-detail">03.06~03.12 · 67주</div></div><div class="trade-pnl dn">-4만</div></div>
+
+  <!-- 유형 필터 -->
+  <div class="trade-filter-row" style="margin-bottom:10px;">
+    <button class="tfilter fa" id="tf-all"  onclick="filterType('all')">전체</button>
+    <button class="tfilter"    id="tf-sell" onclick="filterType('sell')">매도익절</button>
+    <button class="tfilter"    id="tf-buy"  onclick="filterType('buy')">매수</button>
+    <button class="tfilter"    id="tf-loss" onclick="filterType('loss')">손절</button>
   </div>
-  </div>
+
+  <!-- 매매 데이터 (JS로 렌더) -->
+  <div id="log-trade-list"></div>
 </div>
 
 <div class="page" id="page-watch">
@@ -901,11 +884,11 @@ canvas{display:block;}
 <script>
 const HOLDINGS={
   kiwoom:[
-    {id:'SKH',name:'SK하이닉스',qty:21,avg:802812},
+    {id:'SKH',name:'SK하이닉스',qty:17,avg:802812},
     {id:'HWA',name:'한화에어로스페이스',qty:3,avg:1220000},
     {id:'TWI',name:'테크윙',qty:110,avg:62791},
     {id:'ISC',name:'ISC',qty:20,avg:219285},
-    {id:'APR',name:'에이피알',qty:53,avg:385650},
+    {id:'APR',name:'에이피알',qty:62,avg:391298},
   ],
   toss:[
     {id:'DSE',name:'두산에너빌리티',qty:12,avg:100442},
@@ -914,9 +897,9 @@ const HOLDINGS={
     {id:'ABL',name:'에이비엘바이오',qty:13,avg:139100},
   ]
 };
-let PRICES={SKH:1292000,HWA:1400000,TWI:60000,ISC:246000,APR:424000,DSE:128100,MIA:67200,TIG:9835,ABL:138300};
-let PRICES_PREV={SKH:1292000,HWA:1400000,TWI:60000,ISC:246000,APR:424000,DSE:128100,MIA:67200,TIG:9835,ABL:138300};
-let CASH={kiwoom:15876000,toss:2930000};
+let PRICES={SKH:1590000,HWA:1439000,TWI:62200,ISC:254000,APR:424500,DSE:127500,MIA:84200,TIG:9600,ABL:127600};
+let PRICES_PREV={SKH:1590000,HWA:1439000,TWI:62200,ISC:254000,APR:424500,DSE:127500,MIA:84200,TIG:9600,ABL:127600};
+let CASH={kiwoom:18492949,toss:2041656};
 
 const HISTORY=[
   {date:'03/05',total:7200,cashPct:28,pnl:{SKH:30,HWA:8,TWI:-2,ISC:5,APR:12,DSE:-5.4,MIA:0.1,TIG:0}},
@@ -936,6 +919,7 @@ const HISTORY=[
   {date:'04/24',total:9436,cashPct:24.5,pnl:{SKH:51.9,HWA:19.8,TWI:-3.2,ISC:6.5,APR:31.5,DSE:26.1,MIA:-7.1,TIG:0.7}},
   {date:'04/28',total:9708,cashPct:18.2,pnl:{SKH:61.9,HWA:14.4,TWI:-4.0,ISC:8.8,APR:19.5,DSE:27.3,MIA:-4.7,TIG:-5.4,ABL:0.3}},
   {date:'04/30',total:9547,cashPct:19.7,pnl:{SKH:60.9,HWA:14.8,TWI:-4.4,ISC:12.2,APR:9.9,DSE:27.5,MIA:-6.6,TIG:-8.4,ABL:-0.6}},
+  {date:'05/06',total:11203,cashPct:36.5,pnl:{SKH:97.6,HWA:17.7,TWI:-1.1,ISC:15.8,APR:8.5,DSE:26.9,MIA:17.0,TIG:-10.5,ABL:-8.2}},
 ];
 
 const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS'};
@@ -1238,7 +1222,7 @@ function calcSplit(){
 }
 function resetSplit(){initSplitRows();document.getElementById('split-result').style.display='none';}
 function setDate(){const d=new Date();document.getElementById('today-lbl').textContent=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;}
-function showPage(name,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');btn.classList.add('active');if(name==='trend')renderCharts();if(name==='sim'){initSimSelect();initSplitRows();initAvgSelect();}if(name==='log')setTimeout(renderCumulativeChart,100);if(name==='analysis')renderAnalysis();}
+function showPage(name,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');btn.classList.add('active');if(name==='trend')renderCharts();if(name==='sim'){initSimSelect();initSplitRows();initAvgSelect();}if(name==='log'){setTimeout(renderCumulativeChart,100);setTimeout(renderTradeLog,50);}if(name==='analysis')renderAnalysis();}
 
 // ============================================================
 // 종목분석 탭 — 종합 스코어 대시보드
@@ -1273,7 +1257,8 @@ const AN_SCORES = {
 const AN_EVENTS = [
   { date:'4/29(수)', name:'두산에너빌리티', desc:'26Q1 실적발표 · YoY +400%E', color:'#ffb938', urgent:true },
   { date:'4/30(목)', name:'한화에어로스페이스', desc:'26Q1 실적발표 · 수주잔고 37조', color:'#4d8bff', urgent:true },
-  { date:'5/7(수)',  name:'미래에셋증권', desc:'26Q1 실적발표 · SpaceX 평가이익', color:'#a855f7', urgent:false },
+  { date:'5/7(목)',  name:'에이피알', desc:'26Q1 실적발표 · 매출 5,692억E · 어닝서프라이즈 기대', color:'#a855f7', urgent:true },
+  { date:'5/7(목)',  name:'미래에셋증권', desc:'26Q1 실적발표 · SpaceX 평가이익', color:'#4d8bff', urgent:false },
   { date:'하반기',  name:'에이비엘바이오', desc:'ABL111 임상 1b상 결과 발표', color:'#00e5ff', urgent:false },
 ];
 
@@ -1459,6 +1444,7 @@ function renderDash(){
       {label:'에너지 · 원전',color:'#00f5b4',ids:['DSE']},
       {label:'금융 · IPO',color:'#4d8bff',ids:['MIA']},
       {label:'우주 ETF',color:'#00e5ff',ids:['TIG']},
+      {label:'바이오',color:'#a855f7',ids:['ABL']},
     ]
   };
 
@@ -1508,7 +1494,7 @@ function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();de
 function renderCharts(){
   let kV=0,tV=0;HOLDINGS.kiwoom.forEach(h=>{kV+=PRICES[h.id]*h.qty;});HOLDINGS.toss.forEach(h=>{tV+=PRICES[h.id]*h.qty;});
   const cashT=CASH.kiwoom+CASH.toss,liveTotal=Math.round((kV+tV+cashT)/10000),liveCashPct=parseFloat((cashT/(kV+tV+cashT)*100).toFixed(1));
-  const livePnl={SKH:parseFloat(pct(802812,PRICES.SKH)),HWA:parseFloat(pct(1220000,PRICES.HWA)),TWI:parseFloat(pct(62791,PRICES.TWI)),ISC:parseFloat(pct(219285,PRICES.ISC)),APR:parseFloat(pct(339382,PRICES.APR)),TIG:parseFloat(pct(10859,PRICES.TIG))};
+  const livePnl={SKH:parseFloat(pct(802812,PRICES.SKH)),HWA:parseFloat(pct(1220000,PRICES.HWA)),TWI:parseFloat(pct(62791,PRICES.TWI)),ISC:parseFloat(pct(219285,PRICES.ISC)),APR:parseFloat(pct(391298,PRICES.APR)),TIG:parseFloat(pct(10736,PRICES.TIG))};
   const d=new Date(),todayLabel=`${d.getMonth()+1}/${String(d.getDate()).padStart(2,'0')}`;
   const hist=[...HISTORY];
   if(hist[hist.length-1].date===todayLabel)hist[hist.length-1]={date:todayLabel,total:liveTotal,cashPct:liveCashPct,pnl:livePnl};else hist.push({date:todayLabel,total:liveTotal,cashPct:liveCashPct,pnl:livePnl});
@@ -1529,14 +1515,15 @@ function renderCharts(){
 }
 
 const SIM_DEFAULTS={
-  SKH:{qty:21,avg:802812,cur:1292000,budget:5000000,target:1400000,reinvest:1100000,stop:1000000,final:1600000},
-  HWA:{qty:3,avg:1220000,cur:1400000,budget:5000000,target:1600000,reinvest:1300000,stop:1100000,final:1900000},
-  TWI:{qty:110,avg:62791,cur:60000,budget:2000000,target:75000,reinvest:50000,stop:40000,final:90000},
-  ISC:{qty:20,avg:219285,cur:246000,budget:3000000,target:270000,reinvest:210000,stop:185000,final:320000},
-  APR:{qty:53,avg:385650,cur:433000,budget:3000000,target:500000,reinvest:380000,stop:310000,final:700000},
-  DSE:{qty:12,avg:100442,cur:128100,budget:3000000,target:150000,reinvest:110000,stop:85000,final:180000},
-  MIA:{qty:60,avg:71927,cur:67200,budget:3000000,target:75000,reinvest:63000,stop:60000,final:90000},
-  TIG:{qty:404,avg:10736,cur:9835,budget:2000000,target:12000,reinvest:9500,stop:8500,final:14000},
+  SKH:{qty:17,avg:802812,cur:1590000,budget:5000000,target:2000000,reinvest:1400000,stop:1000000,final:2000000},
+  HWA:{qty:3,avg:1220000,cur:1439000,budget:5000000,target:1600000,reinvest:1300000,stop:1100000,final:1900000},
+  TWI:{qty:110,avg:62791,cur:62200,budget:2000000,target:75000,reinvest:50000,stop:40000,final:90000},
+  ISC:{qty:20,avg:219285,cur:254000,budget:3000000,target:300000,reinvest:210000,stop:185000,final:320000},
+  APR:{qty:62,avg:391298,cur:424500,budget:3000000,target:500000,reinvest:380000,stop:310000,final:700000},
+  DSE:{qty:12,avg:100442,cur:127500,budget:3000000,target:150000,reinvest:110000,stop:85000,final:180000},
+  MIA:{qty:60,avg:71927,cur:84200,budget:3000000,target:90000,reinvest:75000,stop:60000,final:100000},
+  TIG:{qty:404,avg:10736,cur:9600,budget:2000000,target:12000,reinvest:9500,stop:8500,final:14000},
+  ABL:{qty:13,avg:139100,cur:127600,budget:2000000,target:250000,reinvest:120000,stop:97000,final:250000},
 };
 let activeTab='A';
 function switchTab(t){activeTab=t;['A','B','C'].forEach(x=>{document.getElementById('sc-'+x).style.display=x===t?'block':'none';document.getElementById('tab-'+x).classList.toggle('active',x===t);});}
@@ -1665,11 +1652,11 @@ function renderDonut(){
 /* ━━ PROFIT BARS ━━ */
 const PROFIT_DATA=[
   {name:'현대모비스',pnl:18670000,type:'sell'},
-  {name:'SK하이닉스',pnl:12330000,type:'sell'},
+  {name:'SK하이닉스',pnl:15478752,type:'sell'},
   {name:'에이피알',pnl:2160000,type:'sell'},
+  {name:'두산에너빌',pnl:900000,type:'sell'},
   {name:'ISC',pnl:720000,type:'sell'},
   {name:'한화에어로',pnl:430000,type:'sell'},
-  {name:'두산에너빌',pnl:70000,type:'sell'},
   {name:'네이버',pnl:50000,type:'sell'},
   {name:'펄어비스(익)',pnl:160000,type:'sell'},
   {name:'펄어비스(손)',pnl:-1090914,type:'loss'},
@@ -1689,6 +1676,7 @@ const PROFIT_MONTHLY_REAL=[
   {name:'2월',pnl:26830000},
   {name:'3월',pnl:-739000},
   {name:'4월',pnl:8910000},
+  {name:'5월',pnl:3148752},
 ];
 
 let profitMode='stock'; // 'stock' | 'monthly'
@@ -1876,7 +1864,7 @@ async function runAIBriefing(){
 
 [포트폴리오]
 - 현금비중: ${cashPct}% (목표 25~30%)
-- 2026 확정수익: +3,850만원
+- 2026 확정수익: +3,660만원
 ${holdings}
 
 [투자 원칙]
@@ -2079,14 +2067,102 @@ function toggleAnalytics(){
   }
 }
 
-/* ━━ TRADE FILTER ━━ */
-function filterTrades(t){
-  ['all','sell','loss'].forEach(x=>{const b=document.getElementById('tf-'+x);if(b)b.className='tfilter'+(t===x?' f'+t[0]:'');});
-  const sell=document.getElementById('log-sell'),loss=document.getElementById('log-loss');
-  if(t==='all'){sell.style.display='';loss.style.display='';}
-  else if(t==='sell'){sell.style.display='';loss.style.display='none';}
-  else{sell.style.display='none';loss.style.display='';}
+/* ━━ TRADE LOG DATA (최신순) ━━ */
+const TRADE_LOG=[
+  {m:5,date:'05.06',name:'에이피알',type:'buy',detail:'9주 · 424,000(4주)+425,000(5주) · 평단391,298 · 잔고62주',pnl:null,memo:'★실적발표 전 추매'},
+  {m:5,date:'05.06',name:'SK하이닉스',type:'sell',detail:'4주 · 802,812→1,590,000 · 잔고17주',pnl:'+315만',memo:'코스피 +6.63% 불장'},
+  {m:4,date:'04.30',name:'SK하이닉스',type:'sell',detail:'3주 · 802,812→1,292,000',pnl:'+147만',memo:'분할 익절 +63% 구간'},
+  {m:4,date:'04.28',name:'에이비엘바이오',type:'buy',detail:'13주 · 139,100원 · 손절 97,000',pnl:null,memo:'★바이오 첫진입'},
+  {m:4,date:'04.28',name:'두산에너빌리티',type:'sell',detail:'30주 · 100,442→128,200',pnl:'+83만',memo:''},
+  {m:4,date:'04.15',name:'SK하이닉스',type:'sell',detail:'3주 · +56.66%',pnl:'+123만',memo:'분할 매도'},
+  {m:4,date:'04.14',name:'SK하이닉스',type:'sell',detail:'3주 · +54.05%',pnl:'+118만',memo:'분할 매도'},
+  {m:4,date:'04.10',name:'에이피알',type:'sell',detail:'12주 · +20.99%',pnl:'+81만',memo:'분할 익절'},
+  {m:4,date:'04.10',name:'ISC',type:'sell',detail:'10주 · +17.57%',pnl:'+38만',memo:'분할 익절'},
+  {m:4,date:'04.16',name:'에이피알',type:'buy',detail:'3주 · 405,000원 · 평단 상향',pnl:null,memo:'20일선 지지 확인 추매'},
+  {m:4,date:'04.13',name:'ISC',type:'buy',detail:'10주 · 220,500원 · 잔고20주',pnl:null,memo:'HBM 소켓 수요 증가 추매'},
+  {m:4,date:'04.02',name:'한화에어로스페이스',type:'sell',detail:'2주 · 1,220,000→1,439,000',pnl:'+43만',memo:'전쟁 불안 회피'},
+  {m:4,date:'04.02',name:'에이피알',type:'sell',detail:'15주 · 289,654→344,000',pnl:'+80만',memo:'전쟁 불안 회피'},
+  {m:4,date:'04.02',name:'SK하이닉스',type:'sell',detail:'10주 · 713,562→860,000',pnl:'+144만',memo:'전쟁 불안 회피'},
+  {m:4,date:'04.02',name:'ISC',type:'sell',detail:'5주 · 176,300→244,500',pnl:'+34만',memo:'전쟁 불안 회피'},
+  {m:3,date:'03.19',name:'펄어비스',type:'loss',detail:'83주 · 60,628→47,550',pnl:'-109만',memo:''},
+  {m:3,date:'03.12',name:'한화솔루션',type:'loss',detail:'26주 · 52,935→53,200 (소익)',pnl:'+0.7만',memo:''},
+  {m:3,date:'03.11',name:'한화솔루션',type:'loss',detail:'25주 · 52,935→53,400 (소익)',pnl:'+1.2만',memo:''},
+  {m:3,date:'03.06',name:'한화솔루션',type:'loss',detail:'16주 · 52,935→49,000',pnl:'-6만',memo:'손절'},
+  {m:2,date:'02.27',name:'미래에셋벤처투자',type:'loss',detail:'150주 · 25,100→21,600',pnl:'-52만',memo:'손절'},
+  {m:2,date:'02.25',name:'미래에셋벤처투자',type:'loss',detail:'150주 · 25,100→22,200',pnl:'-44만',memo:'손절'},
+  {m:2,date:'02.23',name:'미래에셋벤처투자',type:'loss',detail:'100주 · 25,100→25,250',pnl:'+1.5만',memo:''},
+  {m:3,date:'03.11',name:'미래에셋증권',type:'buy',detail:'21주 · 74,000원 매도(익절) · 잔고60주',pnl:'+4.4만',memo:'단기 익절'},
+  {m:3,date:'03.11',name:'SK하이닉스',type:'sell',detail:'8주 · 668,367→960,000',pnl:'+233만',memo:''},
+  {m:3,date:'03.06',name:'두산에너빌리티',type:'sell',detail:'15주 · 88,000→92,500',pnl:'+7만',memo:'현대차증권'},
+  {m:3,date:'03.05',name:'펄어비스',type:'sell',detail:'66주 · 51,306→53,800',pnl:'+16만',memo:''},
+  {m:2,date:'02.27',name:'현대모비스',type:'sell',detail:'69주 · 246,428→517,000',pnl:'+1,867만',memo:'현대차증권'},
+  {m:2,date:'02.25',name:'네이버',type:'sell',detail:'5주 · 241,900→252,500',pnl:'+5만',memo:''},
+  {m:2,date:'02.20',name:'SK하이닉스',type:'sell',detail:'15주 · 430,500→949,000',pnl:'+778만',memo:''},
+  {m:1,date:'01.29',name:'에이피알',type:'sell',detail:'13주 · 227,500→270,000',pnl:'+55만',memo:''},
+];
+
+let activeMonth='all';
+let activeType='all';
+
+function filterMonth(m){
+  activeMonth=m;
+  ['all','1','2','3','4','5'].forEach(x=>{
+    const b=document.getElementById('mf-'+x);
+    if(b)b.className='tfilter'+(x===m?' fa':'');
+  });
+  renderTradeLog();
 }
+
+function filterType(t){
+  activeType=t;
+  ['all','sell','buy','loss'].forEach(x=>{
+    const b=document.getElementById('tf-'+x);
+    if(b){
+      let cls='tfilter';
+      if(x===t)cls+=x==='sell'?' fs':x==='loss'?' fl':' fa';
+      b.className=cls;
+    }
+  });
+  renderTradeLog();
+}
+
+function renderTradeLog(){
+  const el=document.getElementById('log-trade-list');
+  if(!el)return;
+  let filtered=TRADE_LOG.filter(t=>{
+    const mOk=activeMonth==='all'||t.m===parseInt(activeMonth);
+    const tOk=activeType==='all'||t.type===activeType;
+    return mOk&&tOk;
+  });
+  if(filtered.length===0){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;">해당 조건의 거래가 없습니다</div>';
+    return;
+  }
+  const groups={};
+  filtered.forEach(t=>{if(!groups[t.m])groups[t.m]=[];groups[t.m].push(t);});
+  const monthNames={1:'1월',2:'2월',3:'3월',4:'4월',5:'5월'};
+  const monthColors={5:'#00f5b4',4:'#4d8bff',3:'#ffb938',2:'#a855f7',1:'#00e5ff'};
+  const typeConfig={
+    sell:{label:'매도',bg:'rgba(0,245,180,0.12)',color:'var(--profit)',border:'rgba(0,245,180,0.2)'},
+    buy:{label:'매수',bg:'rgba(77,139,255,0.12)',color:'var(--accent)',border:'rgba(77,139,255,0.2)'},
+    loss:{label:'손절',bg:'rgba(255,48,96,0.12)',color:'var(--loss)',border:'rgba(255,48,96,0.2)'},
+  };
+  let html='';
+  Object.keys(groups).sort((a,b)=>b-a).forEach(m=>{
+    const mc=monthColors[m]||'#9aafd4';
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;"><div style="font-family:var(--mono);font-size:9px;font-weight:700;color:${mc};letter-spacing:2px;">${monthNames[m]}</div><div style="flex:1;height:1px;background:${mc}33;"></div></div>`;
+    groups[m].forEach(t=>{
+      const tc=typeConfig[t.type]||typeConfig.sell;
+      const pnlColor=t.type==='loss'?'var(--loss)':t.pnl?'var(--profit)':'var(--accent)';
+      const pnlText=t.pnl||(t.type==='buy'?'매수':'—');
+      html+=`<div class="trade-item"><div class="trade-badge" style="background:${tc.bg};color:${tc.color};border:1px solid ${tc.border};">${tc.label}</div><div class="trade-info"><div class="trade-name">${t.name}${t.memo?` <span style="font-size:9px;color:var(--gold);">${t.memo}</span>`:''}</div><div class="trade-detail">${t.date} · ${t.detail}</div></div><div class="trade-pnl" style="color:${pnlColor};">${pnlText}</div></div>`;
+    });
+  });
+  el.innerHTML=`<div class="card" style="border-color:rgba(79,143,255,0.2);">${html}</div>`;
+}
+
+/* ━━ TRADE FILTER (구형 호환) ━━ */
+function filterTrades(t){filterType(t);}
 
 /* ━━ COUNT-UP ANIMATION ━━ */
 function countUp(el,target,suffix='만원',dur=900){
