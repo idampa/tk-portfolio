@@ -1846,19 +1846,34 @@ canvas { display: block; }
     <div class="card" style="padding:12px 14px;margin-bottom:14px;">
       <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:10px;">수급 강세 반영 → 홀딩 비중 확대 / 190.8만·17주 기준</div>
       <div style="display:flex;flex-direction:column;gap:0;">
-        ${[
-          ['200만 터치','2주 매도','보험성 — 오버슈팅 대응','var(--loss)'],
-          ['210~220만','2주 매도','추가 상승 확인 후','var(--loss)'],
-          ['230~250만','4주 매도','본격 차익실현 구간','var(--loss)'],
-          ['잔량 9주','장기 홀딩','300만 목표 · 수급 강세 지속 시','var(--profit)'],
-        ].map(([price,qty,desc,color])=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
           <div>
-            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">${price}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px;">${desc}</div>
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">200만 터치</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">보험성 — 오버슈팅 대응</div>
           </div>
-          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${color};">${qty}</div>
-        </div>`).join('')}
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);">2주 매도</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">210~220만</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">추가 상승 확인 후</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);">2주 매도</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">230~250만</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">본격 차익실현 구간</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);">4주 매도</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">잔량 9주</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">300만 목표 · 수급 강세 지속 시</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--profit);">장기 홀딩</div>
+        </div>
       </div>
     </div>
 
