@@ -1848,20 +1848,43 @@ canvas { display: block; }
 
       <!-- 단계별 플랜 -->
       <div style="display:flex;flex-direction:column;gap:0;margin-bottom:14px;">
-        ${[
-          ['1차 · 200만','3주 매도','주당 +99.1만 · 구간수익 +297만','var(--loss)','현재가 근접 — 오버슈팅 대응'],
-          ['2차 · 220만','3주 매도','주당 +119.1만 · 구간수익 +357만','var(--loss)','추가 상승 확인 후 실행'],
-          ['3차 · 250만','4주 매도','주당 +149.1만 · 구간수익 +597만','var(--loss)','목표가 도달 — 본격 차익실현'],
-          ['코어 · 11주','장기 홀딩','270만+ 오픈엔드 · 익절 합계 +1,251만','var(--profit)','수급·HBM사이클 이상 없는 한 유지'],
-        ].map(([price,qty,desc,color,sub])=>`
+
         <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);">
           <div style="flex:1;">
-            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">${price}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px;">${desc}</div>
-            <div style="font-size:9px;color:var(--text3);margin-top:1px;opacity:0.7;">${sub}</div>
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">1차 · 200만</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">주당 +99.1만 · 구간수익 +297만</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;opacity:0.7;">현재가 근접 — 오버슈팅 대응</div>
           </div>
-          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${color};white-space:nowrap;margin-left:10px;">${qty}</div>
-        </div>`).join('')}
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);white-space:nowrap;margin-left:10px;">3주 매도</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);">
+          <div style="flex:1;">
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">2차 · 220만</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">주당 +119.1만 · 구간수익 +357만</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;opacity:0.7;">추가 상승 확인 후 실행</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);white-space:nowrap;margin-left:10px;">3주 매도</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);">
+          <div style="flex:1;">
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">3차 · 250만</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">주당 +149.1만 · 구간수익 +597만</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;opacity:0.7;">목표가 도달 — 본격 차익실현</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--loss);white-space:nowrap;margin-left:10px;">4주 매도</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;">
+          <div style="flex:1;">
+            <div style="font-family:var(--mono);font-size:11px;font-weight:700;">코어 · 11주</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">270만+ 오픈엔드 · 익절 합계 +1,251만</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;opacity:0.7;">수급·HBM사이클 이상 없는 한 유지</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--profit);white-space:nowrap;margin-left:10px;">장기 홀딩</div>
+        </div>
+
       </div>
 
       <!-- 시나리오 요약 -->
