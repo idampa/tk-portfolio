@@ -2185,24 +2185,47 @@ canvas { display: block; }
 /* ═══════════════════════════════════════
    DATA
 ═══════════════════════════════════════ */
-const HOLDINGS={
-  kiwoom:[
-    {id:'SKH',name:'SK하이닉스',qty:26,avg:1168646},
-    {id:'HWA',name:'한화에어로스페이스',qty:3,avg:1220000},
-    {id:'TWI',name:'테크윙',qty:110,avg:62791},
-    {id:'ISC',name:'ISC',qty:20,avg:219285},
-    {id:'APR',name:'에이피알',qty:62,avg:391298},
-  ],
-  toss:[
-    {id:'DSE',name:'두산에너빌리티',qty:12,avg:100442},
-    {id:'MIA',name:'미래에셋증권',qty:60,avg:71927},
-    {id:'TIG',name:'TIGER 미국우주테크',qty:464,avg:11164},
-    {id:'ABL',name:'에이비엘바이오',qty:13,avg:139100},
-  ]
-};
-let PRICES={SKH:1833000,HWA:1225000,TWI:50400,ISC:226500,APR:403000,DSE:111000,MIA:69000,TIG:13895,ABL:118300};
-let PRICES_PREV={SKH:1972000,HWA:1298000,TWI:54900,ISC:246500,APR:425000,DSE:117400,MIA:72400,TIG:13180,ABL:125000};
-let CASH={kiwoom:1753509,toss:1198656};
+// ─── portfolio.json에서 동적 로드 (portfolio_updater.py가 업데이트) ───
+let HOLDINGS={kiwoom:[],toss:[]};
+let PRICES={};
+let PRICES_PREV={};
+let CASH={kiwoom:0,toss:0};
+
+async function loadPortfolioJson(){
+  try{
+    const r=await fetch('portfolio.json?t='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    HOLDINGS=d.holdings||{kiwoom:[],toss:[]};
+    CASH=d.cash||{kiwoom:0,toss:0};
+    for(const acc of['kiwoom','toss']){
+      for(const h of(HOLDINGS[acc]||[])){
+        PRICES[h.id]=h.current_price||h.avg;
+        PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
+      }
+    }
+    // 실현손익 데이터
+    if(d.realized_gains){
+      if(d.realized_gains.stocks) PROFIT_DATA.splice(0,PROFIT_DATA.length,...d.realized_gains.stocks);
+      if(d.realized_gains.monthly) PROFIT_MONTHLY_REAL.splice(0,PROFIT_MONTHLY_REAL.length,...d.realized_gains.monthly);
+    }
+    // 거래일지
+    if(d.trade_log&&d.trade_log.length){
+      TRADE_LOG.splice(0,TRADE_LOG.length,...d.trade_log.map(t=>{
+        const dt=t.date||'';const parts=dt.split('-');
+        const m=parseInt(parts[1]||'0');
+        const dateStr=parts.length>=3?parts[1]+'.'+parts[2]:dt;
+        return{m,date:dateStr,name:t.name,type:t.type,
+          detail:t.qty+'주 · '+(t.price||0).toLocaleString('ko-KR')+'원',
+          pnl:t.pnl!=null?(t.pnl>=0?'+':'')+Math.round(t.pnl/10000)+'만':null,
+          memo:t.memo||''};
+      }));
+    }
+    console.log('portfolio.json 로드 완료:',Object.keys(PRICES).length+'종목');
+  }catch(e){
+    console.warn('portfolio.json 로드 실패, 하드코딩 데이터 유지:',e);
+  }
+}
 
 const HISTORY=[
   {date:'03/05',total:7200,cashPct:28,pnl:{SKH:30,HWA:8,TWI:-2,ISC:5,APR:12,DSE:-5.4,MIA:0.1,TIG:0}},
@@ -2246,18 +2269,9 @@ const WATCH_CODES={
 };
 const WATCH_FROM_PRICES={APR:'wp-APR',MIA:'wp-MIA',DSE:'wp-DSE',TWI:'wp-TWI',ABL:'wp-ABL'};
 
-const PROFIT_DATA=[
-  {name:'현대모비스',pnl:18670000,type:'sell'},{name:'SK하이닉스',pnl:15478752,type:'sell'},
-  {name:'에이피알',pnl:2160000,type:'sell'},{name:'두산에너빌',pnl:900000,type:'sell'},
-  {name:'ISC',pnl:720000,type:'sell'},{name:'한화에어로',pnl:430000,type:'sell'},
-  {name:'네이버',pnl:50000,type:'sell'},{name:'펄어비스(익)',pnl:160000,type:'sell'},
-  {name:'펄어비스(손)',pnl:-1090914,type:'loss'},{name:'미래에셋벤처',pnl:-945912,type:'loss'},
-  {name:'한화솔루션',pnl:-40000,type:'loss'},
-];
-const PROFIT_MONTHLY_REAL=[
-  {name:'1월',pnl:550000},{name:'2월',pnl:26830000},{name:'3월',pnl:-739000},
-  {name:'4월',pnl:8910000},{name:'5월',pnl:3148752},
-];
+// PROFIT_DATA / PROFIT_MONTHLY_REAL: loadPortfolioJson()에서 덮어씀
+const PROFIT_DATA=[];
+const PROFIT_MONTHLY_REAL=[];
 let profitMode='stock';
 
 const TRADE_LOG=[
@@ -3571,6 +3585,7 @@ function initEventCollapse(){
    INIT
 ═══════════════════════════════════════ */
 (async function init(){
+  await loadPortfolioJson();  // portfolio.json 먼저 로드
   try{await loadHistoryFromGist();}catch(e){console.warn('Gist 불러오기 실패:',e);}
   renderDash();
   fetchMacroData();
