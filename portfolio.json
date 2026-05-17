@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-17T15:35:00+09:00",
+  "last_updated": "2026-05-18T00:23:41.665101+09:00",
   "cash": {
     "kiwoom": 1753509,
     "toss": 1198656
@@ -13,8 +13,8 @@
         "name": "SK하이닉스",
         "qty": 26,
         "avg": 1168646,
-        "current_price": 1833000,
-        "prev_price": 1972000
+        "current_price": 1819000,
+        "prev_price": 1970000
       },
       {
         "id": "HWA",
@@ -23,8 +23,8 @@
         "name": "한화에어로스페이스",
         "qty": 3,
         "avg": 1220000,
-        "current_price": 1225000,
-        "prev_price": 1298000
+        "current_price": 1216000,
+        "prev_price": 1306000
       },
       {
         "id": "TWI",
@@ -43,8 +43,8 @@
         "name": "ISC",
         "qty": 20,
         "avg": 219285,
-        "current_price": 226500,
-        "prev_price": 246500
+        "current_price": 224500,
+        "prev_price": 247500
       },
       {
         "id": "APR",
@@ -53,7 +53,7 @@
         "name": "에이피알",
         "qty": 62,
         "avg": 391298,
-        "current_price": 403000,
+        "current_price": 404000,
         "prev_price": 425000
       }
     ],
@@ -65,8 +65,8 @@
         "name": "두산에너빌리티",
         "qty": 12,
         "avg": 100442,
-        "current_price": 111000,
-        "prev_price": 117400
+        "current_price": 110800,
+        "prev_price": 117100
       },
       {
         "id": "MIA",
@@ -75,8 +75,8 @@
         "name": "미래에셋증권",
         "qty": 60,
         "avg": 71927,
-        "current_price": 69000,
-        "prev_price": 72400
+        "current_price": 69900,
+        "prev_price": 72300
       },
       {
         "id": "TIG",
@@ -95,8 +95,8 @@
         "name": "에이비엘바이오",
         "qty": 13,
         "avg": 139100,
-        "current_price": 118300,
-        "prev_price": 125000
+        "current_price": 119300,
+        "prev_price": 125600
       }
     ]
   },
