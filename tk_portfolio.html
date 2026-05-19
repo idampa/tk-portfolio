@@ -1424,6 +1424,26 @@ canvas { display: block; }
     </div>
   </div>
 
+
+  <!-- ── ① 키움 1억 목표 진행바 ── -->
+  <div class="card anim" id="kiwoom-goal-card" style="padding:12px 16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">키움 1억 목표</span>
+      <span style="font-family:var(--mono);font-size:12px;font-weight:700;" id="kiwoom-goal-label">—</span>
+    </div>
+    <div style="height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;">
+      <div id="kiwoom-goal-bar" style="height:100%;width:0%;border-radius:3px;background:var(--accent);transition:width .6s ease;"></div>
+    </div>
+  </div>
+
+  <!-- ── ② 어제 대비 수익 카드 ── -->
+  <div class="card anim" id="daily-gain-card" style="padding:12px 16px;display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">어제 대비</span>
+      <span style="font-family:var(--mono);font-size:13px;font-weight:700;" id="daily-gain-label">—</span>
+    </div>
+  </div>
+
   <!-- ── SECTION 2: 수익 실현 ── -->
   <div class="port-section-head anim">
     <span class="port-section-title">수익 실현</span>
@@ -2187,6 +2207,7 @@ canvas { display: block; }
 ═══════════════════════════════════════ */
 // ─── portfolio.json에서 동적 로드 (portfolio_updater.py가 업데이트) ───
 let HOLDINGS={kiwoom:[],toss:[]};
+let PERSISTENT_HISTORY=[];
 let PRICES={};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
@@ -2548,6 +2569,51 @@ function renderDash(){
 
   // watch prices
   Object.keys(WATCH_FROM_PRICES).forEach(id=>{const e=el(WATCH_FROM_PRICES[id]);if(e&&PRICES[id])e.textContent=fmt(PRICES[id]);});
+  renderKiwoomGoal();
+  renderDailyGain();
+}
+
+
+function renderKiwoomGoal(){
+  const GOAL=100000000;
+  const kVal=HOLDINGS.kiwoom.reduce((s,h)=>s+(PRICES[h.id]||h.avg)*h.qty,0)+CASH.kiwoom;
+  const pct=Math.min(kVal/GOAL*100,100);
+  const achieved=kVal>=GOAL;
+  const label=el('kiwoom-goal-label');
+  const bar=el('kiwoom-goal-bar');
+  if(!label||!bar) return;
+  const kMan=Math.round(kVal/10000).toLocaleString('ko-KR');
+  if(achieved){
+    label.innerHTML='🎉 '+kMan+'만 / 1억 ('+pct.toFixed(1)+'%)';
+    label.style.color='#ffd700';
+    bar.style.width='100%';
+    bar.style.background='linear-gradient(90deg,#b8860b,#ffd700,#ffa500)';
+    bar.style.boxShadow='0 0 8px rgba(255,215,0,0.4)';
+  }else{
+    label.textContent=kMan+'만 / 1억 ('+pct.toFixed(1)+'%)';
+    label.style.color='var(--accent)';
+    bar.style.width=pct+'%';
+    bar.style.background='var(--accent)';
+    bar.style.boxShadow='none';
+  }
+}
+
+function renderDailyGain(){
+  const card=el('daily-gain-card');
+  const label=el('daily-gain-label');
+  if(!card||!label) return;
+  if(PERSISTENT_HISTORY.length<2){card.style.display='none';return;}
+  const sorted=[...PERSISTENT_HISTORY].sort((a,b)=>a.date.localeCompare(b.date));
+  const prev=sorted[sorted.length-2];
+  const curr=sorted[sorted.length-1];
+  const diff=curr.total-prev.total;
+  const diffPct=((diff/prev.total)*100).toFixed(1);
+  const diffMan=Math.round(Math.abs(diff)/10000).toLocaleString('ko-KR');
+  const sign=diff>=0?'+':'-';
+  const arrow=diff>=0?'▲':'▼';
+  label.textContent='어제보다 '+sign+diffMan+'만원 ('+arrow+' '+Math.abs(diffPct)+'%)';
+  label.style.color=diff>=0?'var(--profit)':'var(--loss)';
+  card.style.display='block';
 }
 
 function makeStockHTML(h){
@@ -3588,6 +3654,7 @@ async function loadPortfolioHistory(){
     if(!r.ok) return;
     const data=await r.json();
     if(!Array.isArray(data)||data.length===0) return;
+    PERSISTENT_HISTORY=data;
     data.forEach(entry=>{
       const parts=entry.date.split('-');
       const dateStr=parseInt(parts[1])+'/'+parseInt(parts[2]);
