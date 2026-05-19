@@ -1390,6 +1390,17 @@ canvas { display: block; }
     </div>
   </div>
 
+  <!-- E. 수익 기여도 -->
+  <div class="sec-head anim" style="margin-top:12px;margin-bottom:8px;">
+    <div class="sec-title">수익 기여도</div>
+    <div class="sec-badge" id="contrib-badge"></div>
+  </div>
+  <div class="card anim" style="padding:14px 16px 10px;">
+    <div id="contrib-chart-wrap" style="position:relative;">
+      <canvas id="contribChart"></canvas>
+    </div>
+  </div>
+
 </div>
 
 <!-- ② 포트 -->
@@ -2451,6 +2462,88 @@ function renderHome(){
   }
   // action cards
   renderActionCards(s);
+  renderContribChart();
+}
+
+
+function renderContribChart(){
+  if(!window.Chart){onChartReady(renderContribChart);return;}
+  destroyChart('contribChart');
+  const canvas=el('contribChart');
+  if(!canvas) return;
+
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  const rows=all.map(h=>{
+    const cur=PRICES[h.id]||h.avg;
+    return {name:h.name, pnl:(cur-h.avg)*h.qty};
+  }).sort((a,b)=>b.pnl-a.pnl);
+
+  const totalAbsPnl=rows.reduce((s,r)=>s+Math.abs(r.pnl),0)||1;
+  const labels=rows.map(r=>{
+    const m=Math.round(r.pnl/10000);
+    const sign=m>=0?'+':'';
+    const pct=(Math.abs(r.pnl)/totalAbsPnl*100).toFixed(0);
+    return r.name+'  '+sign+m.toLocaleString('ko-KR')+'만 ('+pct+'%)';
+  });
+  const values=rows.map(r=>Math.round(r.pnl/10000));
+  const bgs=rows.map(r=>r.pnl>=0?'rgba(63,182,139,0.75)':'rgba(217,108,117,0.75)');
+  const borders=rows.map(r=>r.pnl>=0?'#3fb68b':'#d96c75');
+
+  const wrap=el('contrib-chart-wrap');
+  if(wrap) wrap.style.height=(rows.length*36+32)+'px';
+
+  const badge=el('contrib-badge');
+  if(badge){
+    const net=Math.round(rows.reduce((s,r)=>s+r.pnl,0)/10000);
+    badge.textContent=(net>=0?'+':'')+net.toLocaleString('ko-KR')+'만 순손익';
+    badge.style.color=net>=0?'var(--profit)':'var(--loss)';
+  }
+
+  chartInstances.contribChart=new Chart(canvas.getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[{
+      data:values,
+      backgroundColor:bgs,
+      borderColor:borders,
+      borderWidth:1,
+      borderRadius:3,
+      borderSkipped:false,
+    }]},
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:400},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,19,24,0.97)',
+          borderColor:'rgba(91,140,255,0.25)',
+          borderWidth:1,
+          bodyColor:'#e6eaf2',
+          callbacks:{
+            label:c=>{
+              const r=rows[c.dataIndex];
+              const sign=r.pnl>=0?'+':'';
+              const pct=(r.pnl/totalAbsPnl*100).toFixed(1);
+              return ' '+sign+Math.round(r.pnl/10000).toLocaleString('ko-KR')+'만원  기여 '+Math.abs(pct)+'%';
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{color:'#5a6478',font:{size:9},callback:v=>v+'만'},
+          grid:{color:'rgba(91,140,255,0.06)'},
+          border:{color:'rgba(91,140,255,0.12)'}
+        },
+        y:{
+          ticks:{color:'#c8d0e4',font:{size:9.5}},
+          grid:{display:false}
+        }
+      }
+    }
+  });
 }
 
 function renderActionCards(s){
