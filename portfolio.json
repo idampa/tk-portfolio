@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-19T11:43:50.474814+09:00",
+  "last_updated": "2026-05-19T15:44:01.222882+09:00",
   "cash": {
     "kiwoom": 1753509,
     "toss": 1198656
@@ -13,7 +13,7 @@
         "name": "SK하이닉스",
         "qty": 26,
         "avg": 1168646,
-        "current_price": 1770000,
+        "current_price": 1745000,
         "prev_price": 1840000
       },
       {
@@ -33,7 +33,7 @@
         "name": "테크윙",
         "qty": 110,
         "avg": 62791,
-        "current_price": 46850,
+        "current_price": 48150,
         "prev_price": 49400
       },
       {
@@ -43,7 +43,7 @@
         "name": "ISC",
         "qty": 20,
         "avg": 219285,
-        "current_price": 199300,
+        "current_price": 197300,
         "prev_price": 209000
       },
       {
@@ -53,7 +53,7 @@
         "name": "에이피알",
         "qty": 62,
         "avg": 391298,
-        "current_price": 397000,
+        "current_price": 397500,
         "prev_price": 402000
       }
     ],
@@ -65,7 +65,7 @@
         "name": "두산에너빌리티",
         "qty": 12,
         "avg": 100442,
-        "current_price": 105500,
+        "current_price": 106000,
         "prev_price": 112100
       },
       {
@@ -85,7 +85,7 @@
         "name": "TIGER미국우주테크",
         "qty": 464,
         "avg": 11164,
-        "current_price": 13780,
+        "current_price": 13910,
         "prev_price": 13700
       },
       {
@@ -95,7 +95,7 @@
         "name": "에이비엘바이오",
         "qty": 13,
         "avg": 139100,
-        "current_price": 106700,
+        "current_price": 112000,
         "prev_price": 112200
       }
     ]
