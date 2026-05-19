@@ -3581,11 +3581,35 @@ function initEventCollapse(){
   if(hasTodayEvent) toggleEventCollapse(true);
 }
 
+
+async function loadPortfolioHistory(){
+  try{
+    const r=await fetch('data/portfolio_history.json?t='+Date.now());
+    if(!r.ok) return;
+    const data=await r.json();
+    if(!Array.isArray(data)||data.length===0) return;
+    data.forEach(entry=>{
+      const parts=entry.date.split('-');
+      const dateStr=parseInt(parts[1])+'/'+parseInt(parts[2]);
+      const totalMan=Math.round(entry.total/10000);
+      const idx=HISTORY.findIndex(h=>h.date===dateStr);
+      if(idx>=0){HISTORY[idx].total=totalMan;}
+      else{HISTORY.push({date:dateStr,total:totalMan});}
+    });
+    HISTORY.sort((a,b)=>{
+      const[am,ad]=a.date.split('/').map(Number);
+      const[bm,bd]=b.date.split('/').map(Number);
+      return am!==bm?am-bm:ad-bd;
+    });
+  }catch(e){console.warn('portfolio_history.json 로드 실패:',e);}
+}
+
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 (async function init(){
   await loadPortfolioJson();  // portfolio.json 먼저 로드
+  try{await loadPortfolioHistory();}catch(e){console.warn('portfolio_history 로드 실패:',e);}
   try{await loadHistoryFromGist();}catch(e){console.warn('Gist 불러오기 실패:',e);}
   renderDash();
   fetchMacroData();
