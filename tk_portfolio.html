@@ -1233,6 +1233,7 @@ canvas { display: block; }
   color: var(--accent);
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -2116,7 +2117,7 @@ canvas { display: block; }
   <div class="sec-head"><div class="sec-title">데이터 백업</div></div>
   <button onclick="autoSaveHistory();" id="gist-save-btn" class="action-btn success">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    오늘 기록 저장 (Gist 자동 업로드)
+    오늘 기록 저장 (Supabase)
   </button>
   <button onclick="exportData()" class="action-btn primary">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -2125,8 +2126,8 @@ canvas { display: block; }
 
   <div class="sec-head"><div class="sec-title">앱 정보</div></div>
   <div class="card">
-    <div class="sum-row"><span class="sum-key">버전</span><span class="mono-sm">v3.0 리팩토링</span></div>
-    <div class="sum-row"><span class="sum-key">Gist ID</span><span class="mono-sm" style="font-size:9px;color:var(--text3);">a161c2fe...</span></div>
+    <div class="sum-row"><span class="sum-key">버전</span><span class="mono-sm">v4.0 Supabase</span></div>
+    <div class="sum-row"><span class="sum-key">DB</span><span class="mono-sm" style="font-size:9px;color:var(--text3);">Supabase PostgreSQL</span></div>
     <div class="sum-row"><span class="sum-key">n8n 워크플로</span><span class="mono-sm" style="font-size:9px;color:var(--text3);">railway.app</span></div>
   </div>
 </div>
@@ -2216,7 +2217,7 @@ canvas { display: block; }
 /* ═══════════════════════════════════════
    DATA
 ═══════════════════════════════════════ */
-// ─── portfolio.json에서 동적 로드 (portfolio_updater.py가 업데이트) ───
+// ─── Supabase에서 동적 로드 ───
 let HOLDINGS={kiwoom:[],toss:[]};
 let PERSISTENT_HISTORY=[];
 let PRICES={};
@@ -2225,37 +2226,49 @@ let CASH={kiwoom:0,toss:0};
 
 async function loadPortfolioJson(){
   try{
-    const r=await fetch('portfolio.json?t='+Date.now());
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    HOLDINGS=d.holdings||{kiwoom:[],toss:[]};
-    CASH=d.cash||{kiwoom:0,toss:0};
-    for(const acc of['kiwoom','toss']){
-      for(const h of(HOLDINGS[acc]||[])){
-        PRICES[h.id]=h.current_price||h.avg;
-        PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
-      }
+    const [{data:hData,error:hErr},{data:cData,error:cErr}]=await Promise.all([
+      _sb.from('holdings').select('*'),
+      _sb.from('cash').select('*'),
+    ]);
+    if(hErr) throw hErr;
+    if(cErr) throw cErr;
+
+    HOLDINGS={kiwoom:[],toss:[]};
+    for(const h of hData){
+      if(HOLDINGS[h.account]) HOLDINGS[h.account].push(h);
+      PRICES[h.id]=h.current_price||h.avg;
+      PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
     }
-    // 실현손익 데이터
-    if(d.realized_gains){
-      if(d.realized_gains.stocks) PROFIT_DATA.splice(0,PROFIT_DATA.length,...d.realized_gains.stocks);
-      if(d.realized_gains.monthly) PROFIT_MONTHLY_REAL.splice(0,PROFIT_MONTHLY_REAL.length,...d.realized_gains.monthly);
+    for(const c of cData) CASH[c.account]=c.amount;
+
+    // 실현손익 (종목별)
+    const {data:rgData}=await _sb.from('realized_gains').select('*').order('id');
+    if(rgData) PROFIT_DATA.splice(0,PROFIT_DATA.length,...rgData.map(r=>({name:r.name,pnl:r.pnl,type:r.type})));
+
+    // 실현손익 (월별)
+    const MONTH_ORDER=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+    const {data:rgmData}=await _sb.from('realized_gains_monthly').select('*');
+    if(rgmData){
+      const sorted=[...rgmData].sort((a,b)=>MONTH_ORDER.indexOf(a.month)-MONTH_ORDER.indexOf(b.month));
+      PROFIT_MONTHLY_REAL.splice(0,PROFIT_MONTHLY_REAL.length,...sorted.map(m=>({name:m.month,pnl:m.pnl})));
     }
+
     // 거래일지
-    if(d.trade_log&&d.trade_log.length){
-      TRADE_LOG.splice(0,TRADE_LOG.length,...d.trade_log.map(t=>{
-        const dt=t.date||'';const parts=dt.split('-');
+    const {data:tlData}=await _sb.from('trade_log').select('*').order('date',{ascending:false}).order('id',{ascending:false});
+    if(tlData){
+      TRADE_LOG.splice(0,TRADE_LOG.length,...tlData.map(t=>{
+        const parts=t.date.split('-');
         const m=parseInt(parts[1]||'0');
-        const dateStr=parts.length>=3?parts[1]+'.'+parts[2]:dt;
+        const dateStr=parts.length>=3?parts[1]+'.'+parts[2]:t.date;
         return{m,date:dateStr,name:t.name,type:t.type,
           detail:t.qty+'주 · '+(t.price||0).toLocaleString('ko-KR')+'원',
           pnl:t.pnl!=null?(t.pnl>=0?'+':'')+Math.round(t.pnl/10000)+'만':null,
           memo:t.memo||''};
       }));
     }
-    console.log('portfolio.json 로드 완료:',Object.keys(PRICES).length+'종목');
+    console.log('Supabase 로드 완료:',Object.keys(PRICES).length+'종목');
   }catch(e){
-    console.warn('portfolio.json 로드 실패, 하드코딩 데이터 유지:',e);
+    console.warn('Supabase 로드 실패, 하드코딩 데이터 유지:',e);
   }
 }
 
@@ -2350,9 +2363,9 @@ const AN_SCORES = {
   ABL:{name:'에이비엘',sector:'바이오',grade:'C+',total:47,color:'#a855f7'},
 };
 
-const GIST_TOKEN='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';
-const GIST_ID='a161c2fe3aca1ae00f8abbd2b9d30d0f';
-const GIST_FILE='tk_portfolio_history.json';
+const SUPABASE_URL='https://opcosixoerzfkpenquda.supabase.co';
+const SUPABASE_KEY='sb_publishable_plNylzYWa7aI20LGPEFS0Q_8ZjRft53';
+const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let chartInstances={};
 let activeMonth='all';
@@ -3656,30 +3669,32 @@ async function fetchMacroData(){
 }
 
 /* ═══════════════════════════════════════
-   GIST
+   SUPABASE HISTORY
 ═══════════════════════════════════════ */
-async function loadHistoryFromGist(){
-  try{
-    const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{headers:{'Authorization':`token ${GIST_TOKEN}`,'Accept':'application/vnd.github.v3+json'}});
-    const data=await res.json();
-    const histContent=data.files?.[GIST_FILE]?.content;
-    if(histContent){const saved=JSON.parse(histContent);if(Array.isArray(saved)&&saved.length>0){saved.forEach(snap=>{const idx=HISTORY.findIndex(h=>h.date===snap.date);if(idx>=0)HISTORY[idx]=snap;else HISTORY.push(snap);});HISTORY.sort((a,b)=>{const[am,ad]=a.date.split('/').map(Number);const[bm,bd]=b.date.split('/').map(Number);return am!==bm?am-bm:ad-bd;});}}
-    const stateContent=data.files?.['tk_portfolio_state.json']?.content;
-    if(stateContent){const state=JSON.parse(stateContent);if(state.prices&&typeof state.prices==='object'){Object.keys(state.prices).forEach(k=>{if(PRICES[k]!==undefined)PRICES[k]=state.prices[k];});PRICES_PREV={...PRICES};}if(state.cash&&typeof state.cash==='object'){if(state.cash.kiwoom)CASH.kiwoom=state.cash.kiwoom;if(state.cash.toss)CASH.toss=state.cash.toss;}if(Array.isArray(state.holdings)){state.holdings.forEach(saved=>{['kiwoom','toss'].forEach(acct=>{const h=HOLDINGS[acct].find(x=>x.id===saved.id);if(h){if(saved.qty!==undefined)h.qty=saved.qty;if(saved.avg!==undefined)h.avg=saved.avg;}});});}}
-  }catch(e){console.warn('Gist 불러오기 실패:',e);}
-}
-
-async function saveHistoryToGist(){
+async function saveHistoryToSupabase(){
   const btn=el('gist-save-btn');if(btn){btn.textContent='저장 중...';btn.style.opacity='0.6';}
   try{
-    const d=new Date();const savedAt=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-    const allHoldings=[...HOLDINGS.kiwoom,...HOLDINGS.toss].map(h=>({id:h.id,qty:h.qty,avg:h.avg}));
-    const state={savedAt,prices:{...PRICES},cash:{...CASH},holdings:allHoldings};
-    await fetch(`https://api.github.com/gists/${GIST_ID}`,{method:'PATCH',headers:{'Authorization':`token ${GIST_TOKEN}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(HISTORY,null,2)},'tk_portfolio_state.json':{content:JSON.stringify(state,null,2)}}})});
-    if(btn){btn.innerHTML='✅ 저장 완료!';btn.style.color='var(--profit)';btn.style.opacity='1';setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 오늘 기록 저장 (Gist 자동 업로드)';btn.style.color='var(--profit)';},2500);}
-  }catch(e){if(btn){btn.textContent='⚠ 저장 실패';btn.style.opacity='1';}}
+    const today=new Date();
+    const dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    let total=0;
+    for(const acc of['kiwoom','toss']){
+      for(const h of(HOLDINGS[acc]||[])) total+=(PRICES[h.id]||h.avg)*h.qty;
+      total+=CASH[acc]||0;
+    }
+    const cashTotal=(CASH.kiwoom||0)+(CASH.toss||0);
+    const cashPct=total>0?Math.round(cashTotal/total*1000)/10:0;
+    const pnl={};
+    for(const acc of['kiwoom','toss']){
+      for(const h of(HOLDINGS[acc]||[])){
+        if(h.avg>0) pnl[h.id]=parseFloat((((PRICES[h.id]||h.avg)-h.avg)/h.avg*100).toFixed(1));
+      }
+    }
+    const {error}=await _sb.from('portfolio_history').upsert({date:dateStr,total,cash_pct:cashPct,pnl});
+    if(error) throw error;
+    if(btn){btn.innerHTML='✅ Supabase 저장 완료!';btn.style.color='var(--profit)';btn.style.opacity='1';setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 오늘 기록 저장 (Supabase)';btn.style.color='var(--profit)';},2500);}
+  }catch(e){if(btn){btn.textContent='⚠ 저장 실패';btn.style.opacity='1';}console.error('Supabase 저장 실패:',e);}
 }
-function autoSaveHistory(){saveHistoryToGist();}
+function autoSaveHistory(){saveHistoryToSupabase();}
 
 function exportData(){
   const state={savedAt:new Date().toISOString(),prices:{...PRICES},cash:{...CASH},holdings:[...HOLDINGS.kiwoom,...HOLDINGS.toss].map(h=>({id:h.id,qty:h.qty,avg:h.avg})),history:HISTORY};
@@ -3741,36 +3756,29 @@ function initEventCollapse(){
 }
 
 
-async function loadPortfolioHistory(){
+async function loadHistoryFromSupabase(){
   try{
-    const r=await fetch('data/portfolio_history.json?t='+Date.now());
-    if(!r.ok) return;
-    const data=await r.json();
+    const {data,error}=await _sb.from('portfolio_history').select('*').order('date',{ascending:true});
+    if(error) throw error;
     if(!Array.isArray(data)||data.length===0) return;
     PERSISTENT_HISTORY=data;
+    HISTORY.length=0;
     data.forEach(entry=>{
       const parts=entry.date.split('-');
       const dateStr=parseInt(parts[1])+'/'+parseInt(parts[2]);
       const totalMan=Math.round(entry.total/10000);
-      const idx=HISTORY.findIndex(h=>h.date===dateStr);
-      if(idx>=0){HISTORY[idx].total=totalMan;}
-      else{HISTORY.push({date:dateStr,total:totalMan});}
+      HISTORY.push({date:dateStr,total:totalMan,cashPct:entry.cash_pct,pnl:entry.pnl||{}});
     });
-    HISTORY.sort((a,b)=>{
-      const[am,ad]=a.date.split('/').map(Number);
-      const[bm,bd]=b.date.split('/').map(Number);
-      return am!==bm?am-bm:ad-bd;
-    });
-  }catch(e){console.warn('portfolio_history.json 로드 실패:',e);}
+    console.log('portfolio_history 로드 완료:',HISTORY.length+'건');
+  }catch(e){console.warn('Supabase history 로드 실패:',e);}
 }
 
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 (async function init(){
-  await loadPortfolioJson();  // portfolio.json 먼저 로드
-  try{await loadPortfolioHistory();}catch(e){console.warn('portfolio_history 로드 실패:',e);}
-  try{await loadHistoryFromGist();}catch(e){console.warn('Gist 불러오기 실패:',e);}
+  await loadPortfolioJson();
+  await loadHistoryFromSupabase();
   renderDash();
   fetchMacroData();
   setDate();setInterval(setDate,60000);
