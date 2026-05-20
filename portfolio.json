@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-19T23:24:23.358023+09:00",
+  "last_updated": "2026-05-20T11:44:12.153532+09:00",
   "cash": {
     "kiwoom": 1753509,
     "toss": 1198656
@@ -13,8 +13,8 @@
         "name": "SK하이닉스",
         "qty": 26,
         "avg": 1168646,
-        "current_price": 1745000,
-        "prev_price": 1840000
+        "current_price": 1744000,
+        "prev_price": 1745000
       },
       {
         "id": "HWA",
@@ -23,8 +23,8 @@
         "name": "한화에어로스페이스",
         "qty": 3,
         "avg": 1220000,
-        "current_price": 1286000,
-        "prev_price": 1227000
+        "current_price": 1230000,
+        "prev_price": 1286000
       },
       {
         "id": "TWI",
@@ -33,8 +33,8 @@
         "name": "테크윙",
         "qty": 110,
         "avg": 62791,
-        "current_price": 48150,
-        "prev_price": 49400
+        "current_price": 47600,
+        "prev_price": 48150
       },
       {
         "id": "ISC",
@@ -43,8 +43,8 @@
         "name": "ISC",
         "qty": 20,
         "avg": 219285,
-        "current_price": 197300,
-        "prev_price": 209000
+        "current_price": 193300,
+        "prev_price": 197300
       },
       {
         "id": "APR",
@@ -53,8 +53,8 @@
         "name": "에이피알",
         "qty": 62,
         "avg": 391298,
-        "current_price": 397500,
-        "prev_price": 402000
+        "current_price": 382500,
+        "prev_price": 397500
       }
     ],
     "toss": [
@@ -65,8 +65,8 @@
         "name": "두산에너빌리티",
         "qty": 12,
         "avg": 100442,
-        "current_price": 106000,
-        "prev_price": 112100
+        "current_price": 100800,
+        "prev_price": 106000
       },
       {
         "id": "MIA",
@@ -75,8 +75,8 @@
         "name": "미래에셋증권",
         "qty": 60,
         "avg": 71927,
-        "current_price": 66400,
-        "prev_price": 70500
+        "current_price": 61400,
+        "prev_price": 66400
       },
       {
         "id": "TIG",
@@ -85,8 +85,8 @@
         "name": "TIGER미국우주테크",
         "qty": 464,
         "avg": 11164,
-        "current_price": 13910,
-        "prev_price": 13700
+        "current_price": 13590,
+        "prev_price": 13910
       },
       {
         "id": "ABL",
@@ -95,8 +95,8 @@
         "name": "에이비엘바이오",
         "qty": 13,
         "avg": 139100,
-        "current_price": 112000,
-        "prev_price": 112200
+        "current_price": 105100,
+        "prev_price": 112000
       }
     ]
   },
