@@ -2241,9 +2241,17 @@ async function loadPortfolioJson(){
     }
     for(const c of cData) CASH[c.account]=c.amount;
 
-    // 실현손익 (종목별)
+    // 실현손익 (종목별) — 같은 종목 여러 번 매도 시 합산
     const {data:rgData}=await _sb.from('realized_gains').select('*').order('id');
-    if(rgData) PROFIT_DATA.splice(0,PROFIT_DATA.length,...rgData.map(r=>({name:r.name,pnl:r.pnl,type:r.type})));
+    if(rgData){
+      const grouped={};
+      rgData.forEach(r=>{
+        if(!grouped[r.name]) grouped[r.name]=0;
+        grouped[r.name]+=r.pnl;
+      });
+      const merged=Object.entries(grouped).map(([name,pnl])=>({name,pnl,type:pnl>=0?'sell':'loss'}));
+      PROFIT_DATA.splice(0,PROFIT_DATA.length,...merged);
+    }
 
     // 실현손익 (월별)
     const MONTH_ORDER=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
