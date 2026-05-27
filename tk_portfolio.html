@@ -1463,7 +1463,7 @@ canvas { display: block; }
   <!-- ── SECTION 2: 수익 실현 ── -->
   <div class="port-section-head anim">
     <span class="port-section-title">수익 실현</span>
-    <span class="port-section-meta">익절 <span style="color:var(--profit);">+3,625만</span> · 손절 <span style="color:var(--loss);">-208만</span></span>
+    <span class="port-section-meta">익절 <span id="section-gain-sum" style="color:var(--profit);">—</span> · 손절 <span id="section-loss-sum" style="color:var(--loss);">—</span></span>
   </div>
   <div class="card anim" style="padding:14px 16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -1478,7 +1478,7 @@ canvas { display: block; }
     <div class="profit-bars" id="profit-bars"></div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
       <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">2026 누적 순확정손익</span>
-      <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--profit);">+3,419만</span>
+      <span id="section-net-confirmed" style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--profit);">—</span>
     </div>
   </div>
 
@@ -2648,6 +2648,13 @@ function renderConfirmedPnl(){
   if(lEl) lEl.textContent=Math.round(loss).toLocaleString('ko-KR')+'원';
   const nEl=el('sum-net-confirmed');
   if(nEl){nEl.textContent=sign+(Math.round(net)).toLocaleString('ko-KR')+'원';nEl.className='sum-val '+(net>=0?'up':'dn');}
+  // 수익 실현 섹션 헤더 및 하단
+  const sgEl=el('section-gain-sum');
+  if(sgEl) sgEl.textContent='+'+Math.round(gain/10000).toLocaleString('ko-KR')+'만';
+  const slEl=el('section-loss-sum');
+  if(slEl) slEl.textContent=Math.round(loss/10000).toLocaleString('ko-KR')+'만';
+  const snEl=el('section-net-confirmed');
+  if(snEl){snEl.textContent=sign+netMon.toLocaleString('ko-KR')+'만';snEl.style.color=net>=0?'var(--profit)':'var(--loss)';}
 }
 
 function renderDash(){
