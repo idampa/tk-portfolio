@@ -1273,7 +1273,7 @@ canvas { display: block; }
       </div>
       <div class="home-hero-stat">
         <div class="home-hero-stat-label">확정손익</div>
-        <div class="home-hero-stat-val" style="color:var(--profit);">+3,660만</div>
+        <div class="home-hero-stat-val" id="home-confirmed-pnl" style="color:var(--profit);">—</div>
       </div>
       <div class="home-hero-stat">
         <div class="home-hero-stat-label">현금비중리스크</div>
@@ -1424,7 +1424,7 @@ canvas { display: block; }
       </div>
       <div class="port-stat">
         <div class="port-stat-label">확정손익</div>
-        <div class="port-stat-val" style="color:var(--profit);cursor:pointer;" onclick="event.stopPropagation();openTrendModal('confirmedPnl')">+3,660만</div>
+        <div class="port-stat-val" id="port-confirmed-pnl" style="color:var(--profit);cursor:pointer;" onclick="event.stopPropagation();openTrendModal('confirmedPnl')">—</div>
         <div class="port-stat-sub">2026 누적</div>
       </div>
       <div class="port-stat">
@@ -1554,12 +1554,11 @@ canvas { display: block; }
   <div class="card anim" style="margin-bottom:0;">
     <div class="sum-row"><span class="sum-key">키움 평가손익</span><span class="sum-val" id="sum-kiwoom-pnl">—</span></div>
     <div class="sum-row"><span class="sum-key">토스 평가손익</span><span class="sum-val" id="sum-toss-pnl">—</span></div>
-    <div class="sum-row"><span class="sum-key">2026 확정수익</span><span class="sum-val up">+36,235,558원</span></div>
-    <div class="sum-row"><span class="sum-key">토스 확정 손실</span><span class="sum-val dn">-945,912원</span></div>
-    <div class="sum-row"><span class="sum-key">펄어비스 확정 손실</span><span class="sum-val dn">-1,090,914원</span></div>
+    <div class="sum-row"><span class="sum-key">확정 수익 합계</span><span class="sum-val up" id="sum-confirmed-gain">—</span></div>
+    <div class="sum-row"><span class="sum-key">확정 손실 합계</span><span class="sum-val dn" id="sum-confirmed-loss">—</span></div>
     <div class="sum-row" style="border-top:1px solid var(--border2);margin-top:4px;padding-top:12px;">
       <span class="sum-key" style="font-weight:600;color:var(--text);">2026 누적 순확정손익</span>
-      <span class="sum-val up" style="font-size:14px;">+34,198,732원</span>
+      <span class="sum-val up" id="sum-net-confirmed" style="font-size:14px;">—</span>
     </div>
   </div>
 
@@ -2630,10 +2629,32 @@ function renderActionCards(s){
 let activeAcct = 'all';
 let activeChartTab = 'total';
 
+function renderConfirmedPnl(){
+  // 순확정손익: realized_gains_monthly 전체 합산
+  const net=PROFIT_MONTHLY_REAL.reduce((s,d)=>s+d.pnl,0);
+  const netMon=Math.round(net/10000);
+  const sign=netMon>=0?'+':'';
+  // 홈/포트 히어로 (만 단위)
+  const hEl=el('home-confirmed-pnl');
+  if(hEl) hEl.textContent=sign+netMon.toLocaleString('ko-KR')+'만';
+  const pEl=el('port-confirmed-pnl');
+  if(pEl) pEl.textContent=sign+netMon.toLocaleString('ko-KR')+'만';
+  // 수익 요약 섹션 (원 단위)
+  const gain=PROFIT_DATA.filter(d=>d.pnl>0).reduce((s,d)=>s+d.pnl,0);
+  const loss=PROFIT_DATA.filter(d=>d.pnl<0).reduce((s,d)=>s+d.pnl,0);
+  const gEl=el('sum-confirmed-gain');
+  if(gEl) gEl.textContent='+'+(Math.round(gain)).toLocaleString('ko-KR')+'원';
+  const lEl=el('sum-confirmed-loss');
+  if(lEl) lEl.textContent=Math.round(loss).toLocaleString('ko-KR')+'원';
+  const nEl=el('sum-net-confirmed');
+  if(nEl){nEl.textContent=sign+(Math.round(net)).toLocaleString('ko-KR')+'원';nEl.className='sum-val '+(net>=0?'up':'dn');}
+}
+
 function renderDash(){
   const s=calcPortStats();
   // 홈 갱신
   renderHome();
+  renderConfirmedPnl();
 
   // 포트 Hero
   const grandMon=Math.round(s.grand/10000);
