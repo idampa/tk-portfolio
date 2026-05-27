@@ -731,15 +731,19 @@ body {
   inset: 0;
   background: rgba(0,0,0,0.75);
   z-index: 200;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
   backdrop-filter: blur(6px);
 }
 .modal-bg.open { display: flex; }
 .modal {
   background: var(--bg2);
   border: 1px solid var(--border2);
-  border-radius: 20px 20px 0 0;
-  padding: 20px 18px 40px;
+  border-radius: 20px;
+  padding: 20px 18px 32px;
+  width: 100%;
+  max-width: 420px;
   width: 100%;
   max-height: 85dvh;
   overflow-y: auto;
@@ -1420,7 +1424,7 @@ canvas { display: block; }
       </div>
       <div class="port-stat">
         <div class="port-stat-label">확정손익</div>
-        <div class="port-stat-val" style="color:var(--profit);">+3,660만</div>
+        <div class="port-stat-val" style="color:var(--profit);cursor:pointer;" onclick="event.stopPropagation();openTrendModal('confirmedPnl')">+3,660만</div>
         <div class="port-stat-sub">2026 누적</div>
       </div>
       <div class="port-stat">
@@ -1430,7 +1434,7 @@ canvas { display: block; }
       </div>
       <div class="port-stat">
         <div class="port-stat-label">현금 합계</div>
-        <div class="port-stat-val" id="port-cash-total">—</div>
+        <div class="port-stat-val" id="port-cash-total" style="cursor:pointer;" onclick="event.stopPropagation();openTrendModal('cashTotal')">—</div>
         <div class="port-stat-sub">키움+토스</div>
       </div>
     </div>
@@ -3156,16 +3160,34 @@ function saveUpdate(){
 /* ═══════════════════════════════════════
    TREND MODAL
 ═══════════════════════════════════════ */
+const CONFIRMED_HISTORY=[
+  {date:'01/29',val:55},
+  {date:'02/20',val:833},
+  {date:'02/27',val:2610},
+  {date:'03/05',val:2626},
+  {date:'03/11',val:2962},
+  {date:'03/19',val:2753},
+  {date:'04/09',val:3264},
+  {date:'05/15',val:3660},
+];
 const TREND_CFG={
   total:{title:'TOTAL VALUE',chartLabel:'총 평가금액 (만원)',unit:'만원',color:'#4d8bff',gA:'rgba(77,139,255,0.28)',gB:'rgba(77,139,255,0.01)',histVal:h=>h.total,liveVal:()=>{let v=0;HOLDINGS.kiwoom.forEach(s=>{v+=PRICES[s.id]*s.qty;});HOLDINGS.toss.forEach(s=>{v+=PRICES[s.id]*s.qty;});return Math.round((v+CASH.kiwoom+CASH.toss)/10000);},fmtTip:v=>v.toLocaleString('ko-KR')+'만원'},
   cashPct:{title:'CASH RATIO',chartLabel:'현금 비중 (%)',unit:'%',color:'#00f5b4',gA:'rgba(0,245,180,0.28)',gB:'rgba(0,245,180,0.01)',histVal:h=>h.cashPct,liveVal:()=>{let v=0;HOLDINGS.kiwoom.forEach(s=>{v+=PRICES[s.id]*s.qty;});HOLDINGS.toss.forEach(s=>{v+=PRICES[s.id]*s.qty;});const c=CASH.kiwoom+CASH.toss;return parseFloat((c/(v+c)*100).toFixed(1));},fmtTip:v=>v+'%'},
   kiwoomPnl:{title:'KIWOOM P&L',chartLabel:'키움 평가손익 (만원)',unit:'만원',color:'#a855f7',gA:'rgba(168,85,247,0.28)',gB:'rgba(168,85,247,0.01)',histVal:h=>{let t=0;HOLDINGS.kiwoom.forEach(s=>{if(h.pnl[s.id]!=null)t+=(h.pnl[s.id]/100)*s.avg*s.qty;});return Math.round(t/10000);},liveVal:()=>{let t=0;HOLDINGS.kiwoom.forEach(s=>{t+=(PRICES[s.id]-s.avg)*s.qty;});return Math.round(t/10000);},fmtTip:v=>(v>=0?'+':'')+v.toLocaleString('ko-KR')+'만원'},
+  confirmedPnl:{title:'확정 손익',chartLabel:'누적 확정손익 (만원)',unit:'만원',color:'#00f5b4',gA:'rgba(0,245,180,0.28)',gB:'rgba(0,245,180,0.01)',fixedData:CONFIRMED_HISTORY,fmtTip:v=>(v>=0?'+':'')+v.toLocaleString('ko-KR')+'만원'},
+  cashTotal:{title:'현금 합계',chartLabel:'현금 합계 (만원)',unit:'만원',color:'#ffb938',gA:'rgba(255,185,56,0.28)',gB:'rgba(255,185,56,0.01)',histVal:h=>Math.round(h.total*h.cashPct/100),liveVal:()=>Math.round((CASH.kiwoom+CASH.toss)/10000),fmtTip:v=>v.toLocaleString('ko-KR')+'만원'},
 };
 function openTrendModal(type){
   const cfg=TREND_CFG[type];if(!cfg)return;
-  const liveV=cfg.liveVal();const isUp=liveV>=0;
   el('tm-title').textContent=cfg.title;el('tm-chart-label').textContent=cfg.chartLabel;
-  el('tm-stat').innerHTML=`<div style="flex:1;background:var(--bg3);border:1px solid ${isUp?'rgba(0,245,180,0.25)':'rgba(255,48,96,0.25)'};border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">현재</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${cfg.color};">${cfg.fmtTip(liveV)}</div></div><div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">기간</div><div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);">${HISTORY[0].date} ~ 오늘</div></div>`;
+  if(cfg.fixedData){
+    const last=cfg.fixedData[cfg.fixedData.length-1];
+    const liveV=last.val;const isUp=liveV>=0;
+    el('tm-stat').innerHTML=`<div style="flex:1;background:var(--bg3);border:1px solid ${isUp?'rgba(0,245,180,0.25)':'rgba(255,48,96,0.25)'};border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">누적</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${cfg.color};">${cfg.fmtTip(liveV)}</div></div><div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">기간</div><div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);">${cfg.fixedData[0].date} ~ ${last.date}</div></div>`;
+  } else {
+    const liveV=cfg.liveVal();const isUp=liveV>=0;
+    el('tm-stat').innerHTML=`<div style="flex:1;background:var(--bg3);border:1px solid ${isUp?'rgba(0,245,180,0.25)':'rgba(255,48,96,0.25)'};border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">현재</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${cfg.color};">${cfg.fmtTip(liveV)}</div></div><div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);margin-bottom:5px;">기간</div><div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);">${HISTORY[0].date} ~ 오늘</div></div>`;
+  }
   el('trend-modal-bg').classList.add('open');
   setTimeout(()=>renderTrendChart(type,cfg),50);
 }
@@ -3173,9 +3195,14 @@ function closeTrendModal(){el('trend-modal-bg').classList.remove('open');destroy
 function closeTrendModalOutside(e){if(e.target===el('trend-modal-bg'))closeTrendModal();}
 function renderTrendChart(type,cfg){
   const d=new Date(),todayLabel=`${d.getMonth()+1}/${String(d.getDate()).padStart(2,'0')}`;
-  const hist=HISTORY.map(h=>({date:h.date,val:cfg.histVal(h)}));
-  const liveV=cfg.liveVal();
-  if(hist[hist.length-1].date===todayLabel)hist[hist.length-1].val=liveV;else hist.push({date:todayLabel,val:liveV});
+  let hist;
+  if(cfg.fixedData){
+    hist=cfg.fixedData.map(h=>({date:h.date,val:h.val}));
+  } else {
+    hist=HISTORY.map(h=>({date:h.date,val:cfg.histVal(h)}));
+    const liveV=cfg.liveVal();
+    if(hist[hist.length-1].date===todayLabel)hist[hist.length-1].val=liveV;else hist.push({date:todayLabel,val:liveV});
+  }
   const labels=hist.map(h=>h.date),data=hist.map(h=>h.val);
   destroyChart('trendChart');const canvas=el('trendChart');if(!canvas)return;
   const ctx=canvas.getContext('2d');const grad=ctx.createLinearGradient(0,0,0,200);
