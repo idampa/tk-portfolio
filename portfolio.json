@@ -55,6 +55,16 @@
         "avg": 391298,
         "current_price": 399500,
         "prev_price": 390000
+      },
+      {
+        "id": "GLS",
+        "ticker": "086280",
+        "naver": "086280",
+        "name": "현대글로비스",
+        "qty": 20,
+        "avg": 233000,
+        "current_price": 232500,
+        "prev_price": 242500
       }
     ],
     "toss": [
@@ -183,6 +193,16 @@
     ]
   },
   "trade_log": [
+    {
+      "date": "2026-06-02",
+      "id": "GLS",
+      "name": "현대글로비스",
+      "type": "buy",
+      "qty": 20,
+      "price": 233000,
+      "pnl": null,
+      "memo": "1차진입 · 손절 195,000 · BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절"
+    },
     {
       "date": "2026-05-15",
       "id": "TIG",

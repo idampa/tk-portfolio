@@ -1878,6 +1878,7 @@ canvas { display: block; }
   <!-- 월 필터 -->
   <div class="rv-filter-row anim">
     <button class="rv-filter active" id="mf-all" onclick="filterMonth('all')">전체</button>
+    <button class="rv-filter" id="mf-6" onclick="filterMonth('6')">6월</button>
     <button class="rv-filter" id="mf-5" onclick="filterMonth('5')">5월</button>
     <button class="rv-filter" id="mf-4" onclick="filterMonth('4')">4월</button>
     <button class="rv-filter" id="mf-3" onclick="filterMonth('3')">3월</button>
@@ -2281,6 +2282,7 @@ canvas { display: block; }
       <div class="price-item"><label>테크윙</label><input id="p-TWI" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>ISC</label><input id="p-ISC" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>에이피알</label><input id="p-APR" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
+      <div class="price-item"><label>현대글로비스</label><input id="p-GLS" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
     </div>
     <div class="label-xs" style="margin:8px 0;">토스 종목</div>
     <div class="price-grid">
@@ -2398,12 +2400,6 @@ async function loadPortfolioJson(){
           memo:t.memo||''};
       }));
     }
-    // 현대글로비스 초기 데이터 삽입 (없을 때만)
-    if(!hData.find(h=>h.id==='GLS')){
-      await _sb.from('holdings').upsert({
-        id:'GLS',name:'현대글로비스',account:'kiwoom',qty:20,avg:233000,sector:'물류/자동차'
-      },{onConflict:'id',ignoreDuplicates:true});
-    }
     console.log('Supabase 로드 완료:',Object.keys(PRICES).length+'종목');
   }catch(e){
     console.warn('Supabase 로드 실패, 하드코딩 데이터 유지:',e);
@@ -2442,7 +2438,7 @@ const SIM_DEFAULTS={
 };
 
 const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS'};
-const NAVER_CODES={SKH:'000660',HWA:'012450',TWI:'089030',ISC:'095340',APR:'278470',DSE:'034020',MIA:'006800',TIG:'0183J0',ABL:'298380'};
+const NAVER_CODES={SKH:'000660',HWA:'012450',TWI:'089030',ISC:'095340',APR:'278470',DSE:'034020',MIA:'006800',TIG:'0183J0',ABL:'298380',GLS:'086280'};
 const WATCH_CODES={
   OCI:{code:'010060',elIds:['wp-OCI-w']},
   GNC:{code:'119850',elIds:['wp-GNC','wp-GNC-w','wp-GNC-s']},
@@ -2450,7 +2446,7 @@ const WATCH_CODES={
   HMG:{code:'053690',elIds:['wp-HMG']},
   SDI:{code:'006400',elIds:['wp-SDI','wp-SDI-s']},
 };
-const WATCH_FROM_PRICES={APR:'wp-APR',MIA:'wp-MIA',DSE:'wp-DSE',TWI:'wp-TWI',ABL:'wp-ABL'};
+const WATCH_FROM_PRICES={APR:'wp-APR',MIA:'wp-MIA',DSE:'wp-DSE',TWI:'wp-TWI',ABL:'wp-ABL',GLS:'wp-GLS'};
 
 // PROFIT_DATA / PROFIT_MONTHLY_REAL: loadPortfolioJson()에서 덮어씀
 const PROFIT_DATA=[];
@@ -2458,7 +2454,7 @@ const PROFIT_MONTHLY_REAL=[];
 let profitMode='stock';
 
 const TRADE_LOG=[
-  {m:6,date:'06.01',name:'현대글로비스',type:'buy',detail:'20주 · 233,000원 · 1차진입 · 손절 195,000',pnl:null,memo:'BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절'},
+  {m:6,date:'06.02',name:'현대글로비스',type:'buy',detail:'20주 · 233,000원 · 1차진입 · 손절 195,000',pnl:null,memo:'BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절'},
   {m:5,date:'05.15',name:'TIGER 미국우주테크',type:'buy',detail:'60주 · 14,050원 · 평단11,164 · 잔고464주',pnl:null,memo:'스페이스X IPO 6월 로드쇼 앞두고 추매'},
   {m:5,date:'05.15',name:'SK하이닉스',type:'buy',detail:'5주 · 평균1,841,398원 · 평단1,168,646 · 잔고26주',pnl:null,memo:'코스닥 -5% 하락장 저점 분할 추매'},
   {m:5,date:'05.12',name:'SK하이닉스',type:'buy',detail:'4주 · 192만+189만+187.9만+184.1만 · 평단1,008,467 · 잔고21주',pnl:null,memo:'AI 국민배당 쇼크 급락 분할 추매'},
@@ -3674,7 +3670,7 @@ function renderPatternDiagnosis(){
 ═══════════════════════════════════════ */
 function filterMonth(m){
   activeMonth=m;
-  ['all','1','2','3','4','5'].forEach(x=>{
+  ['all','1','2','3','4','5','6'].forEach(x=>{
     const b=el('mf-'+x);
     if(b) b.className='rv-filter'+(x===m?' active':'');
   });
@@ -3704,7 +3700,7 @@ function renderTradeLog(){
   }
   const groups={};
   filtered.forEach(t=>{if(!groups[t.m])groups[t.m]=[];groups[t.m].push(t);});
-  const monthNames={1:'1월',2:'2월',3:'3월',4:'4월',5:'5월'};
+  const monthNames={1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월'};
   const typeConfig={
     sell:{label:'매도', bg:'rgba(63,182,139,0.1)',  color:'var(--profit)', border:'rgba(63,182,139,0.25)'},
     buy: {label:'매수', bg:'rgba(91,140,255,0.1)',  color:'var(--accent)', border:'rgba(91,140,255,0.25)'},
