@@ -1174,11 +1174,28 @@ canvas { display: block; }
   font-family: var(--mono);
   font-size: 12px;
   color: var(--text2);
-  margin-bottom: 14px;
+  margin-bottom: 5px;
+}
+.port-hero-breakdown {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.port-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  padding: 8px 0 11px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
 }
 .port-stat-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--border);
   margin: 0 -18px;
 }
@@ -1484,26 +1501,26 @@ canvas { display: block; }
     <div class="port-hero-label">TOTAL PORTFOLIO</div>
     <div class="port-hero-total" id="port-total">—</div>
     <div class="port-hero-pnl" id="port-pnl">—</div>
+    <div class="port-hero-breakdown" id="port-total-breakdown">—</div>
+    <div class="port-hero-meta">
+      <span>보유주식 매입원금 <b id="port-invested-cost" style="color:var(--text2);">—</b></span>
+      <span id="port-daily-change">보유종목 전일 대비 —</span>
+    </div>
     <div class="port-stat-row">
       <div class="port-stat">
-        <div class="port-stat-label">현금 비중</div>
-        <div class="port-stat-val" id="port-cash-pct" onclick="event.stopPropagation();openTrendModal('cashPct')">—</div>
-        <div class="port-stat-sub">목표 25~30%</div>
+        <div class="port-stat-label">계좌별 자산</div>
+        <div class="port-stat-val" id="port-kiwoom-assets">—</div>
+        <div class="port-stat-sub" id="port-toss-assets">—</div>
       </div>
       <div class="port-stat">
-        <div class="port-stat-label">확정손익</div>
-        <div class="port-stat-val" id="port-confirmed-pnl" style="color:var(--profit);cursor:pointer;" onclick="event.stopPropagation();openTrendModal('confirmedPnl')">—</div>
-        <div class="port-stat-sub">2026 누적</div>
-      </div>
-      <div class="port-stat">
-        <div class="port-stat-label">키움 손익</div>
-        <div class="port-stat-val" id="port-k-pnl" onclick="event.stopPropagation();openTrendModal('kiwoomPnl')">—</div>
-        <div class="port-stat-sub" id="port-k-pct">—</div>
-      </div>
-      <div class="port-stat">
-        <div class="port-stat-label">현금 합계</div>
+        <div class="port-stat-label">현금 · 비중</div>
         <div class="port-stat-val" id="port-cash-total" style="cursor:pointer;" onclick="event.stopPropagation();openTrendModal('cashTotal')">—</div>
-        <div class="port-stat-sub">키움+토스</div>
+        <div class="port-stat-sub" id="port-cash-pct" onclick="event.stopPropagation();openTrendModal('cashPct')">—</div>
+      </div>
+      <div class="port-stat">
+        <div class="port-stat-label">26년 확정손익</div>
+        <div class="port-stat-val" id="port-confirmed-pnl" style="color:var(--profit);cursor:pointer;" onclick="event.stopPropagation();openTrendModal('confirmedPnl')">—</div>
+        <div class="port-stat-sub" id="port-confirmed-month">이번 달 —</div>
       </div>
     </div>
   </div>
@@ -2568,14 +2585,17 @@ function setDate(){
    CALC HELPERS
 ═══════════════════════════════════════ */
 function calcPortStats(){
-  let kPnl=0,kCost=0,kVal=0,tPnl=0,tCost=0,tVal=0;
-  HOLDINGS.kiwoom.forEach(h=>{const v=PRICES[h.id]*h.qty,c=h.avg*h.qty;kPnl+=v-c;kVal+=v;kCost+=c;});
-  HOLDINGS.toss.forEach(h=>{const v=PRICES[h.id]*h.qty,c=h.avg*h.qty;tPnl+=v-c;tVal+=v;tCost+=c;});
+  let kPnl=0,kCost=0,kVal=0,tPnl=0,tCost=0,tVal=0,dailyPnl=0,prevStockVal=0;
+  HOLDINGS.kiwoom.forEach(h=>{const cur=PRICES[h.id]||h.avg,prev=PRICES_PREV[h.id]||cur,v=cur*h.qty,c=h.avg*h.qty;kPnl+=v-c;kVal+=v;kCost+=c;dailyPnl+=(cur-prev)*h.qty;prevStockVal+=prev*h.qty;});
+  HOLDINGS.toss.forEach(h=>{const cur=PRICES[h.id]||h.avg,prev=PRICES_PREV[h.id]||cur,v=cur*h.qty,c=h.avg*h.qty;tPnl+=v-c;tVal+=v;tCost+=c;dailyPnl+=(cur-prev)*h.qty;prevStockVal+=prev*h.qty;});
   const grand=kVal+tVal+CASH.kiwoom+CASH.toss;
   const cashTotal=CASH.kiwoom+CASH.toss;
   const cashPct=(cashTotal/grand*100).toFixed(1);
   const totalPnl=kPnl+tPnl;
-  return{kPnl,kVal,tPnl,tVal,grand,cashTotal,cashPct:parseFloat(cashPct),totalPnl};
+  const investedCost=kCost+tCost;
+  const prevGrand=prevStockVal+cashTotal;
+  const dailyPct=prevGrand?dailyPnl/prevGrand*100:0;
+  return{kPnl,kCost,kVal,tPnl,tCost,tVal,grand,cashTotal,cashPct:parseFloat(cashPct),totalPnl,investedCost,dailyPnl,dailyPct,kAssets:kVal+CASH.kiwoom,tAssets:tVal+CASH.toss};
 }
 function calcCashPct(){return calcPortStats().cashPct;}
 
@@ -2777,6 +2797,10 @@ function renderConfirmedPnl(){
   if(hEl) hEl.textContent=sign+netMon.toLocaleString('ko-KR')+'만';
   const pEl=el('port-confirmed-pnl');
   if(pEl) pEl.textContent=sign+netMon.toLocaleString('ko-KR')+'만';
+  const nowMonth=(new Date().getMonth()+1)+'월';
+  const monthPnl=PROFIT_MONTHLY_REAL.find(d=>d.name===nowMonth)?.pnl||0;
+  const monthEl=el('port-confirmed-month');
+  if(monthEl) monthEl.textContent='이번 달 '+(monthPnl>=0?'+':'')+Math.round(monthPnl/10000).toLocaleString('ko-KR')+'만';
   // 수익 요약 섹션 (원 단위)
   const gain=PROFIT_DATA.filter(d=>d.pnl>0).reduce((s,d)=>s+d.pnl,0);
   const loss=PROFIT_DATA.filter(d=>d.pnl<0).reduce((s,d)=>s+d.pnl,0);
@@ -2815,25 +2839,27 @@ function renderDash(){
     ppEl.style.color=pnlColor;
   }
 
-  // 포트 4-stat
+  // 포트 요약
+  const breakdownEl=el('port-total-breakdown');
+  if(breakdownEl) breakdownEl.textContent=`키움 주식 ${Math.round(s.kVal/10000).toLocaleString('ko-KR')}만 · 토스 주식 ${Math.round(s.tVal/10000).toLocaleString('ko-KR')}만 · 예수금 ${Math.round(s.cashTotal/10000).toLocaleString('ko-KR')}만`;
+  const investedEl=el('port-invested-cost');
+  if(investedEl) investedEl.textContent=Math.round(s.investedCost/10000).toLocaleString('ko-KR')+'만';
+  const dailyEl=el('port-daily-change');
+  if(dailyEl){
+    dailyEl.textContent=`보유종목 전일 대비 ${s.dailyPnl>=0?'+':''}${Math.round(s.dailyPnl/10000).toLocaleString('ko-KR')}만 (${s.dailyPnl>=0?'+':''}${s.dailyPct.toFixed(1)}%)`;
+    dailyEl.style.color=s.dailyPnl>=0?'var(--profit)':'var(--loss)';
+  }
+  const kaEl=el('port-kiwoom-assets');
+  if(kaEl) kaEl.textContent='키움 '+Math.round(s.kAssets/10000).toLocaleString('ko-KR')+'만';
+  const taEl=el('port-toss-assets');
+  if(taEl) taEl.textContent='토스 '+Math.round(s.tAssets/10000).toLocaleString('ko-KR')+'만';
   const cpEl=el('port-cash-pct');
   if(cpEl){
-    cpEl.textContent=s.cashPct+'%';
+    cpEl.textContent=s.cashPct+'% · 목표 25~30%';
     cpEl.style.color=s.cashPct>=25&&s.cashPct<=30?'var(--profit)':s.cashPct<20?'var(--loss)':'var(--gold)';
   }
   const ctEl=el('port-cash-total');
   if(ctEl) ctEl.textContent=Math.round(s.cashTotal/10000).toLocaleString('ko-KR')+'만';
-
-  const kPnlEl=el('port-k-pnl');
-  if(kPnlEl){
-    kPnlEl.textContent=(s.kPnl>=0?'+':'')+Math.round(s.kPnl/10000).toLocaleString('ko-KR')+'만';
-    kPnlEl.style.color=s.kPnl>=0?'var(--profit)':'var(--loss)';
-  }
-  const kPctEl=el('port-k-pct');
-  if(kPctEl){
-    const kPct=s.kVal?((s.kPnl/s.kVal)*100).toFixed(1):0;
-    kPctEl.textContent=(s.kPnl>=0?'+':'')+kPct+'%';
-  }
 
   // 종목 리스트 렌더
   renderStockList(activeAcct);
