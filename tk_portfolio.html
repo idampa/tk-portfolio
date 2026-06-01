@@ -2019,7 +2019,7 @@ canvas { display: block; }
       <div class="watch-item" data-ticker="APR">
         <div class="watch-accent-bar" style="background:var(--profit);"></div>
         <div class="watch-info">
-          <div class="watch-name">에이피알 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">62주</span></div>
+          <div class="watch-name">에이피알 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">52주</span></div>
           <div class="watch-sub">현재 <span id="wp-APR">441,000</span>원 · 1Q26 어닝서프라이즈 확인</div>
           <div class="watch-cond">500,000원 절반 매도 · 나머지 700,000원 홀딩</div>
           <div class="memo-display" id="memo-APR" style="display:none;"></div>
@@ -2079,6 +2079,19 @@ canvas { display: block; }
         <div class="watch-right">
           <div class="watch-status hold">바이오</div>
           <button class="memo-edit-btn" onclick="openMemoModal('ABL','에이비엘바이오')">✏ 메모</button>
+        </div>
+      </div>
+      <div class="watch-item" data-ticker="GLS">
+        <div class="watch-accent-bar" style="background:var(--gold);"></div>
+        <div class="watch-info">
+          <div class="watch-name">현대글로비스 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">20주</span></div>
+          <div class="watch-sub">평단 233,000원 · 현재 <span id="wp-GLS">233,000</span>원</div>
+          <div class="watch-cond">손절 195,000원 · BD IPO 6월 결단 + 풋옵션 만료 압박</div>
+          <div class="memo-display" id="memo-GLS" style="display:none;"></div>
+        </div>
+        <div class="watch-right">
+          <div class="watch-status hold">물류</div>
+          <button class="memo-edit-btn" onclick="openMemoModal('GLS','현대글로비스')">✏ 메모</button>
         </div>
       </div>
     </div>
@@ -2331,7 +2344,7 @@ canvas { display: block; }
 // ─── Supabase에서 동적 로드 ───
 let HOLDINGS={kiwoom:[],toss:[]};
 let PERSISTENT_HISTORY=[];
-let PRICES={};
+let PRICES={GLS:233000};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
 
@@ -2384,6 +2397,12 @@ async function loadPortfolioJson(){
           pnl:t.pnl!=null?(t.pnl>=0?'+':'')+Math.round(t.pnl/10000)+'만':null,
           memo:t.memo||''};
       }));
+    }
+    // 현대글로비스 초기 데이터 삽입 (없을 때만)
+    if(!hData.find(h=>h.id==='GLS')){
+      await _sb.from('holdings').upsert({
+        id:'GLS',name:'현대글로비스',account:'kiwoom',qty:20,avg:233000,sector:'물류/자동차'
+      },{onConflict:'id',ignoreDuplicates:true});
     }
     console.log('Supabase 로드 완료:',Object.keys(PRICES).length+'종목');
   }catch(e){
@@ -2439,6 +2458,7 @@ const PROFIT_MONTHLY_REAL=[];
 let profitMode='stock';
 
 const TRADE_LOG=[
+  {m:6,date:'06.01',name:'현대글로비스',type:'buy',detail:'20주 · 233,000원 · 1차진입 · 손절 195,000',pnl:null,memo:'BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절'},
   {m:5,date:'05.15',name:'TIGER 미국우주테크',type:'buy',detail:'60주 · 14,050원 · 평단11,164 · 잔고464주',pnl:null,memo:'스페이스X IPO 6월 로드쇼 앞두고 추매'},
   {m:5,date:'05.15',name:'SK하이닉스',type:'buy',detail:'5주 · 평균1,841,398원 · 평단1,168,646 · 잔고26주',pnl:null,memo:'코스닥 -5% 하락장 저점 분할 추매'},
   {m:5,date:'05.12',name:'SK하이닉스',type:'buy',detail:'4주 · 192만+189만+187.9만+184.1만 · 평단1,008,467 · 잔고21주',pnl:null,memo:'AI 국민배당 쇼크 급락 분할 추매'},
