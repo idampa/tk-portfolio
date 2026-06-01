@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacksConfig]
+# Python 3.12 명시
+providers = ["python"]
+
+[deploy]
+startCommand = "python server_http.py"
+
+# 배포 실패 시 자동 재시작 (최대 5회)
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
