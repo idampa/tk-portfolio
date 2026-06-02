@@ -6,6 +6,8 @@
 <title>종목분석 — 태균 포트폴리오</title>
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="thesis_data.js"></script>
 <style>
 :root {
   --bg: #0d0f14;
@@ -14,7 +16,7 @@
   --border: #252a38;
   --border2: #2e3447;
   --text: #e8ecf4;
-  --text2: #8b92a8;
+  --text2: #c4cad8;
   --text3: #555e78;
   --accent: #4f8ef7;
   --accent2: #6366f1;
@@ -580,6 +582,54 @@ body {
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+/* 투자 Thesis */
+.thesis-wrap { margin-top: 18px; }
+.thesis-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  padding: 14px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
+}
+.thesis-ticker, .thesis-badge {
+  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(79,142,247,.35);
+  background: rgba(79,142,247,.12); color: var(--accent);
+}
+.thesis-one-liner { margin-top: 8px; color: var(--text); font-size: 14px; font-weight: 600; line-height: 1.55; }
+.thesis-updated { flex-shrink: 0; color: var(--text2); font: 10px 'JetBrains Mono', monospace; }
+.thesis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.thesis-card { padding: 13px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+.thesis-card-title { color: var(--text); font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.thesis-logic { display: flex; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 12px; line-height: 1.55; }
+.thesis-logic:last-child, .thesis-catalyst:last-child { border-bottom: none; }
+.thesis-num { color: var(--accent); font: 11px 'JetBrains Mono', monospace; flex-shrink: 0; }
+.thesis-case-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.thesis-case-list li { color: var(--text2); font-size: 12px; line-height: 1.5; padding-left: 12px; position: relative; }
+.thesis-case-list li::before { content: '•'; position: absolute; left: 0; }
+.thesis-case.bull li::before { color: var(--green); }
+.thesis-case.bear li::before { color: var(--red); }
+.thesis-catalyst { display: grid; grid-template-columns: 82px 1fr auto; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.thesis-date { color: var(--yellow); font: 10px 'JetBrains Mono', monospace; }
+.thesis-event { color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.45; }
+.thesis-action { color: var(--text2); font-size: 11px; line-height: 1.5; margin-top: 3px; }
+.thesis-dir { align-self: start; font: 9px 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 4px; }
+.thesis-dir.bull { color: var(--green); background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.3); }
+.thesis-dir.bear { color: var(--red); background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.3); }
+.thesis-dir.neutral { color: var(--yellow); background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3); }
+.thesis-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.thesis-action-box { padding: 9px; border: 1px solid var(--border); border-radius: 7px; }
+.thesis-action-label { color: var(--accent); font: 10px 'JetBrains Mono', monospace; margin-bottom: 5px; }
+.thesis-action-text { color: var(--text2); font-size: 11px; line-height: 1.55; }
+.thesis-position { display: grid; grid-template-columns: repeat(5,1fr); gap: 1px; margin-top: 10px; background: var(--border); border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.thesis-pos-cell { padding: 10px 7px; background: var(--bg2); text-align: center; }
+.thesis-pos-label { color: var(--text2); font: 9px 'JetBrains Mono', monospace; margin-bottom: 5px; }
+.thesis-pos-value { color: var(--text); font: 11px 'JetBrains Mono', monospace; font-weight: 600; line-height: 1.4; }
+@media (max-width: 720px) {
+  .thesis-grid { grid-template-columns: 1fr; }
+  .thesis-position { grid-template-columns: repeat(2,1fr); }
+  .thesis-pos-cell:last-child { grid-column: span 2; }
+  .thesis-catalyst { grid-template-columns: 72px 1fr; }
+  .thesis-dir { grid-column: 2; justify-self: start; }
 }
 </style>
 </head>
@@ -1914,6 +1964,65 @@ function renderValuation(stockId) {
   </div>`;
 }
 
+/* ═══════════════════════════════════════
+   INVESTMENT THESIS
+═══════════════════════════════════════ */
+const THESIS_PANEL_MAP={skh:'SKH',hwa:'HWA',tw:'TWI',isc:'ISC',apr:'APR',doe:'DSE',mia:'MIA',abl:'ABL'};
+const THESIS_ACTION_LABELS={hold:'홀딩',buyMore:'추가매수',sell:'익절',stopLoss:'손절'};
+const THESIS_DIR_LABELS={bull:'호재',bear:'리스크',neutral:'대기'};
+const ANALYSIS_SB=window.supabase.createClient('https://opcosixoerzfkpenquda.supabase.co','sb_publishable_plNylzYWa7aI20LGPEFS0Q_8ZjRft53');
+let HOLDINGS={};
+let PRICES={};
+
+function escThesis(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtThesis(n){return Number(n||0).toLocaleString('ko-KR')+'원';}
+function renderThesis(ticker){
+  const d=THESIS_DATA[ticker];if(!d)return'';
+  const h=HOLDINGS[ticker]||d.myPosition||{};
+  const qty=h.qty??d.myPosition.qty??0,avg=h.avg??d.myPosition.avg??0,cur=PRICES[ticker]??h.current_price??avg;
+  const pnl=(cur-avg)*qty,pnlPct=avg?((cur-avg)/avg*100):0,pnlColor=pnl>=0?'var(--green)':'var(--red)';
+  const logic=d.keyLogic.map((x,i)=>`<div class="thesis-logic"><span class="thesis-num">${String(i+1).padStart(2,'0')}</span><span>${escThesis(x)}</span></div>`).join('');
+  const caseList=(items,type)=>`<ul class="thesis-case-list thesis-case ${type}">${items.map(x=>`<li>${escThesis(x)}</li>`).join('')}</ul>`;
+  const catalysts=d.catalysts.map(c=>`<div class="thesis-catalyst"><div class="thesis-date">${escThesis(c.date)}</div><div><div class="thesis-event">${escThesis(c.event)}</div><div class="thesis-action">${escThesis(c.action)}</div></div><span class="thesis-dir ${c.direction}">${THESIS_DIR_LABELS[c.direction]||escThesis(c.direction)}</span></div>`).join('');
+  const actions=Object.entries(d.actions).map(([key,text])=>`<div class="thesis-action-box"><div class="thesis-action-label">${THESIS_ACTION_LABELS[key]||escThesis(key)}</div><div class="thesis-action-text">${escThesis(text)}</div></div>`).join('');
+  const target=d.myPosition.targetPrice,stop=d.myPosition.stopPrice;
+  return `<section class="thesis-wrap" data-thesis="${ticker}">
+    <div class="divider">INVESTMENT THESIS</div>
+    <div class="thesis-head"><div><span class="thesis-ticker">${ticker}</span><div class="thesis-one-liner">${escThesis(d.oneLiner)}</div></div><div class="thesis-updated">UPDATE ${escThesis(d.updatedAt)}</div></div>
+    <div class="thesis-grid">
+      <div class="thesis-card"><div class="thesis-card-title">핵심 투자 논리 <span class="thesis-badge">FACT 기반</span></div>${logic}</div>
+      <div class="thesis-card"><div class="thesis-card-title">시나리오 분석</div><div class="thesis-grid" style="margin-top:0;"><div><div class="thesis-action-label" style="color:var(--green);">BULL CASE</div>${caseList(d.bull,'bull')}</div><div><div class="thesis-action-label" style="color:var(--red);">BEAR CASE</div>${caseList(d.bear,'bear')}</div></div></div>
+    </div>
+    <div class="thesis-card" style="margin-top:10px;"><div class="thesis-card-title">카탈리스트</div>${catalysts}</div>
+    <div class="thesis-card" style="margin-top:10px;"><div class="thesis-card-title">액션 포인트</div><div class="thesis-actions">${actions}</div></div>
+    <div class="thesis-position">
+      <div class="thesis-pos-cell"><div class="thesis-pos-label">보유수량</div><div class="thesis-pos-value">${qty.toLocaleString('ko-KR')}주</div></div>
+      <div class="thesis-pos-cell"><div class="thesis-pos-label">평단가</div><div class="thesis-pos-value">${fmtThesis(avg)}</div></div>
+      <div class="thesis-pos-cell"><div class="thesis-pos-label">현재가</div><div class="thesis-pos-value">${fmtThesis(cur)}</div></div>
+      <div class="thesis-pos-cell"><div class="thesis-pos-label">평가손익</div><div class="thesis-pos-value" style="color:${pnlColor};">${pnl>=0?'+':''}${fmtThesis(pnl)}<br>${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</div></div>
+      <div class="thesis-pos-cell"><div class="thesis-pos-label">목표가 · 손절가</div><div class="thesis-pos-value">${target?fmtThesis(target):'—'}<br><span style="color:var(--red);">${stop?fmtThesis(stop):'—'}</span></div></div>
+    </div>
+  </section>`;
+}
+function renderAllThesis(){
+  Object.entries(THESIS_PANEL_MAP).forEach(([panelId,ticker])=>{
+    const panel=document.getElementById('panel-'+panelId);if(!panel)return;
+    panel.querySelector('.thesis-wrap')?.remove();
+    panel.insertAdjacentHTML('beforeend',renderThesis(ticker));
+  });
+}
+async function loadAnalysisHoldings(){
+  try{
+    const {data,error}=await ANALYSIS_SB.from('holdings').select('*');
+    if(error)throw error;
+    HOLDINGS={};PRICES={};
+    data.forEach(h=>{HOLDINGS[h.id]=h;PRICES[h.id]=h.current_price||h.avg;});
+  }catch(e){console.warn('Supabase holdings 로드 실패, Thesis fallback 사용:',e);}
+  renderAllThesis();
+}
+
 // 탭 전환
 function showStock(id) {
   document.querySelectorAll('.stock-panel').forEach(p => p.classList.remove('active'));
@@ -1943,6 +2052,8 @@ function showStock(id) {
 
 // 초기 로드 시 첫 번째 패널
 window.addEventListener('DOMContentLoaded', () => {
+  renderAllThesis();
+  loadAnalysisHoldings();
   const firstPanel = document.querySelector('.stock-panel.active');
   if (firstPanel) {
     const id = firstPanel.id.replace('panel-', '');

@@ -360,6 +360,25 @@ body {
   border-radius: 6px;
   flex-shrink: 0;
 }
+.event-ticker {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(91,140,255,0.1);
+  border: 1px solid rgba(91,140,255,0.25);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 9px;
+  vertical-align: 1px;
+}
+.catalyst-filter-row { display:flex; gap:5px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; }
+.catalyst-filter-row::-webkit-scrollbar { display:none; }
+.catalyst-card { padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card-bg); margin-bottom:7px; }
+.catalyst-card-head { display:flex; align-items:center; gap:7px; margin-bottom:6px; }
+.catalyst-card-date { color:var(--gold); font-family:var(--mono); font-size:10px; }
+.catalyst-card-event { color:var(--text); font-size:13px; font-weight:700; line-height:1.45; }
+.catalyst-card-action { color:var(--text2); font-size:11px; line-height:1.55; margin-top:5px; }
 
 /* Event Collapse (v4) */
 .event-collapse-header {
@@ -1322,6 +1341,7 @@ canvas { display: block; }
 #memo-modal-bg .modal::before { display: none; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="thesis_data.js"></script>
 </head>
 <body>
 
@@ -1667,7 +1687,7 @@ canvas { display: block; }
     <button class="subtab active" id="subtab-analysis" onclick="switchStratTab('analysis')">📈 종목분석</button>
     <button class="subtab" id="subtab-strategy" onclick="switchStratTab('strategy')">📊 매매전략</button>
     <button class="subtab" id="subtab-avg" onclick="switchStratTab('avg')">🧮 평단계산</button>
-    <button class="subtab" id="subtab-scenario" onclick="switchStratTab('scenario')">🎯 시나리오</button>
+    <button class="subtab" id="subtab-catalyst" onclick="switchStratTab('catalyst')">📅 카탈리스트</button>
   </div>
 
   <!-- 종목분석 패널 -->
@@ -1844,15 +1864,8 @@ canvas { display: block; }
     </div>
   </div>
 
-  <!-- 시나리오 패널 -->
-  <div id="panel-scenario" style="display:none;">
-    <div class="card">
-      <div class="label-xs" style="margin-bottom:10px;">포트폴리오 시나리오 분석</div>
-      <div style="color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:16px;">종목별 목표가·손절가 기준으로 전체 포트폴리오의 예상 손익을 시뮬레이션합니다.</div>
-      <!-- 시나리오 요약 카드 -->
-      <div id="scenario-grid" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-  </div>
+  <!-- 카탈리스트 패널 -->
+  <div id="panel-catalyst" style="display:none;"></div>
 </div>
 
 <!-- ④ Review -->
@@ -3436,13 +3449,64 @@ function renderStockChart(id){
 /* ═══════════════════════════════════════
    STRATEGY TAB
 ═══════════════════════════════════════ */
+const CATALYST_NAMES={SKH:'SK하이닉스',HWA:'한화에어로스페이스',TIG:'TIGER미국우주테크',TWI:'테크윙',ISC:'ISC',APR:'에이피알',DSE:'두산에너빌리티',MIA:'미래에셋증권',ABL:'에이비엘바이오',SEC:'삼성전기',GLS:'현대글로비스'};
+const CATALYST_FILTERS=['all','SKH','HWA','TIG','TWI','ISC','APR','DSE','MIA','ABL','GLS'];
+const CATALYST_DIR={
+  bull:{label:'호재',color:'var(--profit)',bg:'rgba(63,182,139,0.12)',border:'rgba(63,182,139,0.3)'},
+  bear:{label:'리스크',color:'var(--loss)',bg:'rgba(217,108,117,0.12)',border:'rgba(217,108,117,0.3)'},
+  neutral:{label:'대기',color:'var(--gold)',bg:'rgba(232,168,58,0.12)',border:'rgba(232,168,58,0.3)'},
+};
+let activeCatalystFilter='all';
+function escCatalyst(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function getThesisCatalysts(){
+  return Object.entries(THESIS_DATA).flatMap(([ticker,thesis])=>(thesis.catalysts||[]).map(c=>({ticker,name:CATALYST_NAMES[ticker]||ticker,...c})))
+    .sort((a,b)=>a.date.localeCompare(b.date,'ko',{numeric:true})||a.ticker.localeCompare(b.ticker));
+}
+function catalystBadge(direction){
+  const d=CATALYST_DIR[direction]||CATALYST_DIR.neutral;
+  return `<span class="event-badge" style="background:${d.bg};color:${d.color};border:1px solid ${d.border};">${d.label}</span>`;
+}
+function renderHomeCatalysts(){
+  const body=el('event-body');if(!body)return;
+  const items=getThesisCatalysts();
+  const count=el('event-count-badge');if(count)count.textContent=items.length+'건';
+  body.innerHTML=items.map(c=>{
+    const urgent=c.date.startsWith('2026-06');
+    return `<div class="event-item">
+      <div class="event-date ${urgent?'urgent':''}">${escCatalyst(c.date.replace(/^2026-/,''))}</div>
+      <div class="event-info">
+        <div class="event-name"><span class="event-ticker">${escCatalyst(c.ticker)}</span>${escCatalyst(c.event)}</div>
+        <div class="event-desc">${escCatalyst(c.name)} · ${escCatalyst(c.action)}</div>
+      </div>
+      ${catalystBadge(c.direction)}
+    </div>`;
+  }).join('');
+}
+function setCatalystFilter(ticker){
+  activeCatalystFilter=ticker;
+  renderCatalystPanel();
+}
+function renderCatalystPanel(){
+  const panel=el('panel-catalyst');if(!panel)return;
+  const items=getThesisCatalysts().filter(c=>activeCatalystFilter==='all'||c.ticker===activeCatalystFilter);
+  panel.innerHTML=`<div class="sec-head" style="margin-top:4px;"><div class="sec-title">CATALYST CALENDAR</div><div class="sec-badge">${items.length}건</div></div>
+    <div class="catalyst-filter-row">${CATALYST_FILTERS.map(t=>`<button class="rv-filter ${activeCatalystFilter===t?'active':''}" onclick="setCatalystFilter('${t}')">${t==='all'?'전체':t}</button>`).join('')}</div>
+    <div>${items.map(c=>{
+      const urgent=c.date.startsWith('2026-06'),d=CATALYST_DIR[c.direction]||CATALYST_DIR.neutral;
+      return `<div class="catalyst-card" style="${urgent?'border-left:3px solid var(--gold);':''}">
+        <div class="catalyst-card-head"><span class="event-ticker">${escCatalyst(c.ticker)}</span><span class="catalyst-card-date">${escCatalyst(c.date)}</span><span class="event-badge" style="margin-left:auto;background:${d.bg};color:${d.color};border:1px solid ${d.border};">${d.label}</span></div>
+        <div class="catalyst-card-event">${escCatalyst(c.event)}</div>
+        <div class="catalyst-card-action"><span style="color:var(--gold);">ACTION</span> · ${escCatalyst(c.action)}</div>
+      </div>`;
+    }).join('')}</div>`;
+}
 function switchStratTab(name){
-  ['analysis','strategy','avg','scenario'].forEach(t=>{
+  ['analysis','strategy','avg','catalyst'].forEach(t=>{
     const btn=el('subtab-'+t);const panel=el('panel-'+t);
     if(btn){btn.classList.toggle('active',t===name);}
     if(panel){panel.style.display=t===name?'block':'none';}
   });
-  if(name==='scenario')renderScenario();
+  if(name==='catalyst')renderCatalystPanel();
   if(name==='analysis')renderStrategyScoreGrid();
 }
 
@@ -4156,13 +4220,7 @@ function toggleEventCollapse(forceOpen){
 }
 
 function initEventCollapse(){
-  // D-DAY 이벤트 있으면 자동 펼침
-  const today=new Date();
-  const mm=today.getMonth()+1,dd=today.getDate();
-  // 현재 하드코딩 기준: 5/7 이벤트가 오늘이면 자동 펼침
-  // 실제 운영 시 EVENTS 배열화 후 로직 교체 가능
-  const hasTodayEvent=(mm===5&&dd===8)||(mm===5&&dd===9);
-  if(hasTodayEvent) toggleEventCollapse(true);
+  if(getThesisCatalysts().some(c=>c.date.startsWith('2026-06'))) toggleEventCollapse(true);
 }
 
 
@@ -4187,6 +4245,8 @@ async function loadHistoryFromSupabase(){
    INIT
 ═══════════════════════════════════════ */
 (async function init(){
+  renderHomeCatalysts();
+  renderCatalystPanel();
   await loadPortfolioJson();
   await loadHistoryFromSupabase();
   renderDash();
