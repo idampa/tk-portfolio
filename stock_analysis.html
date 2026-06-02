@@ -647,6 +647,8 @@ body {
   <div class="stock-tab" onclick="showStock('tw')">테크윙 <span class="acct kiwoom">키움</span></div>
   <div class="stock-tab" onclick="showStock('isc')">ISC <span class="acct kiwoom">키움</span></div>
   <div class="stock-tab" onclick="showStock('apr')">에이피알 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('sec')">삼성전기 <span class="acct kiwoom">키움</span></div>
+  <div class="stock-tab" onclick="showStock('gls')">현대글로비스 <span class="acct kiwoom">키움</span></div>
   <div class="stock-tab" onclick="showStock('doe')">두산에너빌리티 <span class="acct toss">토스</span></div>
   <div class="stock-tab" onclick="showStock('mia')">미래에셋증권 <span class="acct toss">토스</span></div>
   <div class="stock-tab" onclick="showStock('abl')">에이비엘바이오 <span class="acct toss">토스</span></div>
@@ -1404,6 +1406,105 @@ body {
   </div>
 </div>
 
+<!-- ========== 삼성전기 ========== -->
+<div id="panel-sec" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">삼성전기</div>
+      <div class="stock-code">009150 · KOSPI · 전자부품</div>
+      <div class="stock-desc">MLCC·FC-BGA·카메라모듈 핵심 전자부품 제조. AI 서버향 고용량 MLCC 및 FC-BGA 수요 급증 수혜.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION · 진입 예정</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">미보유</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">0원</span></div>
+      <div class="position-row"><span class="position-key">목표 진입가</span><span class="position-val val-green">1,850,000~1,900,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card positive"><div class="kpi-label">영업이익률 ★26Q1</div><div class="kpi-value">11.2%</div><div class="kpi-change" style="color:var(--green)">▲ YoY +40%</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">매출액 ★26Q1</div><div class="kpi-value">2조5,060억</div><div class="kpi-change" style="color:var(--green)">▲ YoY +13%</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">영업이익 ★26Q1</div><div class="kpi-value">2,806억</div><div class="kpi-change" style="color:var(--green)">▲ YoY +40%</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">MLCC 매출성장</div><div class="kpi-value">+25%</div><div class="kpi-change" style="color:var(--green)">▲ AI 서버향 고용량 수요</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">FC-BGA 매출성장</div><div class="kpi-value">+60%+</div><div class="kpi-change" style="color:var(--green)">▲ AI 서버 기판 확대</div></div>
+    <div class="kpi-card neutral"><div class="kpi-label">ROE</div><div class="kpi-value">8.5%</div><div class="kpi-change" style="color:var(--text2)">실적 개선 초기</div></div>
+  </div>
+
+  <div class="divider">손익계산서 (IS)</div>
+  <div class="section-grid">
+    <div class="section-card"><div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge green">★26Q1 확정</span></div><div class="chart-wrap"><canvas id="sec-is-chart"></canvas></div></div>
+    <div class="section-card"><div class="section-title">수익성 비율 추이</div><div class="chart-wrap"><canvas id="sec-margin-chart"></canvas></div></div>
+  </div>
+  <div class="divider">재무비율 · 투자 인사이트</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge green">AI 서버 성장</span></div>
+      <table class="fin-table"><thead><tr><th>항목</th><th>★26Q1</th><th>25Q4</th><th>25Q3</th><th>25Q2</th></tr></thead><tbody>
+        <tr><td>매출액 (억)</td><td class="num-pos">25,060</td><td>24,180</td><td>22,350</td><td>21,840</td></tr>
+        <tr><td>영업이익 (억)</td><td class="num-pos">2,806</td><td>2,650</td><td>2,100</td><td>1,980</td></tr>
+        <tr><td>영업이익률 (%)</td><td class="num-pos">11.2</td><td>11.0</td><td>9.4</td><td>9.1</td></tr>
+        <tr><td>YoY 매출</td><td class="num-pos">+13%</td><td class="num-pos">+15%</td><td class="num-pos">+12%</td><td class="num-pos">+8%</td></tr>
+      </tbody></table>
+    </div>
+    <div class="section-card"><div class="section-title">투자 인사이트</div><div class="insight-block">
+      <div class="insight-row"><div class="insight-dot dot-green"></div>AI 서버향 고용량 MLCC와 FC-BGA가 동시에 성장. 소비자 전자부품 사이클 의존도가 낮아지는 구간.</div>
+      <div class="insight-row"><div class="insight-dot dot-green"></div>26Q1 영업이익 2,806억, YoY +40% — 매출 성장보다 이익 레버리지가 빠르게 확대.</div>
+      <div class="insight-row"><div class="insight-dot dot-yellow"></div>현재 미보유. TIGER 우주테크 익절 자금 확보 후 목표 진입가 185~190만원에서 분할 진입.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ========== 현대글로비스 ========== -->
+<div id="panel-gls" class="stock-panel">
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <div class="stock-name">현대글로비스</div>
+      <div class="stock-code">086280 · KOSPI · 물류/자동차</div>
+      <div class="stock-desc">현대차그룹 전속 물류·해운·유통 핵심 계열사. BD(블루오벌SK) IPO 지분 11.25% 보유. 이벤트 드리븐 포지션.</div>
+    </div>
+    <div class="my-position">
+      <div class="position-label">MY POSITION · 키움</div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">20주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">233,000원</span></div>
+      <div class="position-row"><span class="position-key">손절선</span><span class="position-val val-red">195,000원</span></div>
+      <div class="position-row"><span class="position-key">목표가</span><span class="position-val val-green">270,000원</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card neutral"><div class="kpi-label">영업이익률 25Q4</div><div class="kpi-value">4.2%</div><div class="kpi-change" style="color:var(--text2)">물류 본업 안정</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">매출액 25Q4</div><div class="kpi-value">7조1,200억</div><div class="kpi-change" style="color:var(--green)">▲ YoY +8%</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">영업이익 25Q4</div><div class="kpi-value">2,990억</div><div class="kpi-change" style="color:var(--green)">▲ YoY +12%</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">BD 지분가치</div><div class="kpi-value">5,000억+</div><div class="kpi-change" style="color:var(--green)">지분 11.25% 보유</div></div>
+    <div class="kpi-card positive"><div class="kpi-label">PER</div><div class="kpi-value">10배대</div><div class="kpi-change" style="color:var(--green)">본업 기준 저평가</div></div>
+    <div class="kpi-card neutral"><div class="kpi-label">ROE</div><div class="kpi-value">11.3%</div><div class="kpi-change" style="color:var(--text2)">안정적 자본효율</div></div>
+  </div>
+
+  <div class="divider">손익계산서 (IS)</div>
+  <div class="section-grid">
+    <div class="section-card"><div class="section-title">분기 매출 · 영업이익 추이 <span class="section-badge yellow">26Q1 예상</span></div><div class="chart-wrap"><canvas id="gls-is-chart"></canvas></div></div>
+    <div class="section-card"><div class="section-title">수익성 비율 추이</div><div class="chart-wrap"><canvas id="gls-margin-chart"></canvas></div></div>
+  </div>
+  <div class="divider">재무비율 · 투자 인사이트</div>
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="section-title">주요 재무비율 <span class="section-badge yellow">이벤트 드리븐</span></div>
+      <table class="fin-table"><thead><tr><th>항목</th><th>26Q1(E)</th><th>25Q4</th><th>25Q3</th><th>25Q2</th></tr></thead><tbody>
+        <tr><td>매출액 (억)</td><td>65,000</td><td class="num-pos">71,200</td><td>68,400</td><td>66,800</td></tr>
+        <tr><td>영업이익 (억)</td><td>2,700</td><td class="num-pos">2,990</td><td>2,840</td><td>2,650</td></tr>
+        <tr><td>영업이익률 (%)</td><td>4.2</td><td>4.2</td><td>4.2</td><td>4.0</td></tr>
+        <tr><td>YoY 매출</td><td class="num-pos">+5%</td><td class="num-pos">+8%</td><td class="num-pos">+7%</td><td class="num-pos">+6%</td></tr>
+      </tbody></table>
+    </div>
+    <div class="section-card"><div class="section-title">투자 인사이트</div><div class="insight-block">
+      <div class="insight-row"><div class="insight-dot dot-green"></div>현대차그룹 전속 물류 본업은 PER 10배대. 이벤트를 제외해도 밸류에이션 하방이 제한적.</div>
+      <div class="insight-row"><div class="insight-dot dot-green"></div>BD IPO 성사 시 지분 11.25% 가치 재평가. 6월 공식 발표 여부가 핵심 트리거.</div>
+      <div class="insight-row"><div class="insight-dot dot-red"></div>이벤트 무기 연기 시 195,000원 손절. 목표가는 270,000원부터 분할 익절.</div>
+    </div></div>
+  </div>
+</div>
+
 </div><!-- /main -->
 
 <script>
@@ -1526,6 +1627,20 @@ makeBar('apr-is-chart', qShort9,
 makeLine('apr-margin-chart', qShort9,
   [{ label:'영업이익률', data:[18.6,18.0,15.7,16.3,20.5,25.8,24.9,23.8,25.7], borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.08)', tension:.4, fill:true, pointRadius:3 },
    { label:'ROE', data:[8.1,7.8,5.7,13.4,14.5,16.3,21.4,22.2,null], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.05)', tension:.4, fill:false, pointRadius:3 }]
+);
+
+// ★ 삼성전기 — AI 서버향 MLCC·FC-BGA 동반 성장
+const secLabels=['24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'];
+makeBar('sec-is-chart',secLabels,[19800,20100,19600,21840,22350,24180,25060],[1200,1450,1100,1980,2100,2650,2806],'억',true);
+makeLine('sec-margin-chart',secLabels,
+  [{label:'영업이익률',data:[6.1,7.2,5.6,9.1,9.4,11.0,11.2],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.08)',tension:.4,fill:true,pointRadius:3}]
+);
+
+// ★ 현대글로비스 — BD IPO 이벤트 드리븐
+const glsLabels=['24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1(E)'];
+makeBar('gls-is-chart',glsLabels,[61800,63200,65100,66800,68400,71200,65000],[2400,2500,2580,2650,2840,2990,2700],'억',true);
+makeLine('gls-margin-chart',glsLabels,
+  [{label:'영업이익률',data:[3.9,4.0,4.0,4.0,4.2,4.2,4.2],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.08)',tension:.4,fill:true,pointRadius:3}]
 );
 
 // ★ 두산에너빌리티 — 26Q1 컨센서스: 매출 3.8조, 영업이익 1,449억 YoY +400% (4/29 발표)
@@ -1652,6 +1767,30 @@ const SCORE_DATA = {
     },
     sector: '뷰티',
     highlight: '보유종목 중 밸류에이션 최우수. ROE 22% + PBR 1.45배 = 기대수익 15%.',
+  },
+  sec: {
+    axes: {
+      수익성:   { score: 78, note: 'OPM 11.2% · YoY 이익 +40%' },
+      성장성:   { score: 82, note: 'MLCC +25% · FC-BGA +60%+' },
+      재무안정: { score: 75, note: '전자부품 대형주 · 안정적 재무' },
+      자본효율: { score: 68, note: 'ROE 8.5% · 개선 초기' },
+      밸류에이션:{ score: 72, note: 'AI 서버 프리미엄 반영 중' },
+      모멘텀:   { score: 85, note: 'AI 서버 MLCC·FC-BGA 동시 성장' },
+    },
+    sector: '전자부품',
+    highlight: 'AI 서버 MLCC+FC-BGA 동시 성장. 실적 대비 저평가 구간.',
+  },
+  gls: {
+    axes: {
+      수익성:   { score: 52, note: 'OPM 4.2% · 물류 본업 안정' },
+      성장성:   { score: 58, note: '25Q4 매출 YoY +8%' },
+      재무안정: { score: 72, note: '현대차그룹 전속 물류 기반' },
+      자본효율: { score: 65, note: 'ROE 11.3% · 안정적' },
+      밸류에이션:{ score: 75, note: 'PER 10배대 · PBR 1.08배' },
+      모멘텀:   { score: 80, note: 'BD IPO 6월 결단 기한' },
+    },
+    sector: '물류/자동차',
+    highlight: 'BD IPO 이벤트 드리븐. 본업 PER 10배 저평가 + 지분가치 옵션.',
   },
   doe: {
     axes: {
@@ -1857,6 +1996,22 @@ const VAL_DATA = {
     note: '기대수익률 15.3% — 보유 종목 중 최고. 브랜드·채널 가치가 장부에 미반영. ROE 22% 기업이 PBR 1.45배에 거래되는 건 명확한 저평가. 적정 PBR 1.85배 대비 23% 업사이드 여지.',
     sector: '뷰티',
   },
+  sec: {
+    bps: 185000, currentPrice: 1850000,
+    pbr: 10.0, roe: 8.5,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: 'AI 서버 수요 구조적 성장 반영 중. 실적 개선 속도 대비 밸류 부담 있으나 FC-BGA 성장 프리미엄 정당화 가능.',
+    sector: '전자부품',
+  },
+  gls: {
+    bps: 215000, currentPrice: 233000,
+    pbr: 1.08, roe: 11.3,
+    fwdRoe: null,
+    reqReturn: 12,
+    note: 'PBR 1.08배 · ROE 11.3% — 본업만으로도 적정가. BD IPO 성사 시 지분 재평가로 추가 업사이드.',
+    sector: '물류/자동차',
+  },
   doe: {
     bps: 17765, currentPrice: 127900,
     pbr: 7.20, roe: 0.67,
@@ -1967,7 +2122,7 @@ function renderValuation(stockId) {
 /* ═══════════════════════════════════════
    INVESTMENT THESIS
 ═══════════════════════════════════════ */
-const THESIS_PANEL_MAP={skh:'SKH',hwa:'HWA',tw:'TWI',isc:'ISC',apr:'APR',doe:'DSE',mia:'MIA',abl:'ABL'};
+const THESIS_PANEL_MAP={skh:'SKH',hwa:'HWA',tw:'TWI',isc:'ISC',apr:'APR',sec:'SEC',gls:'GLS',doe:'DSE',mia:'MIA',abl:'ABL'};
 const THESIS_ACTION_LABELS={hold:'홀딩',buyMore:'추가매수',sell:'익절',stopLoss:'손절'};
 const THESIS_DIR_LABELS={bull:'호재',bear:'리스크',neutral:'대기'};
 const ANALYSIS_SB=window.supabase.createClient('https://opcosixoerzfkpenquda.supabase.co','sb_publishable_plNylzYWa7aI20LGPEFS0Q_8ZjRft53');
