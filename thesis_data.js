@@ -368,7 +368,7 @@ const THESIS_DATA = {
   },
 
   /* ═══════════════════════════════════════
-     SEC — 삼성전기 (진입 예정)
+     SEC — 삼성전기 (진입 완료)
   ═══════════════════════════════════════ */
   SEC: {
     oneLiner: "MLCC + FC-BGA 실적 폭발 — AI 서버 핵심 부품 공급자, 아직 저평가 구간",
@@ -376,7 +376,7 @@ const THESIS_DATA = {
       "26Q1 영업이익 2,806억 YoY +40% — AI 서버향 MLCC·FC-BGA 동시 성장.",
       "FC-BGA 기판 AI 서버 채택률 급증 — HBM 패키징 핵심 부품.",
       "MLCC 가격 상승 + 물량 증가 동시 진행 — 공급 부족 구조.",
-      "실적 대비 주가 상승 미흡 — 저평가 가능성. TIGER우주 익절 자금 배치 대상."
+      "실적 대비 주가 상승 미흡 — 저평가 가능성. 1차 1,830,000원 1주 진입 완료 (2026.06.02)."
     ],
     bull: [
       "AI 서버 투자 확대 → MLCC·FC-BGA 수요 구조적 증가",
@@ -388,7 +388,7 @@ const THESIS_DATA = {
       "삼성전자 스마트폰 부진 시 소비자용 MLCC 수요 영향",
       "중국 경쟁사 MLCC 저가 공세 지속",
       "FC-BGA 경쟁사(LG이노텍 등) 증설 경쟁",
-      "미보유 — 진입 타이밍 미스 리스크"
+      "1주 소량 진입 — 급락 변동성 구간에서 추가 분할매수 타이밍 관리 필요"
     ],
     catalysts: [
       { date: "2026-하반기", event: "Q2/Q3 실적 — AI 서버향 매출 비중 공개", direction: "bull", action: "AI 매출 30%+ 확인 시 1차 진입 실행" },
@@ -396,12 +396,12 @@ const THESIS_DATA = {
       { date: "2026-상시", event: "MLCC 가격 하락 전환", direction: "bear", action: "진입 보류 · 기존 계획 재검토" }
     ],
     actions: {
-      hold:     "미보유 — TIGER우주 익절 자금(약 480만) 실탄 확보 후 진입 예정",
-      buyMore:  "1차: 185~190만원 1주 · 2차: 170~175만원 1주 · 3차: 155~160만원 1주",
+      hold:     "1차 1주 진입 완료. AI 서버향 MLCC·FC-BGA 성장 추세 확인하며 홀딩",
+      buyMore:  "2차: 170~175만원 1주 · 3차: 155~160만원 1주",
       sell:     "250만원 이상 도달 시 분할 익절",
       stopLoss: "MLCC 가격 하락 추세 전환 + AI 서버 수요 둔화 동시 확인 시 재검토"
     },
-    myPosition: { qty: 0, avg: 0, stopPrice: null, targetPrice: 2500000 },
+    myPosition: { qty: 1, avg: 1830000, stopPrice: null, targetPrice: 2500000 },
     updatedAt: "2026-06-02"
   },
 

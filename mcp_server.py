@@ -147,13 +147,18 @@ def add_trade(
     price: int,
     account: str,
     memo: str = "",
+    ticker: Optional[str] = None,
+    naver: Optional[str] = None,
 ) -> str:
     """
     매수/매도 기록을 추가하고 holdings를 자동 업데이트한다.
     trade_type: 'buy' | 'sell' | 'loss'
     account:    'kiwoom' | 'toss'
+    ticker:     신규 종목의 거래소 종목코드 — 예: 삼성전기 '009150'
+    naver:      네이버 종목코드 — 생략 시 ticker 사용
     매수 시 — qty·평단 재계산. 신규 종목이면 holdings에 자동 생성.
     매도/손절 시 — qty 차감, 전량이면 holdings에서 제거. pnl 자동 계산.
+    예수금은 매수 시 차감, 매도/손절 시 매도금액만큼 증가한다. (수수료 제외)
     """
     try:
         today = datetime.date.today().isoformat()
@@ -161,6 +166,12 @@ def add_trade(
         # 기존 holdings 조회 (pnl 계산 + qty 업데이트용)
         existing = sb.from_("holdings").select("*").eq("id", stock_id).execute().data
         holding  = existing[0] if existing else None
+        cash_account = holding["account"] if holding else account
+        cash_rows = sb.from_("cash").select("amount").eq("account", cash_account).execute().data
+        if trade_type == "buy" and not holding and not ticker:
+            return "오류: 신규 종목 매수 시 ticker(거래소 종목코드)가 필요합니다."
+        if trade_type == "buy" and cash_rows and cash_rows[0]["amount"] < price * qty:
+            return f"오류: {cash_account} 예수금 부족 — {cash_rows[0]['amount']:,}원"
 
         # sell/loss 시 pnl 자동 계산
         pnl = None
@@ -198,8 +209,8 @@ def add_trade(
                 sb.from_("holdings").insert({
                     "id":            stock_id,
                     "account":       account,
-                    "ticker":        stock_id,
-                    "naver":         stock_id,
+                    "ticker":        ticker,
+                    "naver":         naver or ticker,
                     "name":          name,
                     "qty":           qty,
                     "avg":           price,
@@ -220,11 +231,20 @@ def add_trade(
             else:
                 holding_msg = "⚠ holdings에 해당 종목 없음 (trade_log만 기록됨)"
 
+        # ③ cash UPDATE (수수료 제외)
+        cash_msg = ""
+        if cash_rows:
+            old_cash = cash_rows[0]["amount"]
+            cash_delta = -price * qty if trade_type == "buy" else price * qty
+            new_cash = old_cash + cash_delta
+            sb.from_("cash").update({"amount": new_cash}).eq("account", cash_account).execute()
+            cash_msg = f"\n예수금 업데이트 — {old_cash:,} → {new_cash:,}원"
+
         pnl_str = f" | 실현손익 {pnl:+,}원" if pnl is not None else ""
         return (
             f"✅ 거래 기록 완료\n"
             f"{today}  {trade_type.upper()}  {name}  {qty}주 @ {price:,}원{pnl_str}\n"
-            f"{holding_msg}"
+            f"{holding_msg}{cash_msg}"
         )
     except Exception as e:
         return f"오류: {e}"

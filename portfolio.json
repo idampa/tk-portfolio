@@ -1,7 +1,7 @@
 {
   "last_updated": "2026-05-21T23:14:22.836624+09:00",
   "cash": {
-    "kiwoom": 35672725,
+    "kiwoom": 33842725,
     "toss": 2917
   },
   "holdings": {
@@ -65,6 +65,16 @@
         "avg": 233000,
         "current_price": 232500,
         "prev_price": 242500
+      },
+      {
+        "id": "SEC",
+        "ticker": "009150",
+        "naver": "009150",
+        "name": "삼성전기",
+        "qty": 1,
+        "avg": 1830000,
+        "current_price": 1813000,
+        "prev_price": 2005000
       }
     ],
     "toss": [
@@ -193,6 +203,16 @@
     ]
   },
   "trade_log": [
+    {
+      "date": "2026-06-02",
+      "id": "SEC",
+      "name": "삼성전기",
+      "type": "buy",
+      "qty": 1,
+      "price": 1830000,
+      "pnl": null,
+      "memo": "AI 서버향 MLCC·FC-BGA 성장 확인 · 1차 진입"
+    },
     {
       "date": "2026-06-02",
       "id": "GLS",

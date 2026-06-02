@@ -1694,7 +1694,7 @@ canvas { display: block; }
   <div id="panel-analysis">
     <div class="sec-head" style="margin-top:4px;">
       <div class="sec-title">STOCK SCORE BOARD</div>
-      <div class="sec-badge" id="strategy-score-badge">보유 8종목</div>
+      <div class="sec-badge" id="strategy-score-badge">보유 종목 로드 중</div>
     </div>
     <div id="strategy-score-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;"></div>
     <button onclick="window.open('https://idampa.github.io/tk-portfolio/stock_analysis.html','_blank')" class="action-btn primary" style="margin-bottom:10px;">
@@ -2313,6 +2313,7 @@ canvas { display: block; }
       <div class="price-item"><label>ISC</label><input id="p-ISC" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>에이피알</label><input id="p-APR" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
       <div class="price-item"><label>현대글로비스</label><input id="p-GLS" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
+      <div class="price-item"><label>삼성전기</label><input id="p-SEC" type="text" inputmode="numeric" oninput="fmtInput(this)"></div>
     </div>
     <div class="label-xs" style="margin:8px 0;">토스 종목</div>
     <div class="price-grid">
@@ -2376,7 +2377,7 @@ canvas { display: block; }
 // ─── Supabase에서 동적 로드 ───
 let HOLDINGS={kiwoom:[],toss:[]};
 let PERSISTENT_HISTORY=[];
-let PRICES={GLS:233000};
+let PRICES={GLS:233000,SEC:1813000};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
 
@@ -2465,10 +2466,11 @@ const SIM_DEFAULTS={
   MIA:{qty:60,avg:71927,cur:69000,budget:3000000,target:100000,reinvest:90000,stop:60000,final_p:130000},
   TIG:{qty:464,avg:11164,cur:13895,budget:2000000,target:16000,reinvest:10000,stop:6000,final_p:20000},
   ABL:{qty:13,avg:139100,cur:118300,budget:2000000,target:200000,reinvest:130000,stop:97000,final_p:280000},
+  SEC:{qty:1,avg:1830000,cur:1813000,budget:5000000,target:2500000,reinvest:1750000,stop:1500000,final_p:3000000},
 };
 
-const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS'};
-const NAVER_CODES={SKH:'000660',HWA:'012450',TWI:'089030',ISC:'095340',APR:'278470',DSE:'034020',MIA:'006800',TIG:'0183J0',ABL:'298380',GLS:'086280'};
+const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS',SEC:'009150.KS'};
+const NAVER_CODES={SKH:'000660',HWA:'012450',TWI:'089030',ISC:'095340',APR:'278470',DSE:'034020',MIA:'006800',TIG:'0183J0',ABL:'298380',GLS:'086280',SEC:'009150'};
 const WATCH_CODES={
   OCI:{code:'010060',elIds:['wp-OCI-w']},
   GNC:{code:'119850',elIds:['wp-GNC','wp-GNC-w','wp-GNC-s']},
@@ -2484,6 +2486,7 @@ const PROFIT_MONTHLY_REAL=[];
 let profitMode='stock';
 
 const TRADE_LOG=[
+  {m:6,date:'06.02',name:'삼성전기',type:'buy',detail:'1주 · 1,830,000원 · 1차진입',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인'},
   {m:6,date:'06.02',name:'현대글로비스',type:'buy',detail:'20주 · 233,000원 · 1차진입 · 손절 195,000',pnl:null,memo:'BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절'},
   {m:5,date:'05.15',name:'TIGER 미국우주테크',type:'buy',detail:'60주 · 14,050원 · 평단11,164 · 잔고464주',pnl:null,memo:'스페이스X IPO 6월 로드쇼 앞두고 추매'},
   {m:5,date:'05.15',name:'SK하이닉스',type:'buy',detail:'5주 · 평균1,841,398원 · 평단1,168,646 · 잔고26주',pnl:null,memo:'코스닥 -5% 하락장 저점 분할 추매'},
@@ -2527,6 +2530,7 @@ const AN_SCORES = {
   MIA:{name:'미래에셋',sector:'증권',grade:'B+',total:65,color:'#4d8bff'},
   ABL:{name:'에이비엘',sector:'바이오',grade:'C+',total:47,color:'#a855f7'},
   GLS:{name:'현대글로비스',sector:'물류/자동차',grade:'B+',total:62,color:'#ffb938'},
+  SEC:{name:'삼성전기',sector:'전자부품',grade:'B+',total:77,color:'#4d8bff'},
 };
 
 const SUPABASE_URL='https://opcosixoerzfkpenquda.supabase.co';
@@ -3010,7 +3014,8 @@ function renderStockList(acct){
       {label:'HBM · 반도체',ids:['SKH','ISC','TWI']},
       {label:'방산 · 우주',ids:['HWA']},
       {label:'소비재',ids:['APR']},
-      {label:'물류 · 자동차',ids:['GLS']}
+      {label:'물류 · 자동차',ids:['GLS']},
+      {label:'전자부품',ids:['SEC']}
     ],
     toss:[
       {label:'에너지 · 원전',ids:['DSE']},
@@ -3450,7 +3455,7 @@ function renderStockChart(id){
    STRATEGY TAB
 ═══════════════════════════════════════ */
 const CATALYST_NAMES={SKH:'SK하이닉스',HWA:'한화에어로스페이스',TIG:'TIGER미국우주테크',TWI:'테크윙',ISC:'ISC',APR:'에이피알',DSE:'두산에너빌리티',MIA:'미래에셋증권',ABL:'에이비엘바이오',SEC:'삼성전기',GLS:'현대글로비스'};
-const CATALYST_FILTERS=['all','SKH','HWA','TIG','TWI','ISC','APR','DSE','MIA','ABL','GLS'];
+const CATALYST_FILTERS=['all','SKH','HWA','TIG','TWI','ISC','APR','DSE','MIA','ABL','GLS','SEC'];
 const CATALYST_DIR={
   bull:{label:'호재',color:'var(--profit)',bg:'rgba(63,182,139,0.12)',border:'rgba(63,182,139,0.3)'},
   bear:{label:'리스크',color:'var(--loss)',bg:'rgba(217,108,117,0.12)',border:'rgba(217,108,117,0.3)'},
@@ -3841,6 +3846,7 @@ function renderStrategyScoreGrid(){
 
   // Score cards
   const allStocks=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  const badge=el('strategy-score-badge');if(badge)badge.textContent='보유 '+allStocks.length+'종목';
   allStocks.filter(h=>AN_SCORES[h.id]).forEach(h=>{
     const sc=AN_SCORES[h.id];const cur=PRICES[h.id];const pnl=(cur-h.avg)*h.qty;const pnlPct=parseFloat(((cur-h.avg)/h.avg*100).toFixed(1));const isUp=pnl>=0;
     const gc=gradeColor(sc.grade);const sc100=sc.total;const barColor=sc100>=80?'var(--profit)':sc100>=65?'var(--accent)':sc100>=50?'var(--gold)':'var(--loss)';
