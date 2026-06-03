@@ -118,6 +118,49 @@ body {
 .stock-panel { display: none; }
 .stock-panel.active { display: block; }
 
+/* 종목 내부 서브탭 */
+.stock-subtabs {
+  display: flex;
+  gap: 2px;
+  margin: -4px 0 14px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.stock-subtabs::-webkit-scrollbar { display: none; }
+.stock-subtab {
+  flex: 1;
+  min-width: 108px;
+  padding: 11px 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text3);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Pretendard', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.stock-subtab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.stock-tab-panel { display: none; }
+.stock-tab-panel.active { display: block; }
+.stock-tab-panel > .kpi-grid:first-child { margin-top: 0; }
+
+@media (max-width: 520px) {
+  .stock-subtabs { margin-bottom: 12px; }
+  .stock-subtab {
+    flex: 0 0 auto;
+    min-width: 116px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+}
+
 /* 종목 헤더 */
 .stock-header {
   display: flex;
@@ -2166,7 +2209,8 @@ function renderAllThesis(){
   Object.entries(THESIS_PANEL_MAP).forEach(([panelId,ticker])=>{
     const panel=document.getElementById('panel-'+panelId);if(!panel)return;
     panel.querySelector('.thesis-wrap')?.remove();
-    panel.insertAdjacentHTML('beforeend',renderThesis(ticker));
+    const thesisPanel=panel.querySelector('.stock-tab-panel[data-stock-tab="thesis"]');
+    (thesisPanel||panel).insertAdjacentHTML('beforeend',renderThesis(ticker));
   });
 }
 async function loadAnalysisHoldings(){
@@ -2177,56 +2221,140 @@ async function loadAnalysisHoldings(){
     data.forEach(h=>{HOLDINGS[h.id]=h;PRICES[h.id]=h.current_price||h.avg;});
   }catch(e){console.warn('Supabase holdings 로드 실패, Thesis fallback 사용:',e);}
   renderAllThesis();
+  organizeAllStockPanels();
 }
 
-// 탭 전환
-function showStock(id) {
-  document.querySelectorAll('.stock-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.stock-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+const STOCK_SUBTABS=[
+  {id:'thesis',label:'📋 Thesis'},
+  {id:'performance',label:'📈 실적분석'},
+  {id:'valuation',label:'💰 밸류에이션'}
+];
 
-  // 종합점수 섹션 동적 삽입
-  const panel = document.getElementById('panel-' + id);
+function resizeVisibleCharts(panel){
+  if(!panel||typeof Chart==='undefined')return;
+  panel.querySelectorAll('canvas').forEach(canvas=>{
+    const chart=Chart.getChart(canvas);
+    if(chart)chart.resize();
+  });
+}
+
+function switchStockSubtab(stockId,tabId='thesis'){
+  const panel=document.getElementById('panel-'+stockId);
+  if(!panel)return;
+  panel.querySelectorAll('.stock-subtab').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.tab===tabId);
+  });
+  panel.querySelectorAll('.stock-tab-panel').forEach(tab=>{
+    tab.classList.toggle('active',tab.dataset.stockTab===tabId);
+  });
+  setTimeout(()=>resizeVisibleCharts(panel),60);
+}
+window.switchStockSubtab=switchStockSubtab;
+
+function ensureDynamicSections(panel,id){
+  if(!panel)return;
   if (!panel.querySelector('.score-section')) {
     const kpiGrid = panel.querySelector('.kpi-grid');
     if (kpiGrid) {
       kpiGrid.insertAdjacentHTML('beforebegin', renderScore(id));
     }
   }
-  setTimeout(() => drawRadar(id), 50);
-
-  // 밸류에이션 섹션 동적 삽입
-  const existing = panel.querySelector('.val-section');
-  if (!existing) {
+  if (!panel.querySelector('.val-section')) {
     const divider = panel.querySelector('.divider');
     if (divider) {
       divider.insertAdjacentHTML('beforebegin', renderValuation(id));
     }
   }
+  drawRadar(id);
 }
+
+function organizeStockPanel(id,activeTab='thesis'){
+  const panel=document.getElementById('panel-'+id);
+  if(!panel)return;
+  ensureDynamicSections(panel,id);
+  if(!panel.querySelector('.thesis-wrap')){
+    const ticker=THESIS_PANEL_MAP[id];
+    if(ticker)panel.insertAdjacentHTML('beforeend',renderThesis(ticker));
+  }
+
+  if(!panel.querySelector(':scope > .stock-subtabs')){
+    const subtabs=document.createElement('div');
+    subtabs.className='stock-subtabs';
+    subtabs.innerHTML=STOCK_SUBTABS.map(tab=>`<button type="button" class="stock-subtab" data-stock="${id}" data-tab="${tab.id}">${tab.label}</button>`).join('');
+
+    const thesisPanel=document.createElement('div');
+    thesisPanel.className='stock-tab-panel';
+    thesisPanel.dataset.stockTab='thesis';
+    const performancePanel=document.createElement('div');
+    performancePanel.className='stock-tab-panel';
+    performancePanel.dataset.stockTab='performance';
+    const valuationPanel=document.createElement('div');
+    valuationPanel.className='stock-tab-panel';
+    valuationPanel.dataset.stockTab='valuation';
+
+    const header=panel.querySelector('.stock-header');
+    if(header)header.after(subtabs,thesisPanel,performancePanel,valuationPanel);
+    else panel.prepend(subtabs,thesisPanel,performancePanel,valuationPanel);
+  }
+
+  const thesisPanel=panel.querySelector('.stock-tab-panel[data-stock-tab="thesis"]');
+  const performancePanel=panel.querySelector('.stock-tab-panel[data-stock-tab="performance"]');
+  const valuationPanel=panel.querySelector('.stock-tab-panel[data-stock-tab="valuation"]');
+  const score=panel.querySelector('.score-section');
+  const valuation=panel.querySelector('.val-section');
+  const kpi=panel.querySelector('.kpi-grid');
+  const thesis=panel.querySelector('.thesis-wrap');
+
+  if(score&&score.parentElement!==valuationPanel)valuationPanel.appendChild(score);
+  if(valuation&&valuation.parentElement!==valuationPanel)valuationPanel.appendChild(valuation);
+  if(kpi&&kpi.parentElement!==thesisPanel)thesisPanel.prepend(kpi);
+  if(thesis&&thesis.parentElement!==thesisPanel)thesisPanel.appendChild(thesis);
+
+  Array.from(panel.children).forEach(child=>{
+    if(child.classList.contains('stock-header')||
+      child.classList.contains('stock-subtabs')||
+      child.classList.contains('stock-tab-panel'))return;
+    performancePanel.appendChild(child);
+  });
+
+  switchStockSubtab(id,activeTab);
+}
+
+function organizeAllStockPanels(){
+  Object.keys(THESIS_PANEL_MAP).forEach(id=>organizeStockPanel(id,'thesis'));
+}
+
+// 탭 전환
+function showStock(id) {
+  document.querySelectorAll('.stock-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.stock-tab').forEach(t => t.classList.remove('active'));
+
+  const panel = document.getElementById('panel-' + id);
+  if(!panel)return;
+  panel.classList.add('active');
+  const clickedTab = document.querySelector(`.stock-tab[onclick*="'${id}'"]`);
+  if(clickedTab)clickedTab.classList.add('active');
+
+  organizeStockPanel(id,'thesis');
+  setTimeout(() => {
+    drawRadar(id);
+    resizeVisibleCharts(panel);
+  }, 60);
+}
+window.showStock=showStock;
 
 // 초기 로드 시 첫 번째 패널
 window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click',e=>{
+    const subtab=e.target.closest('.stock-subtab');
+    if(!subtab)return;
+    switchStockSubtab(subtab.dataset.stock,subtab.dataset.tab);
+  });
   renderAllThesis();
+  organizeAllStockPanels();
   loadAnalysisHoldings();
   const firstPanel = document.querySelector('.stock-panel.active');
-  if (firstPanel) {
-    const id = firstPanel.id.replace('panel-', '');
-
-    // 종합점수 삽입
-    const kpiGrid = firstPanel.querySelector('.kpi-grid');
-    if (kpiGrid && !firstPanel.querySelector('.score-section')) {
-      kpiGrid.insertAdjacentHTML('beforebegin', renderScore(id));
-    }
-    setTimeout(() => drawRadar(id), 100);
-
-    // 밸류에이션 삽입
-    const divider = firstPanel.querySelector('.divider');
-    if (divider && !firstPanel.querySelector('.val-section')) {
-      divider.insertAdjacentHTML('beforebegin', renderValuation(id));
-    }
-  }
+  if(firstPanel)setTimeout(()=>resizeVisibleCharts(firstPanel),100);
 });
 </script>
 </body>
