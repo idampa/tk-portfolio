@@ -2125,6 +2125,19 @@ canvas { display: block; }
           <button class="memo-edit-btn" onclick="openMemoModal('GLS','현대글로비스')">✏ 메모</button>
         </div>
       </div>
+      <div class="watch-item" data-ticker="SEC">
+        <div class="watch-accent-bar" style="background:var(--accent);"></div>
+        <div class="watch-info">
+          <div class="watch-name">삼성전기 <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">4주</span></div>
+          <div class="watch-sub">평단 1,710,000원 · 현재 <span id="wp-SEC">1,716,000</span>원</div>
+          <div class="watch-cond">매도목표 2,200,000원 · AI 서버향 MLCC·FC-BGA 성장 확인</div>
+          <div class="memo-display" id="memo-SEC" style="display:none;"></div>
+        </div>
+        <div class="watch-right">
+          <div class="watch-status hold">전자부품</div>
+          <button class="memo-edit-btn" onclick="openMemoModal('SEC','삼성전기')">✏ 메모</button>
+        </div>
+      </div>
     </div>
 
     <!-- 진입 검토 -->
@@ -2377,9 +2390,34 @@ canvas { display: block; }
 // ─── Supabase에서 동적 로드 ───
 let HOLDINGS={kiwoom:[],toss:[]};
 let PERSISTENT_HISTORY=[];
-let PRICES={GLS:233000,SEC:1813000};
+let PRICES={GLS:233000,SEC:1716000};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
+const LOCAL_HOLDING_OVERRIDES={
+  SEC:{id:'SEC',account:'kiwoom',ticker:'009150',naver:'009150',name:'삼성전기',qty:4,avg:1710000,current_price:1716000,prev_price:1813000}
+};
+const LOCAL_TRADE_LOG_OVERRIDES=[
+  {m:6,date:'06.04',name:'삼성전기',type:'buy',detail:'3주 · 1,670,000원 · 2차매수 · 평단 1,710,000',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인. 매도목표 2,200,000원'},
+  {m:6,date:'06.01',name:'삼성전기',type:'buy',detail:'1주 · 1,830,000원 · 1차진입',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인'}
+];
+
+function applyLocalHoldingOverrides(){
+  Object.values(LOCAL_HOLDING_OVERRIDES).forEach(h=>{
+    Object.keys(HOLDINGS).forEach(account=>{
+      HOLDINGS[account]=HOLDINGS[account].filter(x=>x.id!==h.id);
+    });
+    if(HOLDINGS[h.account])HOLDINGS[h.account].push({...h});
+    PRICES[h.id]=h.current_price||h.avg;
+    PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
+  });
+}
+
+function applyLocalTradeLogOverrides(){
+  TRADE_LOG.splice(0,TRADE_LOG.length,
+    ...LOCAL_TRADE_LOG_OVERRIDES,
+    ...TRADE_LOG.filter(t=>!(t.name==='삼성전기'&&t.type==='buy'))
+  );
+}
 
 async function loadPortfolioJson(){
   try{
@@ -2396,6 +2434,7 @@ async function loadPortfolioJson(){
       PRICES[h.id]=h.current_price||h.avg;
       PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
     }
+    applyLocalHoldingOverrides();
     for(const c of cData) CASH[c.account]=c.amount;
 
     // 실현손익 (종목별) — 같은 종목 여러 번 매도 시 합산
@@ -2430,6 +2469,7 @@ async function loadPortfolioJson(){
           pnl:t.pnl!=null?(t.pnl>=0?'+':'')+Math.round(t.pnl/10000)+'만':null,
           memo:t.memo||''};
       }));
+      applyLocalTradeLogOverrides();
     }
     console.log('Supabase 로드 완료:',Object.keys(PRICES).length+'종목');
   }catch(e){
@@ -2466,7 +2506,7 @@ const SIM_DEFAULTS={
   MIA:{qty:60,avg:71927,cur:69000,budget:3000000,target:100000,reinvest:90000,stop:60000,final_p:130000},
   TIG:{qty:464,avg:11164,cur:13895,budget:2000000,target:16000,reinvest:10000,stop:6000,final_p:20000},
   ABL:{qty:13,avg:139100,cur:118300,budget:2000000,target:200000,reinvest:130000,stop:97000,final_p:280000},
-  SEC:{qty:1,avg:1830000,cur:1813000,budget:5000000,target:2500000,reinvest:1750000,stop:1500000,final_p:3000000},
+  SEC:{qty:4,avg:1710000,cur:1716000,budget:5000000,target:2200000,reinvest:1670000,stop:1500000,final_p:2200000},
 };
 
 const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS',SEC:'009150.KS'};
@@ -2478,7 +2518,7 @@ const WATCH_CODES={
   HMG:{code:'053690',elIds:['wp-HMG']},
   SDI:{code:'006400',elIds:['wp-SDI','wp-SDI-s']},
 };
-const WATCH_FROM_PRICES={APR:'wp-APR',MIA:'wp-MIA',DSE:'wp-DSE',TWI:'wp-TWI',ABL:'wp-ABL',GLS:'wp-GLS'};
+const WATCH_FROM_PRICES={APR:'wp-APR',MIA:'wp-MIA',DSE:'wp-DSE',TWI:'wp-TWI',ABL:'wp-ABL',GLS:'wp-GLS',SEC:'wp-SEC'};
 
 // PROFIT_DATA / PROFIT_MONTHLY_REAL: loadPortfolioJson()에서 덮어씀
 const PROFIT_DATA=[];
@@ -2486,7 +2526,8 @@ const PROFIT_MONTHLY_REAL=[];
 let profitMode='stock';
 
 const TRADE_LOG=[
-  {m:6,date:'06.02',name:'삼성전기',type:'buy',detail:'1주 · 1,830,000원 · 1차진입',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인'},
+  {m:6,date:'06.04',name:'삼성전기',type:'buy',detail:'3주 · 1,670,000원 · 2차매수 · 평단 1,710,000',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인. 매도목표 2,200,000원'},
+  {m:6,date:'06.01',name:'삼성전기',type:'buy',detail:'1주 · 1,830,000원 · 1차진입',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인'},
   {m:6,date:'06.02',name:'현대글로비스',type:'buy',detail:'20주 · 233,000원 · 1차진입 · 손절 195,000',pnl:null,memo:'BD IPO 6월 결단 + 풋옵션 만료 압박. 목표 270~300만 분할 익절'},
   {m:5,date:'05.15',name:'TIGER 미국우주테크',type:'buy',detail:'60주 · 14,050원 · 평단11,164 · 잔고464주',pnl:null,memo:'스페이스X IPO 6월 로드쇼 앞두고 추매'},
   {m:5,date:'05.15',name:'SK하이닉스',type:'buy',detail:'5주 · 평균1,841,398원 · 평단1,168,646 · 잔고26주',pnl:null,memo:'코스닥 -5% 하락장 저점 분할 추매'},

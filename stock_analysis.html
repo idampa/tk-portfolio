@@ -1459,10 +1459,10 @@ body {
     </div>
     <div class="my-position">
       <div class="position-label">MY POSITION · 키움</div>
-      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">1주</span></div>
-      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">1,830,000원</span></div>
-      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">1,813,000원</span></div>
-      <div class="position-row"><span class="position-key">목표가</span><span class="position-val val-green">2,500,000원</span></div>
+      <div class="position-row"><span class="position-key">수량</span><span class="position-val val-blue">4주</span></div>
+      <div class="position-row"><span class="position-key">평단가</span><span class="position-val">1,710,000원</span></div>
+      <div class="position-row"><span class="position-key">현재가</span><span class="position-val">1,716,000원</span></div>
+      <div class="position-row"><span class="position-key">목표가</span><span class="position-val val-green">2,200,000원</span></div>
     </div>
   </div>
 
@@ -1494,7 +1494,7 @@ body {
     <div class="section-card"><div class="section-title">투자 인사이트</div><div class="insight-block">
       <div class="insight-row"><div class="insight-dot dot-green"></div>AI 서버향 고용량 MLCC와 FC-BGA가 동시에 성장. 소비자 전자부품 사이클 의존도가 낮아지는 구간.</div>
       <div class="insight-row"><div class="insight-dot dot-green"></div>26Q1 영업이익 2,806억, YoY +40% — 매출 성장보다 이익 레버리지가 빠르게 확대.</div>
-      <div class="insight-row"><div class="insight-dot dot-yellow"></div>1차 1주 183만원 진입 완료. 추가 조정 시 170~175만원 구간에서 2차 분할매수 검토.</div>
+      <div class="insight-row"><div class="insight-dot dot-yellow"></div>6/1 1주 183만원, 6/4 3주 167만원 매수 완료. 총 4주 · 평단 171만원 · 매도목표 220만원.</div>
     </div></div>
   </div>
 </div>
@@ -2041,8 +2041,8 @@ const VAL_DATA = {
     sector: '뷰티',
   },
   sec: {
-    bps: 185000, currentPrice: 1813000,
-    pbr: 9.8, roe: 8.5,
+    bps: 185000, currentPrice: 1716000,
+    pbr: 9.28, roe: 8.5,
     fwdRoe: null,
     reqReturn: 12,
     note: 'AI 서버 수요 구조적 성장 반영 중. 실적 개선 속도 대비 밸류 부담 있으나 FC-BGA 성장 프리미엄 정당화 가능.',
@@ -2172,6 +2172,9 @@ const THESIS_DIR_LABELS={bull:'호재',bear:'리스크',neutral:'대기'};
 const ANALYSIS_SB=window.supabase.createClient('https://opcosixoerzfkpenquda.supabase.co','sb_publishable_plNylzYWa7aI20LGPEFS0Q_8ZjRft53');
 let HOLDINGS={};
 let PRICES={};
+const ANALYSIS_HOLDING_OVERRIDES={
+  SEC:{id:'SEC',name:'삼성전기',account:'kiwoom',qty:4,avg:1710000,current_price:1716000,prev_price:1813000}
+};
 
 function escThesis(v){
   return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2219,6 +2222,10 @@ async function loadAnalysisHoldings(){
     if(error)throw error;
     HOLDINGS={};PRICES={};
     data.forEach(h=>{HOLDINGS[h.id]=h;PRICES[h.id]=h.current_price||h.avg;});
+    Object.values(ANALYSIS_HOLDING_OVERRIDES).forEach(h=>{
+      HOLDINGS[h.id]=h;
+      PRICES[h.id]=h.current_price||h.avg;
+    });
   }catch(e){console.warn('Supabase holdings 로드 실패, Thesis fallback 사용:',e);}
   renderAllThesis();
   organizeAllStockPanels();
