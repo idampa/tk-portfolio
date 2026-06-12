@@ -888,6 +888,7 @@ body {
 .trade-btn:active { opacity: .7; }
 .trade-btn.buy  { color: var(--accent); border-color: rgba(91,140,255,0.35); background: rgba(91,140,255,0.08); }
 .trade-btn.sell { color: var(--profit); border-color: rgba(63,182,139,0.35); background: rgba(63,182,139,0.08); }
+.trade-btn.cash { color: var(--text2); border-color: var(--border2); background: var(--bg3); flex: 0 0 auto; padding: 12px 14px; }
 .trade-err {
   display: none;
   background: rgba(217,108,117,0.1);
@@ -1472,6 +1473,7 @@ canvas { display: block; }
   <div class="trade-action-row anim">
     <button class="trade-btn buy" onclick="openTradeModal('buy')">＋ 매수</button>
     <button class="trade-btn sell" onclick="openTradeModal('sell')">＋ 매도</button>
+    <button class="trade-btn cash" onclick="openCashModal()">💰 예수금</button>
   </div>
 
   <!-- B. 신호 섹션 -->
@@ -2393,6 +2395,25 @@ canvas { display: block; }
     </div>
 
     <button class="save-btn" id="t-save-btn" onclick="saveTrade()">저장</button>
+  </div>
+</div>
+
+<!-- 예수금 수정 모달 -->
+<div class="modal-bg" id="cash-modal-bg" onclick="closeCashModalOutside(event)">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-title">예수금 수정<button class="modal-close" onclick="closeCashModal()">✕</button></div>
+    <div class="trade-err" id="cash-err"></div>
+    <div class="input-grid" style="margin-bottom:14px;">
+      <div>
+        <label class="f-label">키움 예수금</label>
+        <input class="f-input" id="cash-kiwoom" type="text" inputmode="numeric" oninput="fmtInput(this)">
+      </div>
+      <div>
+        <label class="f-label">토스 예수금</label>
+        <input class="f-input" id="cash-toss" type="text" inputmode="numeric" oninput="fmtInput(this)">
+      </div>
+    </div>
+    <button class="save-btn" id="cash-save-btn" onclick="saveCash()">저장</button>
   </div>
 </div>
 
@@ -3833,6 +3854,52 @@ async function refreshAfterTrade(){
   renderProfitBars();
   renderTradeLog();
   setDate();
+}
+
+/* ═══════════════════════════════════════
+   예수금 수정 모달
+═══════════════════════════════════════ */
+function openCashModal(){
+  el('cash-kiwoom').value='';
+  el('cash-toss').value='';
+  el('cash-kiwoom').placeholder=CASH.kiwoom.toLocaleString('ko-KR');
+  el('cash-toss').placeholder=CASH.toss.toLocaleString('ko-KR');
+  el('cash-err').classList.remove('show');
+  el('cash-modal-bg').classList.add('open');
+}
+function closeCashModal(){el('cash-modal-bg').classList.remove('open');}
+function closeCashModalOutside(e){if(e.target===el('cash-modal-bg'))closeCashModal();}
+
+async function saveCash(){
+  const kRaw=el('cash-kiwoom').value.trim();
+  const tRaw=el('cash-toss').value.trim();
+  if(!kRaw&&!tRaw){closeCashModal();return;}
+  const errEl=el('cash-err');
+  const saveBtn=el('cash-save-btn');
+  saveBtn.disabled=true;saveBtn.textContent='저장 중…';
+  errEl.classList.remove('show');
+  try{
+    const now=new Date().toISOString();
+    if(kRaw){
+      const{error}=await _sb.from('cash').update({amount:unFmt(kRaw),updated_at:now}).eq('account','kiwoom');
+      if(error) throw new Error('키움 저장 실패: '+error.message);
+    }
+    if(tRaw){
+      const{error}=await _sb.from('cash').update({amount:unFmt(tRaw),updated_at:now}).eq('account','toss');
+      if(error) throw new Error('토스 저장 실패: '+error.message);
+    }
+    closeCashModal();
+    showToast('예수금 업데이트 완료');
+    await loadPortfolioJson();
+    renderDash();
+    renderGauge(calcCashPct());
+    renderDonut();
+  }catch(e){
+    errEl.textContent=(e&&e.message)||'저장 중 오류가 발생했습니다';
+    errEl.classList.add('show');
+  }finally{
+    saveBtn.disabled=false;saveBtn.textContent='저장';
+  }
 }
 
 /* ═══════════════════════════════════════
