@@ -2394,31 +2394,6 @@ let PRICES={GLS:233000,SEC:1716000};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
 let PLAN={};
-const LOCAL_HOLDING_OVERRIDES={
-  SEC:{id:'SEC',account:'kiwoom',ticker:'009150',naver:'009150',name:'삼성전기',qty:4,avg:1710000,current_price:1716000,prev_price:1813000}
-};
-const LOCAL_TRADE_LOG_OVERRIDES=[
-  {m:6,date:'06.04',name:'삼성전기',type:'buy',detail:'3주 · 1,670,000원 · 2차매수 · 평단 1,710,000',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인. 매도목표 2,200,000원'},
-  {m:6,date:'06.01',name:'삼성전기',type:'buy',detail:'1주 · 1,830,000원 · 1차진입',pnl:null,memo:'AI 서버향 MLCC·FC-BGA 성장 확인'}
-];
-
-function applyLocalHoldingOverrides(){
-  Object.values(LOCAL_HOLDING_OVERRIDES).forEach(h=>{
-    Object.keys(HOLDINGS).forEach(account=>{
-      HOLDINGS[account]=HOLDINGS[account].filter(x=>x.id!==h.id);
-    });
-    if(HOLDINGS[h.account])HOLDINGS[h.account].push({...h});
-    PRICES[h.id]=h.current_price||h.avg;
-    PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
-  });
-}
-
-function applyLocalTradeLogOverrides(){
-  TRADE_LOG.splice(0,TRADE_LOG.length,
-    ...LOCAL_TRADE_LOG_OVERRIDES,
-    ...TRADE_LOG.filter(t=>!(t.name==='삼성전기'&&t.type==='buy'))
-  );
-}
 
 async function loadPortfolioJson(){
   try{
@@ -2450,7 +2425,6 @@ async function loadPortfolioJson(){
       PRICES[h.id]=h.current_price||h.avg;
       PRICES_PREV[h.id]=h.prev_price||h.current_price||h.avg;
     }
-    applyLocalHoldingOverrides();
     for(const c of cData) CASH[c.account]=c.amount;
 
     // 실현손익 (종목별) — 같은 종목 여러 번 매도 시 합산
@@ -2485,7 +2459,6 @@ async function loadPortfolioJson(){
           pnl:t.pnl!=null?(t.pnl>=0?'+':'')+Math.round(t.pnl/10000)+'만':null,
           memo:t.memo||''};
       }));
-      applyLocalTradeLogOverrides();
     }
     console.log('Supabase 로드 완료:',Object.keys(PRICES).length+'종목');
   }catch(e){
