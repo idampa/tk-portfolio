@@ -837,6 +837,62 @@ body {
 [data-theme="dark"] .save-btn { background: rgba(77,139,255,0.2); color: var(--accent); border: 1px solid rgba(77,139,255,0.5); }
 
 /* ═══════════════════════════════════════
+   TRADE ACTION BUTTONS / TOAST
+═══════════════════════════════════════ */
+.trade-action-row { display: flex; gap: 8px; margin: 10px 0 14px; }
+.trade-btn {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 12px;
+  border-radius: 10px;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  min-height: 46px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  transition: opacity .15s;
+}
+.trade-btn:active { opacity: .7; }
+.trade-btn.buy  { color: var(--accent); border-color: rgba(91,140,255,0.35); background: rgba(91,140,255,0.08); }
+.trade-btn.sell { color: var(--profit); border-color: rgba(63,182,139,0.35); background: rgba(63,182,139,0.08); }
+.trade-err {
+  display: none;
+  background: rgba(217,108,117,0.1);
+  border: 1px solid rgba(217,108,117,0.35);
+  color: var(--loss);
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+.trade-err.show { display: block; }
+.toast {
+  position: fixed;
+  left: 50%; bottom: 92px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg2);
+  border: 1px solid var(--profit);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  z-index: 400;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  max-width: 88vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ═══════════════════════════════════════
    CHART WRAPPER
 ═══════════════════════════════════════ */
 .chart-wrap {
@@ -1385,6 +1441,12 @@ canvas { display: block; }
         <div class="home-hero-stat-val" id="home-risk">—</div>
       </div>
     </div>
+  </div>
+
+  <!-- A-2. 거래 기록 버튼 -->
+  <div class="trade-action-row anim">
+    <button class="trade-btn buy" onclick="openTradeModal('buy')">＋ 매수</button>
+    <button class="trade-btn sell" onclick="openTradeModal('sell')">＋ 매도</button>
   </div>
 
   <!-- B. TODAY ACTION -->
@@ -2249,6 +2311,71 @@ canvas { display: block; }
     <button class="save-btn" onclick="saveUpdate()">저장 &amp; 업데이트</button>
   </div>
 </div>
+
+<!-- 거래 기록 모달 (매수/매도) -->
+<div class="modal-bg" id="trade-modal-bg" onclick="closeTradeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title"><span id="trade-modal-title">매수 기록</span><button class="modal-close" onclick="closeTradeModal()">✕</button></div>
+    <div class="trade-err" id="trade-err"></div>
+
+    <div style="margin-bottom:10px;">
+      <label class="f-label">종목</label>
+      <select class="f-input" id="t-stock" onchange="onTradeStockChange()"></select>
+    </div>
+
+    <div id="t-new-fields" style="display:none;">
+      <div style="margin-bottom:10px;">
+        <label class="f-label">새 종목명</label>
+        <input class="f-input" id="t-new-name" type="text" placeholder="예: 삼성전자">
+      </div>
+      <div class="input-grid">
+        <div>
+          <label class="f-label">종목 ID</label>
+          <input class="f-input" id="t-new-id" type="text" placeholder="예: SEC">
+        </div>
+        <div>
+          <label class="f-label">네이버 코드</label>
+          <input class="f-input" id="t-new-naver" type="text" inputmode="numeric" placeholder="예: 009150">
+        </div>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div>
+        <label class="f-label">수량</label>
+        <input class="f-input" id="t-qty" type="text" inputmode="numeric" placeholder="0">
+      </div>
+      <div>
+        <label class="f-label">체결가</label>
+        <input class="f-input" id="t-price" type="text" inputmode="numeric" oninput="fmtInput(this)" placeholder="0">
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div>
+        <label class="f-label">계좌</label>
+        <select class="f-input" id="t-account">
+          <option value="kiwoom">키움</option>
+          <option value="toss">토스</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label">날짜</label>
+        <input class="f-input" id="t-date" type="date">
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label class="f-label">메모 (선택)</label>
+      <input class="f-input" id="t-memo" type="text" placeholder="진입 근거 · 목표가 등">
+    </div>
+
+    <button class="save-btn" id="t-save-btn" onclick="saveTrade()">저장</button>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
 
 <div class="modal-bg" id="trend-modal-bg" onclick="closeTrendModalOutside(event)">
   <div class="modal" style="padding-bottom:32px;">
@@ -3301,6 +3428,193 @@ function saveUpdate(){
   renderGauge(calcCashPct());
   renderDonut();
   renderProfitBars();
+  setDate();
+}
+
+/* ═══════════════════════════════════════
+   거래 기록 모달 (매수/매도) → Supabase 직접 쓰기
+═══════════════════════════════════════ */
+let tradeMode='buy';
+const NEW_STOCK_VAL='__new__';
+
+function showToast(msg){
+  const t=el('toast');if(!t)return;
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+function tradeError(msg){
+  const e=el('trade-err');if(!e)return;
+  e.textContent=msg;
+  e.classList.add('show');
+}
+function clearTradeError(){const e=el('trade-err');if(e)e.classList.remove('show');}
+
+function openTradeModal(mode){
+  tradeMode=mode;
+  clearTradeError();
+  el('trade-modal-title').textContent=mode==='buy'?'매수 기록':'매도 기록';
+  const saveBtn=el('t-save-btn');if(saveBtn)saveBtn.textContent=mode==='buy'?'매수 저장':'매도 저장';
+
+  // 종목 select 채우기
+  const sel=el('t-stock');
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  let opts=all.map(h=>`<option value="${h.id}|${h.account}" data-id="${h.id}" data-account="${h.account}" data-name="${h.name}" data-ticker="${h.ticker||''}" data-naver="${h.naver||''}" data-qty="${h.qty}">${h.name} (${h.account==='kiwoom'?'키움':'토스'} · ${h.qty}주)</option>`).join('');
+  if(mode==='buy') opts+=`<option value="${NEW_STOCK_VAL}">＋ 새 종목</option>`;
+  sel.innerHTML=opts;
+
+  // 입력 초기화
+  el('t-qty').value='';
+  el('t-price').value='';
+  el('t-memo').value='';
+  el('t-new-name').value='';
+  el('t-new-id').value='';
+  el('t-new-naver').value='';
+  const d=new Date();
+  el('t-date').value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  onTradeStockChange();
+  el('trade-modal-bg').classList.add('open');
+}
+function closeTradeModal(){el('trade-modal-bg').classList.remove('open');}
+function closeTradeModalOutside(e){if(e.target===el('trade-modal-bg'))closeTradeModal();}
+
+function onTradeStockChange(){
+  const sel=el('t-stock');
+  const opt=sel.options[sel.selectedIndex];
+  const isNew=sel.value===NEW_STOCK_VAL;
+  el('t-new-fields').style.display=isNew?'block':'none';
+  // 기존 종목 선택 시 계좌 자동 세팅
+  if(!isNew&&opt&&opt.dataset.account){
+    el('t-account').value=opt.dataset.account;
+  }
+}
+
+async function saveTrade(){
+  clearTradeError();
+  const sel=el('t-stock');
+  const opt=sel.options[sel.selectedIndex];
+  const isNew=sel.value===NEW_STOCK_VAL;
+  const qty=unFmt(el('t-qty').value);
+  const price=unFmt(el('t-price').value);
+  const account=el('t-account').value;
+  const date=el('t-date').value;
+  const memo=el('t-memo').value.trim();
+
+  // ─── 입력 검증 ───
+  if(qty<=0) return tradeError('수량을 입력해주세요');
+  if(price<=0) return tradeError('체결가를 입력해주세요');
+
+  let stockId,stockName,ticker,naver;
+  if(isNew){
+    stockName=el('t-new-name').value.trim();
+    stockId=el('t-new-id').value.trim();
+    naver=el('t-new-naver').value.trim();
+    ticker=naver;
+    if(!stockName||!stockId||!naver) return tradeError('종목 정보를 모두 입력해주세요');
+  }else{
+    if(!opt) return tradeError('종목을 선택해주세요');
+    stockId=opt.dataset.id;
+    stockName=opt.dataset.name;
+    ticker=opt.dataset.ticker;
+    naver=opt.dataset.naver;
+  }
+
+  // 기존 보유 조회 (id+account)
+  const allHold=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  const existing=allHold.find(h=>h.id===stockId&&h.account===account);
+
+  if(tradeMode==='sell'){
+    if(!existing) return tradeError('해당 계좌에 보유 중이 아닙니다');
+    if(qty>existing.qty) return tradeError(`보유 수량(${existing.qty}주)을 초과했습니다`);
+  }
+
+  const saveBtn=el('t-save-btn');
+  saveBtn.disabled=true; const _label=saveBtn.textContent; saveBtn.textContent='저장 중…';
+
+  try{
+    if(tradeMode==='buy'){
+      // 1) trade_log INSERT
+      let r=await _sb.from('trade_log').insert({date,stock_id:stockId,name:stockName,type:'buy',qty,price,pnl:null,memo:memo||null});
+      if(r.error) throw new Error('trade_log 기록 실패: '+r.error.message);
+
+      // 2) holdings 처리
+      if(existing){
+        const newQty=existing.qty+qty;
+        const newAvg=Math.round((existing.avg*existing.qty+price*qty)/newQty);
+        r=await _sb.from('holdings').update({qty:newQty,avg:newAvg}).eq('id',stockId).eq('account',account);
+        if(r.error) throw new Error('holdings 갱신 실패: '+r.error.message);
+      }else{
+        r=await _sb.from('holdings').insert({id:stockId,account,ticker,naver,name:stockName,qty,avg:price,current_price:price,prev_price:price});
+        if(r.error) throw new Error('holdings 신규 등록 실패: '+r.error.message);
+      }
+
+      // 3) cash 차감
+      const newCash=(CASH[account]||0)-price*qty;
+      r=await _sb.from('cash').update({amount:newCash}).eq('account',account);
+      if(r.error) throw new Error('cash 갱신 실패: '+r.error.message);
+
+    }else{
+      // ─── 매도 ───
+      const avg=existing.avg;
+      const pnl=(price-avg)*qty;
+      const resultType=pnl>=0?'sell':'loss';
+
+      // 3) trade_log INSERT
+      let r=await _sb.from('trade_log').insert({date,stock_id:stockId,name:stockName,type:resultType,qty,price,pnl,memo:memo||null});
+      if(r.error) throw new Error('trade_log 기록 실패: '+r.error.message);
+
+      // 4) holdings 갱신 or 삭제
+      const remain=existing.qty-qty;
+      if(remain<=0){
+        r=await _sb.from('holdings').delete().eq('id',stockId).eq('account',account);
+        if(r.error) throw new Error('holdings 삭제 실패: '+r.error.message);
+      }else{
+        r=await _sb.from('holdings').update({qty:remain}).eq('id',stockId).eq('account',account);
+        if(r.error) throw new Error('holdings 갱신 실패: '+r.error.message);
+      }
+
+      // 5) cash 가산
+      const newCash=(CASH[account]||0)+price*qty;
+      r=await _sb.from('cash').update({amount:newCash}).eq('account',account);
+      if(r.error) throw new Error('cash 갱신 실패: '+r.error.message);
+
+      // 6) realized_gains INSERT
+      r=await _sb.from('realized_gains').insert({name:stockName,pnl,type:resultType});
+      if(r.error) throw new Error('realized_gains 기록 실패: '+r.error.message);
+
+      // 7) realized_gains_monthly UPSERT (month 형식: '6월')
+      const monthStr=parseInt(date.split('-')[1],10)+'월';
+      const {data:rgmRow,error:rgmSelErr}=await _sb.from('realized_gains_monthly').select('*').eq('month',monthStr).maybeSingle();
+      if(rgmSelErr) throw new Error('월별손익 조회 실패: '+rgmSelErr.message);
+      if(rgmRow){
+        r=await _sb.from('realized_gains_monthly').update({pnl:rgmRow.pnl+pnl}).eq('month',monthStr);
+        if(r.error) throw new Error('월별손익 갱신 실패: '+r.error.message);
+      }else{
+        r=await _sb.from('realized_gains_monthly').insert({month:monthStr,pnl});
+        if(r.error) throw new Error('월별손익 등록 실패: '+r.error.message);
+      }
+    }
+
+    // ─── 성공 ───
+    closeTradeModal();
+    showToast('저장됨 — 보유·평단·손익 반영 완료');
+    await refreshAfterTrade();
+  }catch(e){
+    tradeError((e&&e.message)||'저장 중 오류가 발생했습니다');
+  }finally{
+    saveBtn.disabled=false; saveBtn.textContent=_label;
+  }
+}
+
+async function refreshAfterTrade(){
+  await loadPortfolioJson();
+  renderDash();
+  renderGauge(calcCashPct());
+  renderDonut();
+  renderProfitBars();
+  renderTradeLog();
   setDate();
 }
 
