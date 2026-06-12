@@ -2393,6 +2393,7 @@ let PERSISTENT_HISTORY=[];
 let PRICES={GLS:233000,SEC:1716000};
 let PRICES_PREV={};
 let CASH={kiwoom:0,toss:0};
+let PLAN={};
 const LOCAL_HOLDING_OVERRIDES={
   SEC:{id:'SEC',account:'kiwoom',ticker:'009150',naver:'009150',name:'삼성전기',qty:4,avg:1710000,current_price:1716000,prev_price:1813000}
 };
@@ -2421,12 +2422,27 @@ function applyLocalTradeLogOverrides(){
 
 async function loadPortfolioJson(){
   try{
-    const [{data:hData,error:hErr},{data:cData,error:cErr}]=await Promise.all([
+    const [{data:hData,error:hErr},{data:cData,error:cErr},{data:spData,error:spErr}]=await Promise.all([
       _sb.from('holdings').select('*'),
       _sb.from('cash').select('*'),
+      _sb.from('stock_plan').select('*'),
     ]);
     if(hErr) throw hErr;
     if(cErr) throw cErr;
+    if(spErr) console.warn('stock_plan 로드 실패:', spErr);
+    else if(spData){
+      PLAN={};
+      spData.forEach(r=>{
+        PLAN[r.stock_id]={
+          target:r.target_price,
+          final_p:r.final_target,
+          stop:r.stop_price,
+          reinvest:r.reentry_price,
+          budget:r.budget,
+          thesis:r.thesis,
+        };
+      });
+    }
 
     HOLDINGS={kiwoom:[],toss:[]};
     for(const h of hData){
@@ -2496,18 +2512,6 @@ const HISTORY=[
   {date:'05/15',total:9820,cashPct:2.5,pnl:{SKH:56.5,HWA:0.2,TWI:-19.9,ISC:3.1,APR:2.8,DSE:10.5,MIA:-4.1,TIG:24.4,ABL:-14.9}},
 ];
 
-const SIM_DEFAULTS={
-  SKH:{qty:26,avg:1168646,cur:1833000,budget:10000000,target:1999000,reinvest:1700000,stop:1200000,final_p:2500000},
-  HWA:{qty:3,avg:1220000,cur:1225000,budget:5000000,target:1600000,reinvest:1400000,stop:1000000,final_p:2000000},
-  TWI:{qty:110,avg:62791,cur:50400,budget:3000000,target:80000,reinvest:55000,stop:40000,final_p:100000},
-  ISC:{qty:20,avg:219285,cur:226500,budget:5000000,target:320000,reinvest:280000,stop:180000,final_p:400000},
-  APR:{qty:62,avg:391298,cur:403000,budget:8000000,target:500000,reinvest:450000,stop:320000,final_p:700000},
-  DSE:{qty:12,avg:100442,cur:111000,budget:3000000,target:160000,reinvest:140000,stop:80000,final_p:200000},
-  MIA:{qty:60,avg:71927,cur:69000,budget:3000000,target:100000,reinvest:90000,stop:60000,final_p:130000},
-  TIG:{qty:464,avg:11164,cur:13895,budget:2000000,target:16000,reinvest:10000,stop:6000,final_p:20000},
-  ABL:{qty:13,avg:139100,cur:118300,budget:2000000,target:200000,reinvest:130000,stop:97000,final_p:280000},
-  SEC:{qty:4,avg:1710000,cur:1716000,budget:5000000,target:2200000,reinvest:1670000,stop:1500000,final_p:2200000},
-};
 
 const YAHOO_TICKERS={SKH:'000660.KS',HWA:'012450.KS',TWI:'089030.KS',ISC:'095340.KS',APR:'278470.KS',DSE:'034020.KS',MIA:'006800.KS',TIG:'0183J0.KS',SEC:'009150.KS'};
 const NAVER_CODES={SKH:'000660',HWA:'012450',TWI:'089030',ISC:'095340',APR:'278470',DSE:'034020',MIA:'006800',TIG:'0183J0',ABL:'298380',GLS:'086280',SEC:'009150'};
@@ -2802,16 +2806,16 @@ function renderActionCards(s){
 
   all.forEach(h=>{
     const cur=PRICES[h.id];
-    const d=SIM_DEFAULTS[h.id];
-    if(!d||!cur)return;
+    const d=PLAN[h.id];
+    if(!cur)return;
     const pctVal=((cur-h.avg)/h.avg*100);
-    if(d.target&&cur>=d.target)
+    if(d?.target&&cur>=d.target)
       items.push({type:'urgent',label:'목표가 도달',text:`${h.name} 목표가(${(d.target/10000).toFixed(0)}만) 도달 — 매도 실행 or 상향 검토`});
-    else if(d.target&&cur>=d.target*0.92)
+    else if(d?.target&&cur>=d.target*0.92)
       items.push({type:'caution',label:'매도 준비',text:`${h.name} 목표가 92% 도달(${(cur/10000).toFixed(0)}만) — 매도 준비`});
-    else if(d.stop&&cur<=d.stop*1.05)
+    else if(d?.stop&&cur<=d.stop*1.05)
       items.push({type:'urgent',label:'손절 임박',text:`${h.name} 손절선 5% 근접 — 즉각 대응 필요`});
-    else if(d.stop&&cur<=d.stop*1.12)
+    else if(d?.stop&&cur<=d.stop*1.12)
       items.push({type:'caution',label:'손절 근접',text:`${h.name} 손절선 근접(${(cur/10000).toFixed(0)}만) — 모니터링 강화`});
     else if(pctVal>=40)
       items.push({type:'caution',label:'차익 검토',text:`${h.name} +${pctVal.toFixed(0)}% — 일부 차익실현 검토`});
@@ -2987,7 +2991,7 @@ function renderDailyGain(){
 function makeStockHTML(h){
   const cur=PRICES[h.id],val=cur*h.qty,cost=h.avg*h.qty,p=val-cost,r=pct(h.avg,cur);
   const cls=p>=0?'up':'dn',sign=p>=0?'+':'';
-  const sim=SIM_DEFAULTS[h.id];
+  const sim=PLAN[h.id];
   const nearStop=sim&&sim.stop&&cur<=(sim.stop*1.10);
   let progBar='';
   if(sim&&sim.target&&sim.stop){
@@ -3562,19 +3566,22 @@ function initSimSelect(){
 }
 function simLoadDefaults(){
   const id=el('sim-stock')?.value;
-  const d=SIM_DEFAULTS[id];
+  const d=PLAN[id];
   const bodyEl=el('sim-body');
-  if(!d||!id){if(bodyEl)bodyEl.style.display='none';return;}
+  if(!id){if(bodyEl)bodyEl.style.display='none';return;}
+  if(!d){if(bodyEl)bodyEl.style.display='none';return;}
   if(bodyEl)bodyEl.style.display='block';
+  const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
+  const h=all.find(x=>x.id===id)||{};
   const cur=PRICES[id];
-  el('s-qty').value=d.qty;
-  el('s-avg').value=d.avg.toLocaleString('ko-KR');
-  el('s-cur').value=(cur||d.cur).toLocaleString('ko-KR');
-  el('s-budget').value=d.budget.toLocaleString('ko-KR');
-  el('s-target').value=d.target.toLocaleString('ko-KR');
-  el('s-reinvest').value=d.reinvest.toLocaleString('ko-KR');
-  el('s-stop').value=d.stop.toLocaleString('ko-KR');
-  el('s-final').value=d.final_p.toLocaleString('ko-KR');
+  el('s-qty').value=h.qty||0;
+  el('s-avg').value=(h.avg||0).toLocaleString('ko-KR');
+  el('s-cur').value=(cur||h.avg||0).toLocaleString('ko-KR');
+  el('s-budget').value=(d.budget||0).toLocaleString('ko-KR');
+  el('s-target').value=(d.target||0).toLocaleString('ko-KR');
+  el('s-reinvest').value=(d.reinvest||0).toLocaleString('ko-KR');
+  el('s-stop').value=(d.stop||0).toLocaleString('ko-KR');
+  el('s-final').value=(d.final_p||0).toLocaleString('ko-KR');
   runSim();
 }
 function switchTab(t){
@@ -3674,8 +3681,8 @@ function resetSplit(){initSplitRows();const r=el('split-result');if(r)r.style.di
 function renderScenario(){
   const grid=el('scenario-grid');if(!grid)return;
   const all=[...HOLDINGS.kiwoom,...HOLDINGS.toss];
-  grid.innerHTML=all.filter(h=>SIM_DEFAULTS[h.id]).map(h=>{
-    const d=SIM_DEFAULTS[h.id];
+  grid.innerHTML=all.filter(h=>PLAN[h.id]).map(h=>{
+    const d=PLAN[h.id];
     const cur=PRICES[h.id];
     const targetPnl=d.target?(d.target-h.avg)*h.qty:0;
     const stopPnl=d.stop?(d.stop-h.avg)*h.qty:0;
