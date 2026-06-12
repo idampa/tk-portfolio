@@ -299,6 +299,7 @@ body {
   color: var(--text2); cursor: pointer;
 }
 .signal-btn:active { opacity: .7; }
+.signal-btn.thesis { color: var(--text3); border-color: var(--border); }
 .signal-dismiss {
   margin-left: auto; color: var(--text3); font-size: 10px;
   background: none; border: none; cursor: pointer; padding: 2px 4px;
@@ -2815,7 +2816,7 @@ function renderSignals(){
     // 목표가 도달 (urgent)
     if(d.target&&cur>=d.target){
       if(dismissedSignals.has('target_'+h.id)) return;
-      items.push({level:'urgent',label:'목표가 도달',
+      items.push({level:'urgent',label:'목표가 도달',stockId:h.id,
         text:`${h.name} ${(cur/10000).toFixed(0)}만 — 1차 목표가 ${(d.target/10000).toFixed(0)}만 도달`,
         btns:[{label:'매도 기록',fn:`openTradeModal('sell','${h.id}')`},{label:'목표 수정',fn:`openPlanEditModal('${h.id}')`}],
         dismissKey:'target_'+h.id});
@@ -2823,7 +2824,7 @@ function renderSignals(){
     // 손절선 도달 (urgent)
     else if(d.stop&&cur<=d.stop){
       if(dismissedSignals.has('stop_'+h.id)) return;
-      items.push({level:'urgent',label:'손절선 도달',
+      items.push({level:'urgent',label:'손절선 도달',stockId:h.id,
         text:`${h.name} ${(cur/10000).toFixed(0)}만 — 손절선 ${(d.stop/10000).toFixed(0)}만 도달`,
         btns:[{label:'매도 기록',fn:`openTradeModal('sell','${h.id}')`},{label:'목표 수정',fn:`openPlanEditModal('${h.id}')`}],
         dismissKey:'stop_'+h.id});
@@ -2831,7 +2832,7 @@ function renderSignals(){
     // 매도 준비 (warn, 95%)
     else if(d.target&&cur>=d.target*0.95){
       if(dismissedSignals.has('neartarget_'+h.id)) return;
-      items.push({level:'warn',label:'매도 준비',
+      items.push({level:'warn',label:'매도 준비',stockId:h.id,
         text:`${h.name} ${(cur/10000).toFixed(0)}만 — 목표가 ${(d.target/10000).toFixed(0)}만의 95% 도달`,
         btns:[{label:'매도 기록',fn:`openTradeModal('sell','${h.id}')`}],
         dismissKey:'neartarget_'+h.id});
@@ -2839,7 +2840,7 @@ function renderSignals(){
     // 손절 근접 (warn, 110%)
     else if(d.stop&&cur<=d.stop*1.1){
       if(dismissedSignals.has('nearstop_'+h.id)) return;
-      items.push({level:'warn',label:'손절 근접',
+      items.push({level:'warn',label:'손절 근접',stockId:h.id,
         text:`${h.name} ${(cur/10000).toFixed(0)}만 — 손절선 ${(d.stop/10000).toFixed(0)}만 10% 이내`,
         btns:[{label:'목표 수정',fn:`openPlanEditModal('${h.id}')`}],
         dismissKey:'nearstop_'+h.id});
@@ -2874,13 +2875,19 @@ function renderSignals(){
   wrap.innerHTML=sorted.map(it=>{
     const btnHtml=it.btns.map(b=>`<button class="signal-btn" onclick="${b.fn}">${b.label}</button>`).join('');
     const dismissHtml=it.dismissKey?`<button class="signal-dismiss" onclick="dismissSignal('${it.dismissKey}')">넘김 ✕</button>`:'';
+    // thesis 버튼: urgent/warn이고 플랜 미설정 카드 아니고 THESIS_DATA에 해당 종목 있을 때
+    const hasThesis=(it.level==='urgent'||it.level==='warn')
+      &&it.stockId&&!(it.dismissKey||'').startsWith('plan_')
+      &&typeof THESIS_DATA!=='undefined'&&THESIS_DATA[it.stockId];
+    const thesisBtn=hasThesis?`<button class="signal-btn thesis" onclick="openThesisForStock('${it.stockId}')">thesis 보기</button>`:'';
+    const hasBtns=it.btns.length>0||hasThesis;
     return `<div class="signal-card ${it.level}">
       <div class="signal-head">
         <span class="signal-label ${it.level}">${it.label}</span>
         ${dismissHtml}
       </div>
       <div class="signal-text">${it.text}</div>
-      ${(it.btns.length>0)?`<div class="signal-btns">${btnHtml}</div>`:''}
+      ${hasBtns?`<div class="signal-btns">${btnHtml}${thesisBtn}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -2888,6 +2895,11 @@ function renderSignals(){
 function dismissSignal(key){
   dismissedSignals.add(key);
   renderSignals();
+}
+function openThesisForStock(stockId){
+  const navBtn=document.querySelector('.nav-btn[data-page="strategy"]');
+  showPage('strategy',navBtn);
+  switchStratTab('analysis');
 }
 
 /* ═══════════════════════════════════════
