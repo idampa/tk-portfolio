@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html lang="ko" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TK Portfolio OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1430,6 +1430,7 @@ canvas { display: block; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="thesis_data.js"></script>
+<link rel="stylesheet" href="assets/clean-light.css">
 </head>
 <body>
 
@@ -1690,7 +1691,7 @@ canvas { display: block; }
       <div class="sec-badge" id="strategy-score-badge">보유 종목 로드 중</div>
     </div>
     <div id="strategy-score-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;"></div>
-    <button onclick="window.open('https://idampa.github.io/tk-portfolio/stock_analysis.html','_blank')" class="action-btn primary" style="margin-bottom:10px;">
+    <button onclick="window.open('stock_analysis.html','_blank')" class="action-btn primary" style="margin-bottom:10px;">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       종목분석 상세 페이지
     </button>
@@ -2206,7 +2207,7 @@ canvas { display: block; }
         <div class="metric-box"><div class="metric-label">목표주가</div><div class="metric-value" style="color:var(--gold);">46,000</div></div>
       </div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">PER 14.35배 (업종 61.8배의 1/4) · 2026E 영업이익 893억 YoY+51%</div>
-      <button onclick="window.open('https://idampa.github.io/tk-portfolio/gnc_study_notes.html')" style="width:100%;padding:11px;background:var(--bg3);border:1px solid rgba(91,140,255,0.3);border-radius:10px;color:var(--accent);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 스터디 노트 전체 보기</button>
+      <button onclick="window.open('gnc_study_notes.html')" style="width:100%;padding:11px;background:var(--bg3);border:1px solid rgba(91,140,255,0.3);border-radius:10px;color:var(--accent);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 스터디 노트 전체 보기</button>
     </div>
 
     <!-- 크래프톤 -->
@@ -2226,7 +2227,7 @@ canvas { display: block; }
         <div class="metric-box"><div class="metric-label">수익화 시점</div><div class="metric-value" style="color:var(--accent);">27~28</div></div>
         <div class="metric-box"><div class="metric-label">핵심 리스크</div><div class="metric-value" style="color:var(--loss);font-size:11px;">소송</div></div>
       </div>
-      <button onclick="window.open('https://idampa.github.io/tk-portfolio/krafton_study.html')" style="width:100%;padding:11px;background:var(--bg3);border:1px solid rgba(63,182,139,0.3);border-radius:10px;color:var(--profit);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 크래프톤 스터디 노트</button>
+      <button onclick="window.open('krafton_study.html')" style="width:100%;padding:11px;background:var(--bg3);border:1px solid rgba(63,182,139,0.3);border-radius:10px;color:var(--profit);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 크래프톤 스터디 노트</button>
     </div>
 
     <!-- 삼성SDI -->
@@ -2247,7 +2248,7 @@ canvas { display: block; }
         <div class="metric-box"><div class="metric-label">목표주가</div><div class="metric-value" style="color:var(--gold);">53~60만</div></div>
       </div>
       <div style="font-size:11px;color:var(--text3);">추격매수 대상 아님 — 조정 시 장기 재검토</div>
-      <button onclick="window.open('https://idampa.github.io/tk-portfolio/sdi_study_notes.html')" style="width:100%;margin-top:10px;padding:11px;background:var(--bg3);border:1px solid rgba(91,140,255,0.3);border-radius:10px;color:var(--accent);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 SDI 공부 노트 전체 보기</button>
+      <button onclick="window.open('sdi_study_notes.html')" style="width:100%;margin-top:10px;padding:11px;background:var(--bg3);border:1px solid rgba(91,140,255,0.3);border-radius:10px;color:var(--accent);font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;min-height:44px;">📖 SDI 공부 노트 전체 보기</button>
     </div>
 
   </div><!-- /insight-panel-study -->
@@ -2279,7 +2280,7 @@ canvas { display: block; }
 
   <div class="sec-head"><div class="sec-title">앱 정보</div></div>
   <div class="card">
-    <div class="sum-row"><span class="sum-key">버전</span><span class="mono-sm">v4.0 Supabase</span></div>
+    <div class="sum-row"><span class="sum-key">버전</span><span class="mono-sm">v5.0 Clean Light</span></div>
     <div class="sum-row"><span class="sum-key">DB</span><span class="mono-sm" style="font-size:9px;color:var(--text3);">Supabase PostgreSQL</span></div>
     <div class="sum-row"><span class="sum-key">n8n 워크플로</span><span class="mono-sm" style="font-size:9px;color:var(--text3);">railway.app</span></div>
   </div>
@@ -2786,6 +2787,7 @@ function renderHome(){
 
   renderSignals();
   renderInsight();
+  if(window.renderCleanDashboard) window.renderCleanDashboard();
 }
 
 /* ═══════════════════════════════════════
@@ -4409,7 +4411,7 @@ function renderStrategyScoreGrid(){
     const gc=gradeColor(sc.grade);const sc100=sc.total;const barColor=sc100>=80?'var(--profit)':sc100>=65?'var(--accent)':sc100>=50?'var(--gold)':'var(--loss)';
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;position:relative;overflow:hidden;';
-    card.onclick=()=>window.open('https://idampa.github.io/tk-portfolio/stock_analysis.html','_blank');
+    card.onclick=()=>window.open('stock_analysis.html','_blank');
     card.innerHTML=
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">'+
         '<div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">'+sc.name+'</div>'+
@@ -4439,7 +4441,7 @@ function renderScoreGrid(){
     const gc=gradeColor(sc.grade);const sc100=sc.total;const barColor=sc100>=80?'var(--profit)':sc100>=65?'var(--accent)':sc100>=50?'var(--gold)':'var(--loss)';
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 9px;cursor:pointer;position:relative;overflow:hidden;';
-    card.onclick=()=>window.open('https://idampa.github.io/tk-portfolio/stock_analysis.html','_blank');
+    card.onclick=()=>window.open('stock_analysis.html','_blank');
     card.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font-size:10px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">${sc.name}</div><span style="font-family:var(--mono);font-size:7px;padding:1px 4px;border-radius:3px;background:${gc}22;color:${gc};border:1px solid ${gc}44;">${sc.grade}</span></div><div style="font-family:var(--display);font-size:16px;font-weight:900;color:${isUp?'var(--profit)':'var(--loss)'};line-height:1;margin-bottom:4px;">${isUp?'+':''}${pnlPct}%</div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-family:var(--mono);font-size:8px;color:${isUp?'var(--profit)':'var(--loss)'};">${isUp?'+':''}${Math.round(Math.abs(pnl)/10000)}만</span><span style="font-family:var(--mono);font-size:8px;color:var(--text3);">${cur>=1000000?(cur/10000).toFixed(0)+'만':(cur/10000).toFixed(1)+'만'}</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;"><span style="font-family:var(--mono);font-size:8px;color:var(--text3);">SCORE</span><span style="font-family:var(--display);font-size:12px;font-weight:900;color:${barColor};">${sc100}</span></div><div style="height:3px;background:rgba(79,143,255,0.08);border-radius:2px;overflow:hidden;"><div style="width:${sc100}%;height:100%;background:${barColor};border-radius:2px;"></div></div>`;
     grid.appendChild(card);
   });
@@ -4792,6 +4794,7 @@ async function loadHistoryFromSupabase(){
     const {data,error}=await _sb.from('portfolio_history').select('*').order('date',{ascending:true});
     if(error) throw error;
     if(!Array.isArray(data)||data.length===0) return;
+    window.tkHistoryLoaded=true;
     PERSISTENT_HISTORY=data;
     HISTORY.length=0;
     data.forEach(entry=>{
@@ -4818,7 +4821,9 @@ async function loadHistoryFromSupabase(){
   loadStockMemos();
   setDate();setInterval(setDate,60000);
   initEventCollapse();
+  if(window.renderCleanDashboard) window.renderCleanDashboard();
 })();
 </script>
+<script src="assets/clean-light.js"></script>
 </body>
 </html>
