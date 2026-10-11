@@ -79,4 +79,53 @@
  renderCleanDashboard();
  document.querySelectorAll('.page .sec-title').forEach(n=>{const labels={"STOCK SCORE BOARD":"종목별 투자 점검","UPCOMING EVENTS":"다가오는 일정","CATALYST CALENDAR":"주요 일정"};if(labels[n.textContent.trim()])n.textContent=labels[n.textContent.trim()];});
  document.querySelectorAll('.page [onclick]').forEach(n=>{if(['DIV','SPAN'].includes(n.tagName)&&!n.querySelector('button,input,select,a,[onclick]')){n.tabIndex=0;n.setAttribute('role','button');n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();n.click();}});}});
+ // Desktop review: pair the two overview panels, then a full-width trade journal.
+ const review=$('#page-review');
+ const overview=make('div','review-overview');
+ const habit=$('.rv-score-wrap');
+ const performance=make('section','review-performance');
+ const cum=$('#cumulative-chart').closest('.card');
+ performance.append(cum.previousElementSibling,cum);
+ overview.append(habit,performance);review.querySelector('.page-heading').after(overview);
+ const journal=make('section','review-journal');
+ for(const node of [...review.children])if(node!==overview&&!node.classList.contains('page-heading'))journal.append(node);
+ review.append(journal);
+ habit.prepend(make('h2','review-panel-title','투자 습관 점검'));
+ habit.append(make('p','cl-subtle','점수와 패턴을 확인한 뒤, 아래 거래 기록에서 판단을 돌아보세요.'));
+ const watch=$('#insight-panel-watch'),study=$('#insight-panel-study');
+ for(const panel of [watch,study]){
+  if(!panel)continue;
+  const entries=[];let entry=null;
+  for(const n of [...panel.children]){
+   if(n.classList.contains('ins-section-head')||!entry){entry=make('section','research-entry');entries.push(entry);}
+   entry.append(n);
+  }
+  const browser=make('div','research-browser'),list=make('nav','research-list'),detail=make('div','research-detail');
+  list.setAttribute('aria-label','리서치 주제');
+  entries.forEach((entry,i)=>{detail.append(entry);const title=entry.querySelector('.ins-section-title')?.textContent||entry.querySelector('.stock-name')?.textContent||'리서치 '+(i+1);const btn=make('button','research-choice',escape(title));btn.type='button';btn.onclick=()=>{entries.forEach((e,j)=>{e.classList.toggle('selected',i===j);list.children[j].setAttribute('aria-pressed',String(i===j));});};list.append(btn);if(i===0){entry.classList.add('selected');btn.setAttribute('aria-pressed','true');}});
+  browser.append(list,detail);panel.append(browser);
+ }
+ // Replace the previous flat search with filtering the topic browser.
+ const newSearch=search.cloneNode();search.replaceWith(newSearch);
+ newSearch.addEventListener('input',()=>{let total=0;const q=newSearch.value.trim().toLowerCase();
+  for(const panel of [watch,study]){if(!panel)continue;let first=-1;const entries=[...panel.querySelectorAll('.research-entry')],buttons=[...panel.querySelectorAll('.research-choice')];entries.forEach((entry,i)=>{const match=entry.textContent.toLowerCase().includes(q);buttons[i].hidden=!match;if(match){total++;if(first<0)first=i;}entry.classList.remove('selected');buttons[i].setAttribute('aria-pressed','false');});if(first>=0)buttons[first].click();}noResults.hidden=total>0;
+ });
+ // Show positive and negative realized results side by side, using a shared scale.
+ renderProfitBars=function(){
+  const host=$('#profit-bars');if(!host)return;
+  const data=profitMode==='monthly'?PROFIT_MONTHLY_REAL:PROFIT_DATA;
+  const max=Math.max(1,...data.map(d=>Math.abs(d.pnl)));
+  host.classList.add('profit-comparison');host.replaceChildren();
+  for(const positive of [true,false]){
+   const rows=data.filter(d=>positive?d.pnl>=0:d.pnl<0).sort((a,b)=>Math.abs(b.pnl)-Math.abs(a.pnl));
+   const sum=rows.reduce((a,d)=>a+d.pnl,0);
+   const column=make('section','profit-column '+(positive?'positive':'negative'));
+   column.innerHTML=`<header><h3>${positive?'실현 수익':'실현 손실'}</h3><strong class="${positive?'up':'dn'}">${sum>=0?'+':''}${fmt(Math.round(sum/10000))}만</strong></header>`;
+   for(const d of rows){const row=make('div','profit-row');row.innerHTML=`<div class="profit-row-label"><span>${escape(d.name)}</span><strong class="${d.pnl>=0?'up':'dn'}">${d.pnl>=0?'+':''}${fmt(Math.round(d.pnl/10000))}만</strong></div><div class="profit-track"><div style="width:${Math.abs(d.pnl)/max*100}%"></div></div>`;column.append(row);}
+   if(!rows.length)column.append(make('p','cl-subtle','해당 기록이 없습니다.'));
+   host.append(column);
+  }
+ };
+ const profitBlock=$('#profit-bars').closest('.port-block');profitBlock?.classList.add('profit-section');
+
 })();
