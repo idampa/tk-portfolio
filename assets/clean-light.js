@@ -22,7 +22,7 @@
  const strip=$('.home-strip'),actions=$('.trade-action-row');
  const summary=make('section','');summary.append(strip,actions);home.insertBefore(summary,home.children[1]);
  actions.children[0].textContent='＋ 매수 기록';actions.children[1].textContent='＋ 매도 기록';actions.children[2].textContent='예수금 관리';
- const chart=make('section','cl-panel cl-trend-panel','<h2>자산 추이</h2><div id="cl-trend" class="cl-chart"></div><div id="cl-trend-dates" class="cl-chart-labels"></div><p class="cl-subtle" id="cl-history-note"></p>');
+ const chart=make('section','cl-panel cl-trend-panel','<div class="cl-chart-heading"><h2>자산 추이</h2><div class="cl-chart-legend"><span>자산</span><span>최근 7개 기록 평균</span></div></div><div id="cl-trend" class="cl-chart"></div><div id="cl-trend-dates" class="cl-chart-labels"></div><p class="cl-subtle" id="cl-history-note"></p>');
  const holdings=make('section','cl-panel cl-holdings-panel','<h2>보유종목 <span class="cl-subtle" id="cl-count"></span></h2><div class="cl-holdings"><div class="cl-table-scroll" id="cl-holdings-table"></div><div class="cl-detail" id="cl-detail"></div></div>');primary.append(chart,holdings);
  const holdingsMore=make('button','cl-more cl-holdings-more','보유종목 전체 보기');holdingsMore.onclick=()=>{const expanded=holdings.classList.toggle('expanded');holdingsMore.textContent=expanded?'간단히 보기':'보유종목 전체 보기';holdingsMore.setAttribute('aria-expanded',String(expanded));};holdings.append(holdingsMore);
  const signals=$('#signal-cards'),signalHeading=signals.previousElementSibling;signalHeading.querySelector('.sec-title').textContent='확인할 신호';
@@ -72,7 +72,27 @@
   const vals=hist.map(h=>Number(h.total)),min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;
   const points=vals.map((v,i)=>[58+i/(vals.length-1)*620,175-(v-min)/range*145]);
   const line=points.map(p=>p.join(',')).join(' ');
-  $('#cl-trend').innerHTML=`<svg viewBox="0 0 700 210" role="img" aria-label="저장된 자산 ${hist.length}건의 추이, 시작 ${escape(vals[0])}만원, 최근 ${escape(vals.at(-1))}만원" preserveAspectRatio="none">${[0,1,2].map(i=>`<line x1="58" x2="680" y1="${30+i*72.5}" y2="${30+i*72.5}" stroke="var(--border)"/><text x="0" y="${35+i*72.5}" fill="var(--text3)" font-size="11">${Math.round(max-i*range/2).toLocaleString()}</text>`).join('')}<polygon points="58,190 ${line} 678,190" fill="var(--accent)" opacity=".07"/><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>`;
+  const average=vals.map((_,i)=>{const window=vals.slice(Math.max(0,i-6),i+1);return window.reduce((a,v)=>a+v,0)/window.length;});
+  const averageLine=average.map((v,i)=>`${58+i/(vals.length-1)*620},${175-(v-min)/range*145}`).join(' ');
+  const plot=$('#cl-trend');
+  plot.innerHTML=`<svg viewBox="0 0 700 210" role="slider" tabindex="0" aria-label="자산 기록 탐색. 좌우 방향키로 날짜 선택" aria-valuemin="0" aria-valuemax="${hist.length-1}" aria-valuenow="${hist.length-1}" preserveAspectRatio="none">${[0,1,2].map(i=>`<line x1="58" x2="680" y1="${30+i*72.5}" y2="${30+i*72.5}" stroke="var(--border)"/><text x="0" y="${35+i*72.5}" fill="var(--text3)" font-size="11">${Math.round(max-i*range/2).toLocaleString()}</text>`).join('')}<polygon points="58,190 ${line} 678,190" fill="var(--accent)" opacity=".04"/><polyline class="cl-average-line" points="${averageLine}" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5" opacity=".75" vector-effect="non-scaling-stroke"/><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/><g class="cl-crosshair" visibility="hidden"><line class="cl-guide-h" x1="58" x2="680" stroke="var(--accent)" stroke-opacity=".5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><line class="cl-guide-v" y1="25" y2="190" stroke="var(--accent)" stroke-opacity=".2" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><circle r="4" fill="var(--accent)" stroke="var(--card-bg)" stroke-width="2"/></g></svg><div class="cl-chart-tooltip" hidden role="status"></div>`;
+  const svg=plot.querySelector('svg'),cross=plot.querySelector('.cl-crosshair'),tip=plot.querySelector('.cl-chart-tooltip');let selectedIndex=hist.length-1;
+  function showPoint(index){
+   selectedIndex=Math.max(0,Math.min(hist.length-1,index));const [x,y]=points[selectedIndex];
+   const horizontal=cross.querySelector('.cl-guide-h'),vertical=cross.querySelector('.cl-guide-v'),dot=cross.querySelector('circle');
+   horizontal.setAttribute('y1',y);horizontal.setAttribute('y2',y);vertical.setAttribute('x1',x);vertical.setAttribute('x2',x);dot.setAttribute('cx',x);dot.setAttribute('cy',y);cross.setAttribute('visibility','visible');
+   const amount=fmt(vals[selectedIndex]*10000)+'원';
+   tip.innerHTML=`<span>${escape(hist[selectedIndex].date)}</span><strong>${amount}</strong><small>최근 ${Math.min(selectedIndex+1,7)}개 기록 평균 ${fmt(Math.round(average[selectedIndex]))}만원</small>`;tip.hidden=false;
+   tip.style.left=Math.max(4,Math.min(plot.clientWidth-tip.offsetWidth-4,x/700*plot.clientWidth-tip.offsetWidth/2))+'px';
+   const pointY=y/210*plot.clientHeight;tip.style.top=(pointY>tip.offsetHeight+16?pointY-tip.offsetHeight-12:Math.min(plot.clientHeight-tip.offsetHeight,pointY+14))+'px';
+   svg.setAttribute('aria-valuenow',selectedIndex);svg.setAttribute('aria-valuetext',hist[selectedIndex].date+' '+amount);
+  }
+  const pointer=e=>{const box=svg.getBoundingClientRect();showPoint(Math.round((((e.clientX-box.left)/box.width*700)-58)/620*(hist.length-1)));};
+  svg.addEventListener('pointermove',pointer);svg.addEventListener('pointerdown',pointer);
+  svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){cross.setAttribute('visibility','hidden');tip.hidden=true;}});
+  svg.addEventListener('focus',()=>showPoint(selectedIndex));svg.addEventListener('blur',()=>{cross.setAttribute('visibility','hidden');tip.hidden=true;});
+  svg.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();showPoint(e.key==='Home'?0:e.key==='End'?hist.length-1:selectedIndex+(e.key==='ArrowRight'?1:-1));}});
+  svg.setAttribute('aria-valuetext',hist.at(-1).date+' '+fmt(vals.at(-1)*10000)+'원');
   $('#cl-trend-dates').innerHTML=`<span>${escape(hist[0].date)}</span><span>${escape(hist.at(-1).date)}</span>`;
  };
  // Refresh presentation even when data has completed loading before this script.

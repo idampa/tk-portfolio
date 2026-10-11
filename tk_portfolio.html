@@ -2876,12 +2876,12 @@ function renderSignals(){
   const sorted=[...items.filter(i=>i.level==='urgent'),...items.filter(i=>i.level==='warn'),...items.filter(i=>i.level==='info')];
   wrap.innerHTML=sorted.map(it=>{
     const btnHtml=it.btns.map(b=>`<button class="signal-btn" onclick="${b.fn}">${b.label}</button>`).join('');
-    const dismissHtml=it.dismissKey?`<button class="signal-dismiss" onclick="dismissSignal('${it.dismissKey}')">넘김 ✕</button>`:'';
+    const dismissHtml=it.dismissKey?`<button class="signal-dismiss" onclick="dismissSignal('${it.dismissKey}')" title="이 신호 숨기기" aria-label="이 신호 숨기기">×</button>`:'';
     // thesis 버튼: urgent/warn이고 플랜 미설정 카드 아니고 THESIS_DATA에 해당 종목 있을 때
     const hasThesis=(it.level==='urgent'||it.level==='warn')
       &&it.stockId&&!(it.dismissKey||'').startsWith('plan_')
       &&typeof THESIS_DATA!=='undefined'&&THESIS_DATA[it.stockId];
-    const thesisBtn=hasThesis?`<button class="signal-btn thesis" onclick="openThesisForStock('${it.stockId}')">thesis 보기</button>`:'';
+    const thesisBtn=hasThesis?`<button class="signal-btn thesis" onclick="openThesisForStock('${it.stockId}')">투자 근거 ↗</button>`:'';
     const hasBtns=it.btns.length>0||hasThesis;
     return `<div class="signal-card ${it.level}">
       <div class="signal-head">
