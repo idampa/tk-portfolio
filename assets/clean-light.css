@@ -71,3 +71,4 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[t
  .cl-holdings-panel:not(.expanded) tbody tr:nth-child(n+5){display:none}.cl-holdings-more:not([hidden]){display:block}.cl-detail dl{grid-template-columns:repeat(3,1fr)}.cl-detail dd{font-size:12px}
  .modal-bg{align-items:flex-end;padding:0}.modal{max-width:none;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 }
+[hidden]{display:none!important}
